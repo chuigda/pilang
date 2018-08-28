@@ -7,9 +7,14 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#define eprintf0(fmt) fprintf(stderr, fmt)
-#define eprintf1(fmt, e1) fprintf(stderr, fmt, e1)
-#define eprintf2(fmt, e1, e2) fprintf(stderr, fmt, e2)
+#define eprintf0(fmt) \
+  fprintf(stderr, fmt)
+#define eprintf1(fmt, e1) \
+  fprintf(stderr, fmt, e1)
+#define eprintf2(fmt, e1, e2) \
+  fprintf(stderr, fmt, e2)
+#define eprintf3(fmt, e1, e2, e3) \
+  fprintf(stderr, fmt, e1, e2, e3)
 
 static char shbuf[256];
 
@@ -28,7 +33,10 @@ int main() {
            (*cur_head == ' ' || *cur_head == '\t')) {
       ++cur_head;
     }
+    char *return_pos = strrchr(buffer + strlen(buffer), '\n');
+    if (return_pos != NULL) *return_pos = '\0';
     parse_and_exec(cur_head);
+    memset(buffer, 0, 4096);
   }
   free(buffer);
 }
@@ -55,13 +63,19 @@ void exec_external(const char *command) {
   }
   if (pid == 0) {
     int i = 0;
+    while (*command != '\0' &&
+            (*command == ' ' || *command == '\t')) {
+      ++command;
+    }
     while (*command != ' ' && *command != '\0') {
       shbuf[i] = *command;
       ++command;
+      ++i;
     }
     shbuf[i] = '\0';
     if ( execlp(shbuf, command) < 0 ) {
-      eprintf1("cicosh: %s: not found\n", command);
+      eprintf1("cicosh: %s: not found\n", shbuf);
+      
     }
   }
   else {
@@ -70,14 +84,14 @@ void exec_external(const char *command) {
 }
 
 void exec_internal(const char *command) {
-  eprintf1("internal: received command: %s\n", command);
-  if (!strncmp(command, "quit", 3)) {
+  if (!strncmp(command, "quit", 4)) {
     exit(0);
   }
   else if (!strncmp(command, "scp", 3)) {
     eprintf0("WARNING: ARE YOU SURE THAT YOu KNOW "\
                "WHAT ARE YOU DOING?\n");
-    eprintf0("input the string \"I AM SURE\" to confirm.\n");
+    eprintf0("input the string \"I AM SURE\" to get"\
+               " access to SCP.\n");
     eprintf0("cicosh-scp-auth: ");
     fgets(shbuf, 255, stdin);
     if (!strncmp(shbuf, "I AM SURE", 7)) {
