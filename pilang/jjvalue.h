@@ -8,6 +8,6 @@ typedef union {
   double fvalue;
   int64_t svalue;
   void *pvalue;
-} jjvalue;
+} jjvalue_t;
 
 #endif

@@ -12,7 +12,7 @@ int yylex(void);
 void yyerror(const char *err);
 
 typedef struct {
-  jjvalue val;
+  jjvalue_t val;
   unsigned row : 16;
   unsigned col : 16;
   unsigned replaced : 1;
