@@ -33,9 +33,9 @@ typedef struct {
 %%
 
 function: 
-  TK_FUNCTION TK_TAKES id_list TK_RETUR#include "data/strlib.h"_list function_body
+  TK_FUNCTION TK_TAKES id_list TK_RETURNS id_list function_body
   {
-    printf("function head readed.\n"); #include "data/strlib.h"
+    printf("function head readed.\n");
   } 
   ;
 
