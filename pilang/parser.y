@@ -65,7 +65,7 @@ statements:
 
 statement: empty_statement { $$ = $1; };
 
-empty_statement: TK_SYM_SEMI { $$ = leaf(ANS_NULL); };
+empty_statement: TK_SYM_SEMI { $$.ast = leaf(ANS_NULL); };
 
 id_list: 
   id_list TK_ID

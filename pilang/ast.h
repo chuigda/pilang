@@ -19,13 +19,14 @@ typedef enum {
   ANS_NULL,
   ANS_LIST,
   ANS_ID,
-  ANS_FUNCTION
+  ANS_FUNCTION,
+  ANS_STATEMENTS
 } ast_node_sema_t;
 
 #define AST_NODE_COMMON \
-  uint32_t node_kind : 16; \
-  uint32_t node_sema : 16; \
-  uint32_t : 32;
+  uint16_t node_kind; \
+  uint16_t node_sema; \
+  uint32_t node_index;
 
 typedef struct {
   AST_NODE_COMMON
