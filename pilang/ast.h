@@ -60,12 +60,31 @@ typedef struct {
   uint32_t children[2];
 } ast_dchild_wdata_t;
 
+typedef struct {
+  AST_NODE_COMMON
+  uint32_t children[3];
+} ast_tchild_t;
+
+typedef struct {
+  AST_NODE_COMMON
+  jjvalue data;
+  uint32_t children[3];
+} ast_tchild_wdata_t;
+
 extern uint32_t leaf(ast_node_sema_t sema);
 extern uint32_t leaf_wdata(ast_node_sema_t sema, jjvalue data);
 extern uint32_t node1(ast_node_sema_t sema, uint32_t child);
+extern uint32_t node1_wdata(ast_node_sema_t sema, jjvalue data,
+                            uint32_t child);
 extern uint32_t node2(ast_node_sema_t sema, uint32_t lchild, 
                       uint32_t rchild);
+extern uint32_t node2_wdata(ast_node_sema_t sema, jjvalue data,
+                            uint32_t lchild, uint32_t rchild);
 extern uint32_t node3(ast_node_sema_t sema, uint32_t child0, 
                       uint32_t child1, uint32_t child2);
+extern uint32_t node3_wdata(ast_node_sema_t sema, jjvalue data,
+                            uint32_t child0, uint32_t child1, 
+                            uint32_t child2);
+
 
 #endif
