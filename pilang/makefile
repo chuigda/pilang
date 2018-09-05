@@ -1,10 +1,13 @@
-plc : mstring.o parser.o
-	$(CC) mstring.o parser.o -o plc
+plc : mstring.o parser.o ast.o
+	$(CC) mstring.o parser.o ast.o -o plc
+
+ast.o : ast.c jjvalue.h
+	$(CC) -c ast.c -o ast.o -O2
 
 mstring.o : mstring.c mstring.h
 	$(CC) -c mstring.c -o mstring.o -O2
 
-parser.o : y.tab.c mstring.h
+parser.o : y.tab.c mstring.h jjvalue.h
 	$(CC) -c y.tab.c -o parser.o -O2
 
 y.tab.c : parser.y

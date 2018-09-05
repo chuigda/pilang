@@ -5,21 +5,28 @@
 #include <stdint.h>
 
 #include "mstring.h"
+#include "jjvalue.h"
+#include "ast.h"
 
 int yylex(void);
 void yyerror(const char *err);
 
-typedef union {
-  int value;
-} jjvalue;
-
 typedef struct {
-  
+  jjvalue val;
   unsigned row : 16;
   unsigned col : 16;
   unsigned replaced : 1;
   unsigned token_kind : 7;
   unsigned : 24;
+} token_t;
+
+typedef struct {
+
+} ast_t;
+
+typedef union {
+  token_t token;
+  int32_t ast;
 } yystype_t;
 
 #define YYSTYPE yystype_t
@@ -45,6 +52,9 @@ function_body:
 
 id_list: 
   id_list TK_ID
+  {
+    $$.ast = node2(ANS_LIST, $1.ast, $2.ast);
+  }
   | 
   ;
 
