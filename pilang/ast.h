@@ -2,7 +2,6 @@
 #define AST_H
 
 #include <stdint.h>
-
 #include "jjvalue.h"
 
 typedef enum {
@@ -30,9 +29,43 @@ typedef struct {
   AST_NODE_COMMON
 } ast_node_base_t;
 
-extern int leaf_node(ast_node_sema_t sema);
-extern int leaf_node_wdata(ast_node_sema_t sema, jjvalue data);
-extern int node1(ast_node_sema_t sema, int child);
-extern int node2(ast_node_sema_t sema, int lchild, int rchild);
+typedef struct {
+  AST_NODE_COMMON
+} ast_leaf_t;
+
+typedef struct {
+  AST_NODE_COMMON
+  jjvalue data;
+} ast_leaf_wdata_t;
+
+typedef struct {
+  AST_NODE_COMMON
+  jjvalue data;
+} ast_schild_t;
+
+typedef struct {
+  AST_NODE_COMMON
+  jjvalue data;
+  uint32_t child;
+} ast_schild_wdata_t;
+
+typedef struct {
+  AST_NODE_COMMON
+  uint32_t children[2];
+} ast_dchild_t;
+
+typedef struct {
+  AST_NODE_COMMON
+  jjvalue data;
+  uint32_t children[2];
+} ast_dchild_wdata_t;
+
+extern uint32_t leaf(ast_node_sema_t sema);
+extern uint32_t leaf_wdata(ast_node_sema_t sema, jjvalue data);
+extern uint32_t node1(ast_node_sema_t sema, uint32_t child);
+extern uint32_t node2(ast_node_sema_t sema, uint32_t lchild, 
+                      uint32_t rchild);
+extern uint32_t node3(ast_node_sema_t sema, uint32_t child0, 
+                      uint32_t child1, uint32_t child2);
 
 #endif

@@ -26,7 +26,7 @@ typedef struct {
 
 typedef union {
   token_t token;
-  int32_t ast;
+  uint32_t ast;
 } yystype_t;
 
 #define YYSTYPE yystype_t
