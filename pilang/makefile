@@ -16,7 +16,7 @@ parser.o : y.tab.c mstring.h jjvalue.h
 y.tab.c : parser.y
 	yacc parser.y
 
-clean: 
+clean:
 	rm -rf y.tab.c
 	rm -rf *.o
 	rm -rf plc

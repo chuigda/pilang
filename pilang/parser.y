@@ -36,19 +36,36 @@ typedef union {
 %token TK_FUNCTION TK_TAKES TK_RETURNS TK_BEGIN TK_END
 %token TK_ID
 %token TK_NUM_INT TK_NUM_FLOAT
+%token TK_SYM_COMMA TK_SYM_SEMI TK_SYM_DOT
 
 %%
 
 function: 
-  TK_FUNCTION TK_TAKES id_list TK_RETURNS id_list function_body
+  TK_FUNCTION TK_ID TK_TAKES id_list TK_RETURNS id_list function_body
   {
-    printf("function head readed.\n");
+    $$.ast = node3_wdata(ANS_FUNCTION, $2.token.val, $4.ast, $6.ast,
+                         $7.ast);
   } 
   ;
 
 function_body: 
-  TK_BEGIN TK_END 
+  TK_BEGIN statements TK_END 
+  {
+    $$.ast = leaf(ANS_NULL);
+  }
   ;
+
+statements:
+  statements statement
+  {
+    $$.ast = node2(ANS_STATEMENTS, $1.ast, $2.ast);
+  }
+  |
+  ;
+
+statement: empty_statement { $$ = $1; };
+
+empty_statement: TK_SYM_SEMI { $$ = leaf(ANS_NULL); };
 
 id_list: 
   id_list TK_ID

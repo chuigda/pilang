@@ -16,8 +16,10 @@ typedef enum {
 } ast_node_kind_t;
 
 typedef enum {
+  ANS_NULL,
   ANS_LIST,
-  ANS_ID
+  ANS_ID,
+  ANS_FUNCTION
 } ast_node_sema_t;
 
 #define AST_NODE_COMMON \
