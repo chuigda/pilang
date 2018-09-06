@@ -123,7 +123,38 @@ static int lex_id_or_kwd(void) {
   return TK_ID;
 }
 
+static int maybe_conv(const char* str, int16_t row, int16_t col) {
+  #define STRING_CASE(EXPECT, TOKEN_KIND) \
+    if (!my_strcmpi(str, EXPECT)) { \
+      yylval.token.token_kind = TOKEN_KIND; \
+      yylval.token.replaced = 1; \
+      return TOKEN_KIND; \
+    }
+  
+  STRING_CASE("plus", TK_ESYM_PLUS)
+  STRING_CASE("add", TK_ESYM_PLUS)
+  STRING_CASE("minus", TK_ESYM_MINUS)
+  STRING_CASE("mult", TK_ESYM_ASTER)
+  STRING_CASE("multi", TK_ESYM_ASTER)
+  STRING_CASE("multiply", TK_ESYM_ASTER)
+  STRING_CASE("times", TK_ESYM_ASTER)
+  STRING_CASE("aster", TK_ESYM_ASTER)
+  STRING_CASE("asterisk", TK_ESYM_ASTER)
+  STRING_CASE("div", TK_ESYM_SLASH)
+  STRING_CASE("divide", TK_ESYM_SLASH)
+  STRING_CASE("slash", TK_ESYM_SLASH)
+
+  #undef STRING_CASE
+
+  lex_warn("Invalid conversion seq.", row, col);
+  return TK_SYM_DOT;
+}
+
 static int lex_dot_or_conv(void) {
+  int16_t row = currow();
+  int16_t col = curcol();
+  yylval.token.row = row;
+  yylval.token.col = col;
   peek_one_char();
   if (peeked_char() == '[') {
     get_next_char();
@@ -146,12 +177,12 @@ static int lex_dot_or_conv(void) {
     if (curchar == '\0') {
       lex_warn("Unterminated conv-sequence", currow(), curcol());
     }
-
-    return TK_SYM_DOT; // TODO add conversion support
+    else {
+      get_next_char();
+    }
+    return maybe_conv(buffer, row, col);
   }
   else {
-    yylval.token.row = currow();
-    yylval.token.col = curcol();
     yylval.token.replaced = 0;
     yylval.token.token_kind = TK_SYM_DOT;
     return TK_SYM_DOT;
