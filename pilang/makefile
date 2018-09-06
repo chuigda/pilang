@@ -2,19 +2,19 @@ plc : mstring.o lexer.o parser.o clist.o ast.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o -o plc
 
 ast.o : ast.c jjvalue.h
-	$(CC) -c ast.c -o ast.o -O2
+	$(CC) -c ast.c -o ast.o -g
 
 clist.o : clist.c clist.h
-	$(CC) -c clist.c -o clist.o -O2
+	$(CC) -c clist.c -o clist.o -g
 
 mstring.o : mstring.c mstring.h
-	$(CC) -c mstring.c -o mstring.o -O2
+	$(CC) -c mstring.c -o mstring.o -g
 
 parser.o : y.tab.c mstring.h jjvalue.h
-	$(CC) -c y.tab.c -o parser.o -O2
+	$(CC) -c y.tab.c -o parser.o -g
 
 lexer.o : lexer.c y.tab.h
-	$(CC) -c lexer.c -o lexer.o -O2
+	$(CC) -c lexer.c -o lexer.o -g
 
 y.tab.c y.tab.h : parser.y
 	yacc -d parser.y

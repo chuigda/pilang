@@ -14,6 +14,8 @@ static bool my_strcmpi(const char *s1, const char *s2) {
     if (tolower(*s1) != tolower(*s2)) {
       return false;
     }
+    ++s1;
+    ++s2;
   }
   if (*s1 != '\0' || *s2 != '\0') {
     return false;
@@ -77,7 +79,7 @@ static void lex_warn(const char *warn_text, uint16_t line,
 
 static int maybe_id_to_kwd(const char *str) {
   #define STRING_CASE(EXPECT, TOKEN_KIND) \
-    if (!my_strcmpi(str, EXPECT)) { \
+    if (my_strcmpi(str, EXPECT)) { \
       yylval.token.token_kind = TOKEN_KIND; \
       return TOKEN_KIND; \
     }
@@ -146,7 +148,8 @@ static int maybe_conv(const char* str, int16_t row, int16_t col) {
 
   #undef STRING_CASE
 
-  lex_warn("Invalid conversion seq.", row, col);
+  lex_warn("Invalid conversion seq. Interpreted as normal dot",
+           row, col);
   return TK_SYM_DOT;
 }
 
@@ -189,11 +192,42 @@ static int lex_dot_or_conv(void) {
   }
 }
 
+static int lex_number(void) {
+  yylval.token.replaced = 0;
+  yylval.token.row = currow();
+  yylval.token.col = curcol();
+  int64_t int_part = 0;
+  while (isdigit(curchar())) {
+    int_part *= 10;
+    int_part += curchar() - '0';
+    get_next_char();
+  }
+
+  if (curchar() == '.') {
+    get_next_char();
+    double float_value = int_part;
+    double temp = 0;
+    while (isdigit(curchar())) {
+      temp += curchar() - '0';
+      temp /= 10;
+    }
+    float_value += temp;
+    yylval.token.token_kind = TK_NUM_FLOAT;
+    yylval.token.val.fvalue = float_value;
+    return TK_NUM_FLOAT;
+  }
+
+  yylval.token.token_kind = TK_NUM_INT;
+  yylval.token.val.ivalue = int_part;
+  return TK_NUM_INT;
+}
+
 int yylex(void) {
   get_next_char();
   switch (curchar()) {
   case '\0':
     return -1;
+
   case 'a': case 'b': case 'c': case 'd': case 'e': case 'f': case 'g':
   case 'h': case 'i': case 'j': case 'k': case 'l': case 'm': case 'n':
   case 'o': case 'p': case 'q': case 'r': case 's': case 't': case 'u':
@@ -206,6 +240,14 @@ int yylex(void) {
 
   case '.':
     return lex_dot_or_conv();
+
+  case '1': case '2': case '3': case '4': case '5': case '6':
+  case '7': case '8': case '9': case '0':
+    return lex_number();
+
+  case ' ': case '\n': case '\t': case '\v': case '\f':
+    get_next_char();
+    break;
 
   default:
     lex_warn("Unknown char, skipping", currow(), curcol());

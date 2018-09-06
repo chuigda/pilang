@@ -25,6 +25,8 @@ extern void yyerror(const char *err);
 
 %%
 
+functions: functions function | ;
+
 function: 
   TK_FUNCTION TK_ID TK_TAKES id_list TK_RETURNS id_list function_body
   {
@@ -63,7 +65,9 @@ id_list:
 %%
 
 void yyerror(const char *err) {
-  fprintf(stderr, "at line %d, col %d: error: %s\n", 0, 0, err);
+  fprintf(stderr, "at line %d, col %d: error: %s\n", yylval.token.row,
+          yylval.token.col, err);
+  fprintf(stderr, "TOKEN_KIND = %d\n", yylval.token.token_kind);
 }
 
 int main(int argc, char *argv[]) {
