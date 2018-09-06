@@ -57,7 +57,7 @@ id_list:
   {
     $$.ast = node2(ANS_LIST, $1.ast, $2.ast);
   }
-  | 
+  |
   ;
 
 %%

@@ -9,8 +9,8 @@ typedef struct {
   unsigned row : 16;
   unsigned col : 16;
   unsigned replaced : 1;
-  unsigned token_kind : 7;
-  unsigned : 24;
+  unsigned token_kind : 15;
+  unsigned : 16;
 } token_t;
 
 typedef union {

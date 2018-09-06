@@ -7,7 +7,7 @@
 
 _Static_assert(STRING_HASHMAP_BUCKET_COUNT < 100000, "Too many buckets");
 
-uint64_t BKDRHash(const char *str) {
+uint64_t BKDR_hash(const char *str) {
   uint64_t hash = 0;
   char ch = 0;
   ch = *str++;
@@ -37,7 +37,7 @@ static hash_map_item_t *new_hash_map_item(const char *value,
 }
 
 int64_t create_string(const char *str) {
-  uint64_t str_hash = BKDRHash(str);
+  uint64_t str_hash = BKDR_hash(str);
   size_t bucket = str_hash % STRING_HASHMAP_BUCKET_COUNT;
 
   if (glob_hash_map[bucket]) {
