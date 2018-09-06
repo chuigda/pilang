@@ -13,6 +13,8 @@
 extern int yylex(void);
 extern void yyerror(const char *err);
 
+ast_node_base_t *glob_ast = NULL;
+
 %}
 
 %token TK_FUNCTION TK_TAKES TK_RETURNS TK_BEGIN TK_END
@@ -27,6 +29,8 @@ extern void yyerror(const char *err);
 %token TK_ESYM_NOT TK_ESYM_NEQ TK_ESYM_LEQ TK_ESYM_GEQ
 
 %%
+
+transferer: chunks { glob_ast = $1.ast; $$ = $1; }
 
 chunks: chunks chunk { $$.ast = node2(ANS_LIST, $1.ast, $2.ast); } | ;
 
@@ -93,4 +97,6 @@ int main(int argc, char *argv[]) {
   if (fp_lex_in != stdin) {
     fclose(fp_lex_in);
   }
+
+  printf("glob_ast = %p\n", glob_ast);
 }
