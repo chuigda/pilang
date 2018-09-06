@@ -28,7 +28,9 @@ extern void yyerror(const char *err);
 
 %%
 
-functions: functions function | ;
+chunks: chunks chunk { $$.ast = node2(ANS_LIST, $1.ast, $2.ast); } | ;
+
+chunk: function { $$ = $1; };
 
 function: 
   TK_FUNCTION TK_ID TK_TAKES id_list TK_RETURNS id_list function_body

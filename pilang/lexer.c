@@ -53,7 +53,7 @@ static void get_next_char(void) {
   }
   else {
     curcol_++;
-  }  
+  }
 }
 
 static char curchar(void) {
@@ -233,18 +233,20 @@ static int lex_common_sym(void) {
   yylval.token.row = currow();
   yylval.token.col = curcol();
   switch(curchar()) {
+  case ',': yylval.token.token_kind = TK_SYM_COMMA;    break;
+  case ';': yylval.token.token_kind = TK_SYM_SEMI;     break;
   case '[': yylval.token.token_kind = TK_SYM_LBRACKET; break;
   case ']': yylval.token.token_kind = TK_SYM_RBRACKET; break;
-  case '(': yylval.token.token_kind = TK_ESYM_LPAREN; break;
-  case ')': yylval.token.token_kind = TK_ESYM_RPAREN; break;
-  case '{': yylval.token.token_kind = TK_ESYM_LBRACE; break;
-  case '}': yylval.token.token_kind = TK_ESYM_RBRACE; break;
-  case '+': yylval.token.token_kind = TK_ESYM_PLUS; break;
-  case '-': yylval.token.token_kind = TK_ESYM_MINUS; break;
-  case '*': yylval.token.token_kind = TK_ESYM_ASTER; break;
-  case '/': yylval.token.token_kind = TK_ESYM_SLASH; break;
+  case '(': yylval.token.token_kind = TK_ESYM_LPAREN;  break;
+  case ')': yylval.token.token_kind = TK_ESYM_RPAREN;  break;
+  case '{': yylval.token.token_kind = TK_ESYM_LBRACE;  break;
+  case '}': yylval.token.token_kind = TK_ESYM_RBRACE;  break;
+  case '+': yylval.token.token_kind = TK_ESYM_PLUS;    break;
+  case '-': yylval.token.token_kind = TK_ESYM_MINUS;   break;
+  case '*': yylval.token.token_kind = TK_ESYM_ASTER;   break;
+  case '/': yylval.token.token_kind = TK_ESYM_SLASH;   break;
   case '%': yylval.token.token_kind = TK_ESYM_PERCENT; break;
-  case '^': yylval.token.token_kind = TK_ESYM_CARET; break;
+  case '^': yylval.token.token_kind = TK_ESYM_CARET;   break;
 
   case '=': {
     peek_one_char(); 
@@ -332,7 +334,7 @@ int yylex(void) {
 
     case '+': case '-': case '*': case '/': case '%': case '[':
     case ']': case '=': case '<': case '>': case '&': case '|':
-    case '^': case '!': case '(': case ')':
+    case '^': case '!': case '(': case ')': case ',': case ';':
       return lex_common_sym();
 
     case '1': case '2': case '3': case '4': case '5': case '6':
