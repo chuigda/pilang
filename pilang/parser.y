@@ -17,7 +17,10 @@ ast_node_base_t *glob_ast = NULL;
 
 %}
 
-%token TK_FUNCTION TK_TAKES TK_RETURNS TK_BEGIN TK_END
+%token TK_EXPR_PLACEHOLDER
+
+%token TK_FUNCTION TK_TAKES TK_RETURNS TK_BEGIN TK_END TK_IF TK_THEN
+%token TK_ELSE TK_WHILE TK_FOR
 %token TK_ID
 %token TK_NUM_INT TK_NUM_FLOAT TK_STR
 %token TK_SYM_COMMA TK_SYM_SEMI TK_SYM_DOT
@@ -30,11 +33,10 @@ ast_node_base_t *glob_ast = NULL;
 
 %%
 
-transferer: chunks { glob_ast = $1.ast; $$ = $1; }
+program: functions { glob_ast = $1.ast; $$ = $1; }
 
-chunks: chunks chunk { $$.ast = node2(ANS_LIST, $1.ast, $2.ast); } | ;
-
-chunk: function { $$ = $1; };
+functions: 
+  functions function { $$.ast = node2(ANS_LIST, $1.ast, $2.ast); } | ;
 
 function: 
   TK_FUNCTION TK_ID TK_TAKES id_list TK_RETURNS id_list function_body
@@ -59,7 +61,33 @@ statements:
   |
   ;
 
-statement: empty_statement { $$ = $1; };
+statement: empty_statement { $$ = $1; } |
+           expr_statement { $$ = $1; } 
+           if_statement { $$ = $1; }
+           while_statement { $$ = $1; }
+//           for_statement { $$ = $1; } ;
+
+expr_statement: expr { $$ = $1; } ;
+
+if_statement: 
+  TK_IF expr TK_THEN statements TK_END TK_IF
+  {
+    $$.ast = node2(ANS_IF, $2.ast, $4.ast);
+  }
+  |
+  TK_IF expr TK_THEN statements TK_ELSE statements TK_END TK_IF
+  {
+    $$.ast = node3(ANS_IF, $2.ast, $4.ast, $6.ast);
+  }
+  ;
+
+while_statement: TK_WHILE expr TK_THEN statements TK_END TK_WHILE
+  {
+    $$.ast = node2(ANS_WHILE, $2.ast, $4.ast);
+  }
+  ;
+
+expr: TK_EXPR_PLACEHOLDER;
 
 empty_statement: TK_SYM_SEMI { $$.ast = leaf(ANS_NULL); };
 

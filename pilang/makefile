@@ -17,9 +17,10 @@ lexer.o : lexer.c y.tab.h
 	$(CC) -c lexer.c -o lexer.o -g
 
 y.tab.c y.tab.h : parser.y
-	yacc -d parser.y
+	yacc -d -v parser.y
 
 clean:
 	rm -rf y.tab.*
+	rm -rf y.output
 	rm -rf *.o
 	rm -rf pli
