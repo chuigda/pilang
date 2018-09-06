@@ -123,6 +123,41 @@ static int lex_id_or_kwd(void) {
   return TK_ID;
 }
 
+static int lex_dot_or_conv(void) {
+  peek_one_char();
+  if (peeked_char() == '[') {
+    get_next_char();
+    get_next_char();
+
+    char buffer[16];
+    int idx = 0;
+    while (idx < 15 && (curchar() != ']' || curchar != '\0')) {
+      buffer[idx] = curchar();
+      get_next_char();
+    }
+    buffer[idx] = '\0';
+    if (idx == 15) {
+      lex_warn("Conv-sequence length exceeds 15 characters", 
+               currow(), curcol());
+      while (curchar() != '\0' && curchar() != ']') {
+        get_next_char();
+      }
+    }
+    if (curchar == '\0') {
+      lex_warn("Unterminated conv-sequence", currow(), curcol());
+    }
+
+    return TK_SYM_DOT; // TODO add conversion support
+  }
+  else {
+    yylval.token.row = currow();
+    yylval.token.col = curcol();
+    yylval.token.replaced = 0;
+    yylval.token.token_kind = TK_SYM_DOT;
+    return TK_SYM_DOT;
+  }
+}
+
 int yylex(void) {
   get_next_char();
   switch (curchar()) {
@@ -137,6 +172,12 @@ int yylex(void) {
   case 'O': case 'P': case 'Q': case 'R': case 'S': case 'T': case 'U':
   case 'V': case 'W': case 'X': case 'Y': case 'Z':
     return lex_id_or_kwd();
+
+  case '.':
+    return lex_dot_or_conv();
+
+  default:
+    lex_warn("Unknown char, skipping", currow(), curcol());
+    get_next_char();
   }
-  return -1;
 }
