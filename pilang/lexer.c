@@ -127,12 +127,12 @@ static int lex_id_or_kwd(void) {
 
 static int maybe_conv(const char* str, int16_t row, int16_t col) {
   #define STRING_CASE(EXPECT, TOKEN_KIND) \
-    if (!my_strcmpi(str, EXPECT)) { \
+    if (my_strcmpi(str, EXPECT)) { \
       yylval.token.token_kind = TOKEN_KIND; \
       yylval.token.replaced = 1; \
       return TOKEN_KIND; \
     }
-  
+
   STRING_CASE("plus", TK_ESYM_PLUS)
   STRING_CASE("add", TK_ESYM_PLUS)
   STRING_CASE("minus", TK_ESYM_MINUS)
@@ -145,6 +145,7 @@ static int maybe_conv(const char* str, int16_t row, int16_t col) {
   STRING_CASE("div", TK_ESYM_SLASH)
   STRING_CASE("divide", TK_ESYM_SLASH)
   STRING_CASE("slash", TK_ESYM_SLASH)
+  STRING_CASE("semi", TK_SYM_SEMI)
 
   #undef STRING_CASE
 
@@ -165,8 +166,9 @@ static int lex_dot_or_conv(void) {
 
     char buffer[16];
     int idx = 0;
-    while (idx < 15 && (curchar() != ']' || curchar != '\0')) {
+    while (idx < 15 && curchar() != ']' && curchar() != '\0') {
       buffer[idx] = curchar();
+      ++idx;
       get_next_char();
     }
     buffer[idx] = '\0';
@@ -224,33 +226,35 @@ static int lex_number(void) {
 
 int yylex(void) {
   get_next_char();
-  switch (curchar()) {
-  case '\0':
-    return -1;
+  while (1) {
+    switch (curchar()) {
+    case '\0':
+      return -1;
 
-  case 'a': case 'b': case 'c': case 'd': case 'e': case 'f': case 'g':
-  case 'h': case 'i': case 'j': case 'k': case 'l': case 'm': case 'n':
-  case 'o': case 'p': case 'q': case 'r': case 's': case 't': case 'u':
-  case 'v': case 'w': case 'x': case 'y': case 'z':
-  case 'A': case 'B': case 'C': case 'D': case 'E': case 'F': case 'G':
-  case 'H': case 'I': case 'J': case 'K': case 'L': case 'M': case 'N':
-  case 'O': case 'P': case 'Q': case 'R': case 'S': case 'T': case 'U':
-  case 'V': case 'W': case 'X': case 'Y': case 'Z':
-    return lex_id_or_kwd();
+    case 'a': case 'b': case 'c': case 'd': case 'e': case 'f': case 'g':
+    case 'h': case 'i': case 'j': case 'k': case 'l': case 'm': case 'n':
+    case 'o': case 'p': case 'q': case 'r': case 's': case 't': case 'u':
+    case 'v': case 'w': case 'x': case 'y': case 'z':
+    case 'A': case 'B': case 'C': case 'D': case 'E': case 'F': case 'G':
+    case 'H': case 'I': case 'J': case 'K': case 'L': case 'M': case 'N':
+    case 'O': case 'P': case 'Q': case 'R': case 'S': case 'T': case 'U':
+    case 'V': case 'W': case 'X': case 'Y': case 'Z':
+      return lex_id_or_kwd();
 
-  case '.':
-    return lex_dot_or_conv();
+    case '.':
+      return lex_dot_or_conv();
 
-  case '1': case '2': case '3': case '4': case '5': case '6':
-  case '7': case '8': case '9': case '0':
-    return lex_number();
+    case '1': case '2': case '3': case '4': case '5': case '6':
+    case '7': case '8': case '9': case '0':
+      return lex_number();
 
-  case ' ': case '\n': case '\t': case '\v': case '\f':
-    get_next_char();
-    break;
+    case ' ': case '\n': case '\t': case '\v': case '\f':
+      get_next_char();
+      break;
 
-  default:
-    lex_warn("Unknown char, skipping", currow(), curcol());
-    get_next_char();
+    default:
+      lex_warn("Unknown char, skipping", currow(), curcol());
+      get_next_char();
+    }
   }
 }

@@ -1,5 +1,5 @@
-plc : mstring.o lexer.o parser.o clist.o ast.o
-	$(CC) mstring.o parser.o clist.o ast.o lexer.o -o plc
+pli : mstring.o lexer.o parser.o clist.o ast.o
+	$(CC) mstring.o parser.o clist.o ast.o lexer.o -o pli
 
 ast.o : ast.c jjvalue.h
 	$(CC) -c ast.c -o ast.o -g
@@ -22,4 +22,4 @@ y.tab.c y.tab.h : parser.y
 clean:
 	rm -rf y.tab.*
 	rm -rf *.o
-	rm -rf plc
+	rm -rf pli

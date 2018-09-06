@@ -18,7 +18,7 @@ extern void yyerror(const char *err);
 %token TK_FUNCTION TK_TAKES TK_RETURNS TK_BEGIN TK_END
 %token TK_ID
 %token TK_NUM_INT TK_NUM_FLOAT TK_STR
-%token TK_SYM_COMMA TK_SYM_SEMI TK_SYM_DOT 
+%token TK_SYM_COMMA TK_SYM_SEMI TK_SYM_DOT
 %token TK_SYM_LBRACKET TK_SYM_RBRACKET
 %token TK_ESYM_EQ TK_ESYM_PLUS TK_ESYM_MINUS TK_ESYM_ASTER TK_ESYM_SLASH
 %token TK_ESYM_AMP TK_ESYM_PIPE TK_ESYM_CARET
@@ -86,4 +86,7 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Too many arguments\n");
   }
   yyparse();
+  if (fp_lex_in != stdin) {
+    fclose(fp_lex_in);
+  }
 }
