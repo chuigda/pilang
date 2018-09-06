@@ -11,7 +11,8 @@ typedef struct _clistimpl {
     node_t head_node;
 } list_impl_t;
 
-void create_list(list_t *list, allocator_t alloc, deallocator_t dealloc) {
+void create_list(list_t *list, allocator_t alloc, 
+                 deallocator_t dealloc) {
     list->impl = (list_impl_t*)alloc(sizeof(list_impl_t));
     list->impl->alloc = alloc;
     list->impl->dealloc = dealloc;
