@@ -2,6 +2,7 @@
 #include "mstring.h"
 #include "y.tab.h"
 
+#include <assert.h>
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -22,25 +23,35 @@ static bool my_strcmpi(const char *s1, const char *s2) {
 
 FILE *fp_lex_in;
 
-static int peeked_char;
-static uint16_t peeked_row;
-static uint16_t peeked_col;
-static int peeked_char_count = 0;
+static int peeked_char_ = '\0';
 
 static char curchar_ = 31;
 static uint16_t currow_ = 1;
 static uint16_t curcol_ = 0;
 
-static void get_next_char(void) {
+static void peek_one_char(void) {
+  assert(peeked_char_ == '\0' && "Already having one peeked char");
   int value = fgetc(fp_lex_in);
-  curchar_ = value != EOF ? (char)value : '\0';
+  peeked_char_ = value != EOF ? (char)value : '\0';
+}
+
+static void get_next_char(void) {
+  if (peeked_char_ != '\0') {
+    curchar_ = peeked_char_;
+    peeked_char_ = '\0';
+  }
+  else {
+    int value = fgetc(fp_lex_in);
+    curchar_ = value != EOF ? (char)value : '\0';
+  }
+
   if (curchar_ == '\n') {
     currow_++;
     curcol_ = 0;
   }
   else {
     curcol_++;
-  }
+  }  
 }
 
 static char curchar(void) {
@@ -53,6 +64,10 @@ static uint16_t currow(void) {
 
 static uint16_t curcol(void) {
   return curcol_;
+}
+
+static char peeked_char(void) {
+  return peeked_char_;
 }
 
 static void lex_warn(const char *warn_text, uint16_t line,
@@ -74,6 +89,8 @@ static int maybe_id_to_kwd(const char *str) {
   STRING_CASE("end", TK_END)
 
   #undef STRING_CASE
+
+  return TK_ID;
 }
 
 static int lex_id_or_kwd(void) {

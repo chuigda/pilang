@@ -63,7 +63,7 @@ id_list:
 %%
 
 void yyerror(const char *err) {
-  fprintf(stderr, "at line %d, col %d: error: %s\n", err, 0, 0);
+  fprintf(stderr, "at line %d, col %d: error: %s\n", 0, 0, err);
 }
 
 int main(int argc, char *argv[]) {
