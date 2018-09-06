@@ -20,8 +20,11 @@ extern void yyerror(const char *err);
 %token TK_NUM_INT TK_NUM_FLOAT TK_STR
 %token TK_SYM_COMMA TK_SYM_SEMI TK_SYM_DOT
 %token TK_SYM_LBRACKET TK_SYM_RBRACKET
-%token TK_ESYM_EQ TK_ESYM_PLUS TK_ESYM_MINUS TK_ESYM_ASTER TK_ESYM_SLASH
-%token TK_ESYM_AMP TK_ESYM_PIPE TK_ESYM_CARET
+%token TK_ESYM_EQ TK_ESYM_EQEQ TK_ESYM_PLUS TK_ESYM_MINUS TK_ESYM_ASTER
+%token TK_ESYM_AMP TK_ESYM_PIPE TK_ESYM_AMPAMP TK_ESYM_PIPEPIPE
+%token TK_ESYM_CARET TK_ESYM_SLASH TK_ESYM_PERCENT TK_ESYM_LPAREN 
+%token TK_ESYM_RPAREN TK_ESYM_LBRACE TK_ESYM_RBRACE TK_ESYM_LT TK_ESYM_GT
+%token TK_ESYM_NOT TK_ESYM_NEQ TK_ESYM_LEQ TK_ESYM_GEQ
 
 %%
 
@@ -67,7 +70,6 @@ id_list:
 void yyerror(const char *err) {
   fprintf(stderr, "at line %d, col %d: error: %s\n", yylval.token.row,
           yylval.token.col, err);
-  fprintf(stderr, "TOKEN_KIND = %d\n", yylval.token.token_kind);
 }
 
 int main(int argc, char *argv[]) {

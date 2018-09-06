@@ -145,7 +145,11 @@ static int maybe_conv(const char* str, int16_t row, int16_t col) {
   STRING_CASE("div", TK_ESYM_SLASH)
   STRING_CASE("divide", TK_ESYM_SLASH)
   STRING_CASE("slash", TK_ESYM_SLASH)
-  STRING_CASE("semi", TK_SYM_SEMI)
+  STRING_CASE("eqeq", TK_ESYM_EQEQ)
+  STRING_CASE("perc", TK_ESYM_PERCENT)
+  STRING_CASE("percent", TK_ESYM_PERCENT)
+  STRING_CASE("lbrace", TK_ESYM_LBRACE)
+  STRING_CASE("rbrace", TK_ESYM_RBRACE)
 
   #undef STRING_CASE
 
@@ -224,6 +228,88 @@ static int lex_number(void) {
   return TK_NUM_INT;
 }
 
+static int lex_common_sym(void) {
+  yylval.token.replaced = 0;
+  yylval.token.row = currow();
+  yylval.token.col = curcol();
+  switch(curchar()) {
+  case '[': yylval.token.token_kind = TK_SYM_LBRACKET; break;
+  case ']': yylval.token.token_kind = TK_SYM_RBRACKET; break;
+  case '(': yylval.token.token_kind = TK_ESYM_LPAREN; break;
+  case ')': yylval.token.token_kind = TK_ESYM_RPAREN; break;
+  case '{': yylval.token.token_kind = TK_ESYM_LBRACE; break;
+  case '}': yylval.token.token_kind = TK_ESYM_RBRACE; break;
+  case '+': yylval.token.token_kind = TK_ESYM_PLUS; break;
+  case '-': yylval.token.token_kind = TK_ESYM_MINUS; break;
+  case '*': yylval.token.token_kind = TK_ESYM_ASTER; break;
+  case '/': yylval.token.token_kind = TK_ESYM_SLASH; break;
+  case '%': yylval.token.token_kind = TK_ESYM_PERCENT; break;
+  case '^': yylval.token.token_kind = TK_ESYM_CARET; break;
+
+  case '=': {
+    peek_one_char(); 
+    if (peeked_char() == '=') {
+      get_next_char();
+      yylval.token.token_kind = TK_ESYM_EQEQ;
+    }
+    else {
+      yylval.token.token_kind = TK_ESYM_EQ;
+    }
+    break;
+  }
+
+  case '<': {
+    peek_one_char();
+    if (peeked_char() == '=') {
+      get_next_char();
+      yylval.token.token_kind = TK_ESYM_LEQ;
+    }
+    else {
+      yylval.token.token_kind = TK_ESYM_LT;
+    }
+    break;
+  }
+
+  case '!': {
+    peek_one_char();
+    if (peeked_char() == '=') {
+      get_next_char();
+      yylval.token.token_kind = TK_ESYM_NEQ;
+    }
+    else {
+      yylval.token.token_kind = TK_ESYM_NOT;
+    }
+    break;
+  }
+
+  case '&': {
+    peek_one_char();
+    if (peeked_char() == '&') {
+      get_next_char();
+      yylval.token.token_kind = TK_ESYM_AMPAMP;
+    }
+    else {
+      yylval.token.token_kind = TK_ESYM_AMP;
+    }
+    break;
+  }
+
+  case '|': {
+    peek_one_char();
+    if (peeked_char() == '|') {
+      get_next_char();
+      yylval.token.token_kind = TK_ESYM_PIPEPIPE;
+    }
+    else {
+      yylval.token.token_kind = TK_ESYM_PIPE;
+    }
+  }
+
+  }
+  get_next_char();
+  return yylval.token.token_kind;
+}
+
 int yylex(void) {
   get_next_char();
   while (1) {
@@ -243,6 +329,11 @@ int yylex(void) {
 
     case '.':
       return lex_dot_or_conv();
+
+    case '+': case '-': case '*': case '/': case '%': case '[':
+    case ']': case '=': case '<': case '>': case '&': case '|':
+    case '^': case '!': case '(': case ')':
+      return lex_common_sym();
 
     case '1': case '2': case '3': case '4': case '5': case '6':
     case '7': case '8': case '9': case '0':
