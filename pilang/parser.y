@@ -8,35 +8,20 @@
 #include "jjvalue.h"
 #include "ast.h"
 
-int yylex(void);
-void yyerror(const char *err);
+#include "yystype.h"
 
-typedef struct {
-  jjvalue_t val;
-  unsigned row : 16;
-  unsigned col : 16;
-  unsigned replaced : 1;
-  unsigned token_kind : 7;
-  unsigned : 24;
-} token_t;
-
-typedef struct {
-
-} ast_t;
-
-typedef union {
-  token_t token;
-  ast_node_base_t *ast;
-} yystype_t;
-
-#define YYSTYPE yystype_t
+extern int yylex(void);
+extern void yyerror(const char *err);
 
 %}
 
 %token TK_FUNCTION TK_TAKES TK_RETURNS TK_BEGIN TK_END
 %token TK_ID
-%token TK_NUM_INT TK_NUM_FLOAT
+%token TK_NUM_INT TK_NUM_FLOAT TK_STR
 %token TK_SYM_COMMA TK_SYM_SEMI TK_SYM_DOT
+%token TK_ESYM_LBRACKET TK_ESYM_RBRACKET TK_ESYM_EQ 
+%token TK_ESYM_PLUS TK_ESYM_MINUS TK_ESYM_ASTER TK_ESYM_SLASH
+%token TK_ESYM_AMP TK_ESYM_PIPE TK_ESYM_CARET
 
 %%
 
@@ -79,10 +64,6 @@ id_list:
 
 void yyerror(const char *err) {
   fprintf(stderr, "at line %d, col %d: error: %s\n", err, 0, 0);
-}
-
-int yylex() {
-  return -1;
 }
 
 int main() {

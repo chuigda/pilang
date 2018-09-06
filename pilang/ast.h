@@ -20,6 +20,7 @@ typedef enum {
   ANS_LIST,
   ANS_ID,
   ANS_FUNCTION,
+  ANS_FUNCTION_BODY,
   ANS_STATEMENTS
 } ast_node_sema_t;
 
