@@ -5,23 +5,15 @@
 #include "jjvalue.h"
 
 typedef enum {
-  ANK_LEAF,  
-  ANK_SINGLE_CHILD,
-  ANK_DUAL_CHILD,
-  ANK_TRIPLE_CHILD,
-  ANK_LEAF_WDATA,
-  ANK_SINGLE_CHILD_WDATA,
-  ANK_DUAL_CHILD_WDATA,
-  ANK_TRIPLE_CHILD_WDATA
+  #define ANK_DECLARE(KEY) KEY,
+  #include "ast_node_kind.h"
+  ANK_INVALID
 } ast_node_kind_t;
 
 typedef enum {
-  ANS_NULL,
-  ANS_LIST,
-  ANS_ID,
-  ANS_FUNCTION,
-  ANS_FUNCTION_BODY,
-  ANS_STATEMENTS
+  #define ANS_DECLARE(KEY) KEY,
+  #include "ast_sema_info.h"
+  ANS_INVALID
 } ast_node_sema_t;
 
 #define AST_NODE_COMMON \
@@ -109,5 +101,9 @@ extern ast_node_base_t *node3_wdata(ast_node_sema_t sema_info,
                                     ast_node_base_t *child0,
                                     ast_node_base_t *child1,
                                     ast_node_base_t *child2);
+
+typedef jjvalue_t (*skywalker_t)(ast_node_base_t*);
+
+extern jjvalue_t traverse(ast_node_base_t *root, skywalker_t walker);
 
 #endif
