@@ -20,7 +20,7 @@ ast_node_base_t *glob_ast = NULL;
 %token TK_EXPR_PLACEHOLDER
 
 %token TK_FUNCTION TK_TAKES TK_RETURNS TK_BEGIN TK_END TK_IF TK_THEN
-%token TK_ELSE TK_WHILE TK_FOR
+%token TK_ELSE TK_WHILE TK_FOR TK_TO 
 %token TK_ID
 %token TK_NUM_INT TK_NUM_FLOAT TK_STR
 %token TK_SYM_COMMA TK_SYM_SEMI TK_SYM_DOT
@@ -65,7 +65,7 @@ statement: empty_statement { $$ = $1; } |
            expr_statement { $$ = $1; } 
            if_statement { $$ = $1; }
            while_statement { $$ = $1; }
-//           for_statement { $$ = $1; } ;
+           for_statement { $$ = $1; } ;
 
 expr_statement: expr { $$ = $1; } ;
 
@@ -87,7 +87,30 @@ while_statement: TK_WHILE expr TK_THEN statements TK_END TK_WHILE
   }
   ;
 
+for_statement: 
+  TK_FOR idref_expr TK_ESYM_EQ int_expr TK_TO int_expr TK_THEN 
+  statements
+  TK_END TK_FOR
+  {
+    ast_node_base_t *for_head = node3(ANS_FOR_HEAD, $2.ast, $4.ast, $6.ast);
+    $$.ast = node2(ANS_FOR, for_head, $8.ast);
+  }
+  ;
+
 expr: TK_EXPR_PLACEHOLDER;
+
+// atomic_expr: int_expr { $$ = $1; } 
+//             | float_expr { $$ = $1; } 
+//             | idref_expr { $$ = $1; };
+
+int_expr:
+  TK_NUM_INT { $$.ast = leaf_wdata(ANS_INTVAL, $1.token.val); };
+
+// float_expr:
+//  TK_NUM_FLOAT { $$.ast = leaf_wdata(ANS_FLOATVAL, $1.token.val); } ;
+
+idref_expr:
+  TK_ID { $$.ast = leaf_wdata(ANS_IDREF, $1.token.val); } ;
 
 empty_statement: TK_SYM_SEMI { $$.ast = leaf(ANS_NULL); };
 
