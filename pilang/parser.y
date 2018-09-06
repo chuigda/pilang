@@ -51,7 +51,7 @@ function:
 function_body: 
   TK_BEGIN statements TK_END 
   {
-    $$.ast = leaf(ANS_NULL);
+    $$.ast = node1(ANS_FUNCTION_BODY, $2.ast);
   }
   ;
 
