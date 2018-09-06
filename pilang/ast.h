@@ -5,7 +5,7 @@
 #include "jjvalue.h"
 
 typedef enum {
-  ANK_LEAF,
+  ANK_LEAF,  
   ANK_SINGLE_CHILD,
   ANK_DUAL_CHILD,
   ANK_TRIPLE_CHILD,
@@ -99,15 +99,15 @@ extern ast_node_base_t *node2_wdata(ast_node_sema_t sema_info,
                                     ast_node_base_t *lchild,
                                     ast_node_base_t *rchild);
 
-extern ast_node_base_t *node3(ast_node_sema_t sema_info, 
-                              ast_node_base_t *child0, 
+extern ast_node_base_t *node3(ast_node_sema_t sema_info,
+                              ast_node_base_t *child0,
                               ast_node_base_t *child1,
                               ast_node_base_t *child2);
 
 extern ast_node_base_t *node3_wdata(ast_node_sema_t sema_info,
                                     jjvalue_t data,
                                     ast_node_base_t *child0,
-                                    ast_node_base_t *child1, 
+                                    ast_node_base_t *child1,
                                     ast_node_base_t *child2);
 
 #endif

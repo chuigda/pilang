@@ -66,6 +66,20 @@ void yyerror(const char *err) {
   fprintf(stderr, "at line %d, col %d: error: %s\n", err, 0, 0);
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+  extern FILE *fp_lex_in;
+  if (argc == 2) {
+    fp_lex_in = fopen(argv[1], "r");
+    if (fp_lex_in == NULL) {
+      fprintf(stderr, "Cannot open file %s\n", argv[1]);
+      exit(-1);
+    }
+  }
+  else if (argc == 1) {
+    fp_lex_in = stdin;
+  }
+  else {
+    fprintf(stderr, "Too many arguments\n");
+  }
   yyparse();
 }

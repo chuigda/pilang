@@ -107,4 +107,3 @@ const_iter_t const_iter_next(const_iter_t iter) {
 const_iter_t const_iter_prev(const_iter_t iter) {
     return create_const_iter(((const node_t*)iter.opaque)->prev);
 }
-
