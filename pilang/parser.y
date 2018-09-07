@@ -135,13 +135,28 @@ add_expr:
   | mul_expr { $$ = $1; } ;
 
 mul_expr:
-  mul_expr bin_mulop atom_expr
+  mul_expr bin_mulop unary_expr
   {
     jjvalue_t t;
     t.ivalue = $2.token.token_kind;
     $$.ast = node2_wdata(ANS_BINEXPR, t, $1.ast, $3.ast);
   }
   | atom_expr { $$ = $1; };
+
+unary_expr:
+  unary_op_chain atom_expr
+  { $$.ast = node2(ANS_UNARYEXPR, $1.ast, $2.ast); }
+  atom_expr
+  { $$ = $1; } ;
+
+unary_op_chain:
+  unary_op_chain unary_op
+  {
+    jjvalue_t t;
+    t.ivalue = $2.token.token_kind;
+    $$.ast = node1_wdata(ANS_LIST, t, $1.ast);
+  }
+  | ;
 
 bin_logicop: TK_ESYM_AMPAMP { $$ = $1; }
              | TK_ESYM_PIPEPIPE { $$ = $1; } ;
@@ -159,6 +174,11 @@ bin_mulop: TK_ESYM_ASTER { $$ = $1; }
 
 bin_addop: TK_ESYM_PLUS { $$ = $1; } 
            | TK_ESYM_MINUS { $$ = $1; } ;
+
+unary_op: TK_ESYM_PLUS { $$ = $1; }
+          | TK_ESYM_MINUS { $$ = $1; }
+          | TK_ESYM_NOT { $$ = $1; }
+          | TK_ESYM_CARET { $$ = $1; } ;
 
 atom_expr: int_expr { $$ = $1; } 
            | float_expr { $$ = $1; } 
