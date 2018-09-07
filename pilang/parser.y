@@ -95,25 +95,68 @@ for_statement:
   }
   ;
 
-expr: add_expr { $$ = $1; } ;
+expr: logic_expr { $$ = $1; } ;
+
+logic_expr:
+  logic_expr bin_logicop rel_expr
+  {
+    jjvalue_t t;
+    t.ivalue = $2.token.token_kind;
+    $$.ast = node2_wdata(ANS_BINEXPR, t, $1.ast, $3.ast);
+  }
+  | rel_expr { $$ = $1; };
+  
+
+rel_expr:
+  rel_expr bin_relop add_expr
+  {
+    jjvalue_t t;
+    t.ivalue = $2.token.token_kind;
+    $$.ast = node2_wdata(ANS_BINEXPR, t, $1.ast, $3.ast);
+  }
+  | add_expr { $$ = $1; } ;
 
 add_expr: 
-  add_expr addop atom_expr 
+  add_expr bin_addop mul_expr
   {
     jjvalue_t t;
     t.ivalue = $2.token.token_kind;
     $$.ast = node2_wdata(ANS_BINEXPR, t, $1.ast, $3.ast); 
   }
-  | atom_expr { $$ = $1; } ;
+  | mul_expr { $$ = $1; } ;
 
-addop: TK_ESYM_PLUS { $$ = $1; } | TK_ESYM_MINUS { $$ = $1; };
+mul_expr:
+  mul_expr bin_mulop atom_expr
+  {
+    jjvalue_t t;
+    t.ivalue = $2.token.token_kind;
+    $$.ast = node2_wdata(ANS_BINEXPR, t, $1.ast, $3.ast);
+  }
+  | atom_expr { $$ = $1; };
+
+bin_logicop: TK_ESYM_AMPAMP { $$ = $1; }
+             | TK_ESYM_PIPEPIPE { $$ = $1; } ;
+
+bin_relop: TK_ESYM_LT { $$ = $1; }
+           | TK_ESYM_GT { $$ = $1; }
+           | TK_ESYM_EQEQ { $$ = $1; }
+           | TK_ESYM_GEQ { $$ = $1; }
+           | TK_ESYM_LEQ { $$ = $1; }
+           | TK_ESYM_NEQ { $$ = $1; } ;
+
+bin_mulop: TK_ESYM_ASTER { $$ = $1; }
+           | TK_ESYM_SLASH { $$ = $1; }
+           | TK_ESYM_PERCENT { $$ = $1; } ;
+
+bin_addop: TK_ESYM_PLUS { $$ = $1; } 
+           | TK_ESYM_MINUS { $$ = $1; } ;
 
 atom_expr: int_expr { $$ = $1; } 
            | float_expr { $$ = $1; } 
-           | idref_expr { $$ = $1; };
+           | idref_expr { $$ = $1; } ;
 
 int_expr:
-  TK_NUM_INT { $$.ast = leaf_wdata(ANS_INTVAL, $1.token.val); };
+  TK_NUM_INT { $$.ast = leaf_wdata(ANS_INTVAL, $1.token.val); } ;
 
 float_expr:
   TK_NUM_FLOAT { $$.ast = leaf_wdata(ANS_FLOATVAL, $1.token.val); } ;
@@ -121,7 +164,7 @@ float_expr:
 idref_expr:
   TK_ID { $$.ast = leaf_wdata(ANS_IDREF, $1.token.val); } ;
 
-empty_statement: TK_SYM_SEMI { $$.ast = leaf(ANS_NULL); };
+empty_statement: TK_SYM_SEMI { $$.ast = leaf(ANS_NULL); } ;
 
 id_list: 
   id_list TK_ID
