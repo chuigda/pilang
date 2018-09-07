@@ -95,7 +95,16 @@ for_statement:
   }
   ;
 
-expr: logic_expr { $$ = $1; } ;
+expr: assign_expr { $$ = $1; } ;
+
+assign_expr:
+  assign_expr TK_ESYM_EQ logic_expr
+  {
+    jjvalue_t t;
+    t.ivalue = TK_ESYM_EQ;
+    $$.ast = node2_wdata(ANS_BINEXPR, t, $1.ast, $3.ast);
+  }
+  | logic_expr { $$ = $1; } ;
 
 logic_expr:
   logic_expr bin_logicop rel_expr
