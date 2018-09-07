@@ -89,12 +89,24 @@ for_statement:
   statements
   TK_END TK_FOR
   {
-    ast_node_base_t *for_head = node3(ANS_FOR_HEAD, $2.ast, $4.ast, $6.ast);
+    ast_node_base_t *for_head = 
+      node3(ANS_FOR_HEAD, $2.ast, $4.ast, $6.ast);
     $$.ast = node2(ANS_FOR, for_head, $8.ast);
   }
   ;
 
-expr: atom_expr { $$ = $1; } ;
+expr: add_expr { $$ = $1; } ;
+
+add_expr: 
+  add_expr addop atom_expr 
+  {
+    jjvalue_t t;
+    t.ivalue = $2.token.token_kind;
+    $$.ast = node2_wdata(ANS_BINEXPR, t, $1.ast, $3.ast); 
+  }
+  | atom_expr { $$ = $1; } ;
+
+addop: TK_ESYM_PLUS { $$ = $1; } | TK_ESYM_MINUS { $$ = $1; };
 
 atom_expr: int_expr { $$ = $1; } 
            | float_expr { $$ = $1; } 
