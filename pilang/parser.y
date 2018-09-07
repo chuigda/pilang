@@ -17,8 +17,6 @@ ast_node_base_t *glob_ast = NULL;
 
 %}
 
-%token TK_EXPR_PLACEHOLDER
-
 %token TK_FUNCTION TK_TAKES TK_RETURNS TK_BEGIN TK_END TK_IF TK_THEN
 %token TK_ELSE TK_WHILE TK_FOR TK_TO 
 %token TK_ID
@@ -33,7 +31,7 @@ ast_node_base_t *glob_ast = NULL;
 
 %%
 
-program: functions { glob_ast = $1.ast; $$ = $1; }
+program: functions { glob_ast = $1.ast; $$ = $1; } ;
 
 functions: 
   functions function { $$.ast = node2(ANS_LIST, $1.ast, $2.ast); } | ;
@@ -47,7 +45,7 @@ function:
   ;
 
 function_body: 
-  TK_BEGIN statements TK_END 
+  TK_BEGIN statements TK_END TK_FUNCTION
   {
     $$.ast = node1(ANS_FUNCTION_BODY, $2.ast);
   }
@@ -74,8 +72,7 @@ if_statement:
   {
     $$.ast = node2(ANS_IF, $2.ast, $4.ast);
   }
-  |
-  TK_IF expr TK_THEN statements TK_ELSE statements TK_END TK_IF
+  | TK_IF expr TK_THEN statements TK_ELSE statements TK_END TK_IF
   {
     $$.ast = node3(ANS_IF, $2.ast, $4.ast, $6.ast);
   }
@@ -97,17 +94,17 @@ for_statement:
   }
   ;
 
-expr: TK_EXPR_PLACEHOLDER;
+expr: atom_expr { $$ = $1; } ;
 
-// atomic_expr: int_expr { $$ = $1; } 
-//             | float_expr { $$ = $1; } 
-//             | idref_expr { $$ = $1; };
+atom_expr: int_expr { $$ = $1; } 
+           | float_expr { $$ = $1; } 
+           | idref_expr { $$ = $1; };
 
 int_expr:
   TK_NUM_INT { $$.ast = leaf_wdata(ANS_INTVAL, $1.token.val); };
 
-// float_expr:
-//  TK_NUM_FLOAT { $$.ast = leaf_wdata(ANS_FLOATVAL, $1.token.val); } ;
+float_expr:
+  TK_NUM_FLOAT { $$.ast = leaf_wdata(ANS_FLOATVAL, $1.token.val); } ;
 
 idref_expr:
   TK_ID { $$.ast = leaf_wdata(ANS_IDREF, $1.token.val); } ;
