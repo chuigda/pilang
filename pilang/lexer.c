@@ -183,7 +183,7 @@ static int lex_dot_or_conv(void) {
         get_next_char();
       }
     }
-    if (curchar == '\0') {
+    if (curchar() == '\0') {
       lex_warn("Unterminated conv-sequence", currow(), curcol());
     }
     else {
