@@ -56,7 +56,7 @@ statements:
   {
     $$.ast = node2(ANS_LIST, $1.ast, $2.ast);
   }
-  |
+  | { $$.ast = NULL; }
   ;
 
 statement: empty_statement { $$ = $1; } |
@@ -104,7 +104,8 @@ assign_expr:
     t.ivalue = TK_ESYM_EQ;
     $$.ast = node2_wdata(ANS_BINEXPR, t, $1.ast, $3.ast);
   }
-  | logic_expr { $$ = $1; } ;
+  | logic_expr { $$ = $1; } 
+  ;
 
 logic_expr:
   logic_expr bin_logicop rel_expr
@@ -113,7 +114,8 @@ logic_expr:
     t.ivalue = $2.token.token_kind;
     $$.ast = node2_wdata(ANS_BINEXPR, t, $1.ast, $3.ast);
   }
-  | rel_expr { $$ = $1; };
+  | rel_expr { $$ = $1; }
+  ;
   
 
 rel_expr:
@@ -123,7 +125,8 @@ rel_expr:
     t.ivalue = $2.token.token_kind;
     $$.ast = node2_wdata(ANS_BINEXPR, t, $1.ast, $3.ast);
   }
-  | add_expr { $$ = $1; } ;
+  | add_expr { $$ = $1; }
+  ;
 
 add_expr: 
   add_expr bin_addop mul_expr
@@ -132,7 +135,8 @@ add_expr:
     t.ivalue = $2.token.token_kind;
     $$.ast = node2_wdata(ANS_BINEXPR, t, $1.ast, $3.ast); 
   }
-  | mul_expr { $$ = $1; } ;
+  | mul_expr { $$ = $1; } 
+  ;
 
 mul_expr:
   mul_expr bin_mulop unary_expr
@@ -141,13 +145,13 @@ mul_expr:
     t.ivalue = $2.token.token_kind;
     $$.ast = node2_wdata(ANS_BINEXPR, t, $1.ast, $3.ast);
   }
-  | atom_expr { $$ = $1; };
+  | unary_expr { $$ = $1; }
+  ;
 
 unary_expr:
   unary_op_chain atom_expr
   { $$.ast = node2(ANS_UNARYEXPR, $1.ast, $2.ast); }
-  atom_expr
-  { $$ = $1; } ;
+  ;
 
 unary_op_chain:
   unary_op_chain unary_op
@@ -156,33 +160,39 @@ unary_op_chain:
     t.ivalue = $2.token.token_kind;
     $$.ast = node1_wdata(ANS_LIST, t, $1.ast);
   }
-  | ;
+  | { $$.ast = NULL; };
 
 bin_logicop: TK_ESYM_AMPAMP { $$ = $1; }
-             | TK_ESYM_PIPEPIPE { $$ = $1; } ;
+             | TK_ESYM_PIPEPIPE { $$ = $1; } 
+             ;
 
 bin_relop: TK_ESYM_LT { $$ = $1; }
            | TK_ESYM_GT { $$ = $1; }
            | TK_ESYM_EQEQ { $$ = $1; }
            | TK_ESYM_GEQ { $$ = $1; }
            | TK_ESYM_LEQ { $$ = $1; }
-           | TK_ESYM_NEQ { $$ = $1; } ;
+           | TK_ESYM_NEQ { $$ = $1; } 
+           ;
 
 bin_mulop: TK_ESYM_ASTER { $$ = $1; }
            | TK_ESYM_SLASH { $$ = $1; }
-           | TK_ESYM_PERCENT { $$ = $1; } ;
+           | TK_ESYM_PERCENT { $$ = $1; } 
+           ;
 
 bin_addop: TK_ESYM_PLUS { $$ = $1; } 
-           | TK_ESYM_MINUS { $$ = $1; } ;
+           | TK_ESYM_MINUS { $$ = $1; } 
+           ;
 
 unary_op: TK_ESYM_PLUS { $$ = $1; }
           | TK_ESYM_MINUS { $$ = $1; }
           | TK_ESYM_NOT { $$ = $1; }
-          | TK_ESYM_CARET { $$ = $1; } ;
+          | TK_ESYM_CARET { $$ = $1; } 
+          ;
 
 atom_expr: int_expr { $$ = $1; } 
            | float_expr { $$ = $1; } 
-           | idref_expr { $$ = $1; } ;
+           | idref_expr { $$ = $1; } 
+           ;
 
 int_expr:
   TK_NUM_INT { $$.ast = leaf_wdata(ANS_INTVAL, $1.token.val); } ;
@@ -200,7 +210,7 @@ id_list:
   {
     $$.ast = node2(ANS_LIST, $1.ast, $2.ast);
   }
-  |
+  | { $$.ast = NULL; } 
   ;
 
 %%
