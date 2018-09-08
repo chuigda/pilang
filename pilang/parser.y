@@ -244,6 +244,6 @@ int main(int argc, char *argv[]) {
   }
 
   printf("glob_ast = %p\n", glob_ast);
-  tree_print(glob_ast, 0);
+  tree_print(glob_ast, 0, 0);
 }
 
