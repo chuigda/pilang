@@ -34,6 +34,12 @@
 # Custom output
 cicosh
 baka
+pli
+
+# YACC output
+y.tab.h
+y.tab.c
+y.output
 
 # VSCode config
 .vscode/
