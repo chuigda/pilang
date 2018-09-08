@@ -26,7 +26,15 @@ typedef struct {
   AST_NODE_COMMON
 } ast_node_base_t;
 
+typedef struct {
+  AST_NODE_COMMON
+  jjvalue_t data;
+} ast_node_wdata_base_t;
+
 _Static_assert(sizeof(ast_node_base_t) == 8,
+               "Unexpected size difference");
+
+_Static_assert(sizeof(ast_node_wdata_base_t) == 16,
                "Unexpected size difference");
 
 typedef struct {
@@ -103,7 +111,7 @@ extern ast_node_base_t *node3_wdata(ast_node_sema_t sema_info,
                                     ast_node_base_t *child1,
                                     ast_node_base_t *child2);
 
-extern void tree_print(ast_node_base_t *root);
+extern void tree_print(ast_node_base_t *root, uint16_t parent);
 
 #endif
 
