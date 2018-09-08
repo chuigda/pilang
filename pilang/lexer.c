@@ -28,7 +28,7 @@ FILE *fp_lex_in;
 static int peeked_char_ = '\0';
 
 static char curchar_ = '\n';
-static uint16_t currow_ = 0;
+static uint16_t currow_ = 1;
 static uint16_t curcol_ = 0;
 
 static void peek_one_char(void) {
@@ -89,6 +89,12 @@ static int maybe_id_to_kwd(const char *str) {
   STRING_CASE("returns", TK_RETURNS)
   STRING_CASE("begin", TK_BEGIN)
   STRING_CASE("end", TK_END)
+  STRING_CASE("if", TK_IF)
+  STRING_CASE("then", TK_THEN)
+  STRING_CASE("else", TK_ELSE)
+  STRING_CASE("while", TK_WHILE)
+  STRING_CASE("for", TK_FOR)
+  STRING_CASE("to", TK_TO)
 
   #undef STRING_CASE
 

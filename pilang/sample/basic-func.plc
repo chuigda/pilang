@@ -1,0 +1,5 @@
+function main takes argc argv returns status
+begin
+  if argc == 2 then
+  end if
+end function
