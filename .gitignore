@@ -41,5 +41,9 @@ y.tab.h
 y.tab.c
 y.output
 
+# Markdown output
+*.html
+pilang/docs
+
 # VSCode config
 .vscode/

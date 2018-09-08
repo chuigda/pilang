@@ -1,3 +1,8 @@
+all: docs pli
+
+docs: doc/makefile
+	cd doc && make && cd .. && tree doc -P "*.html" > docs
+
 pli : mstring.o lexer.o parser.o clist.o ast.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o -o pli
 
@@ -24,3 +29,5 @@ clean:
 	rm -rf y.output
 	rm -rf *.o
 	rm -rf pli
+	cd doc && make clean && cd ..
+	rm docs
