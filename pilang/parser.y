@@ -209,7 +209,7 @@ idref_expr:
 empty_statement: TK_SYM_SEMI { $$.ast = leaf(ANS_NULL); } ;
 
 id_list: 
-  id_list TK_ID
+  id_list idref_expr
   {
     $$.ast = node2(ANS_LIST, $1.ast, $2.ast);
   }
