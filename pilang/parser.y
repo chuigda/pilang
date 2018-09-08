@@ -34,7 +34,8 @@ ast_node_base_t *glob_ast = NULL;
 program: functions { glob_ast = $1.ast; $$ = $1; } ;
 
 functions: 
-  functions function { $$.ast = node2(ANS_LIST, $1.ast, $2.ast); } | ;
+  functions function { $$.ast = node2(ANS_LIST, $1.ast, $2.ast); } 
+  | { $$.ast = NULL; } ;
 
 function: 
   TK_FUNCTION TK_ID TK_TAKES id_list TK_RETURNS id_list function_body
@@ -59,13 +60,13 @@ statements:
   | { $$.ast = NULL; }
   ;
 
-statement: empty_statement { $$ = $1; } |
-           expr_statement { $$ = $1; } 
-           if_statement { $$ = $1; }
-           while_statement { $$ = $1; }
-           for_statement { $$ = $1; } ;
+statement: expr_statement { $$ = $1; } 
+           | if_statement { $$ = $1; } 
+           | while_statement { $$ = $1; } 
+           | for_statement { $$ = $1; } 
+           | empty_statement { $$ = $1; } ;
 
-expr_statement: expr { $$ = $1; } ;
+expr_statement: expr TK_SYM_SEMI { $$ = $1; printf("Reduced expr_stmt\n"); } ;
 
 if_statement: 
   TK_IF expr TK_THEN statements TK_END TK_IF
@@ -103,6 +104,7 @@ assign_expr:
     jjvalue_t t;
     t.ivalue = TK_ESYM_EQ;
     $$.ast = node2_wdata(ANS_BINEXPR, t, $1.ast, $3.ast);
+    printf("Reduced assign_expr\n");
   }
   | logic_expr { $$ = $1; } 
   ;
@@ -191,7 +193,8 @@ unary_op: TK_ESYM_PLUS { $$ = $1; }
 
 atom_expr: int_expr { $$ = $1; } 
            | float_expr { $$ = $1; } 
-           | idref_expr { $$ = $1; } 
+           | idref_expr { $$ = $1; }
+           | TK_SYM_LBRACKET expr TK_SYM_RBRACKET { $$ = $2; }
            ;
 
 int_expr:
@@ -242,3 +245,4 @@ int main(int argc, char *argv[]) {
 
   printf("glob_ast = %p\n", glob_ast);
 }
+
