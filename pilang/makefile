@@ -6,7 +6,7 @@ docs: doc/makefile
 pli : mstring.o lexer.o parser.o clist.o ast.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o -o pli
 
-ast.o : ast.c jjvalue.h
+ast.o : ast.c jjvalue.h mstring.h
 	$(CC) -c ast.c -o ast.o -g
 
 clist.o : clist.c clist.h

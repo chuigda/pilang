@@ -1,4 +1,5 @@
 #include "ast.h"
+#include "mstring.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -132,8 +133,15 @@ void tree_print(ast_node_base_t *root, uint16_t parent) {
          ans_strs[root->node_sema_info]);
 
   if (strstr(ank_strs[root->node_kind], "WDATA")) {
-    printf(", IDATA = %lld", 
-           ((ast_node_wdata_base_t*)root)->data.ivalue);
+    if (root->node_sema_info == ANS_ID
+        || root->node_sema_info == ANS_IDREF) {
+      printf(", SDATA = %s",
+             get_string(((ast_node_wdata_base_t*)root)->data.svalue));
+    }
+    else {
+      printf(", IDATA = %lld", 
+             ((ast_node_wdata_base_t*)root)->data.ivalue);
+    }
   }
   putchar('\n');
 
