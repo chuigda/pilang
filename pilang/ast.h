@@ -111,7 +111,8 @@ extern ast_node_base_t *node3_wdata(ast_node_sema_t sema_info,
                                     ast_node_base_t *child1,
                                     ast_node_base_t *child2);
 
-extern void tree_print(ast_node_base_t *root, uint16_t parent);
+extern void tree_print(ast_node_base_t *root, uint16_t parent,
+                       int nth_child);
 
 #endif
 

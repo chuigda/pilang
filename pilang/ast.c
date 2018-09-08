@@ -106,11 +106,12 @@ ast_node_base_t *node3_wdata(ast_node_sema_t sema_info, jjvalue_t data,
   return (ast_node_base_t*)ret;
 }
 
-void tree_print(ast_node_base_t *root, uint16_t parent) {
+void tree_print(ast_node_base_t *root, uint16_t parent, int nth_child) {
   _Static_assert(ANS_COMMENCE_ == 0, "Incorrect ANS order!");
   _Static_assert(ANK_COMMENCE_ == 0, "Incorrect ANK order!");
 
   if (root == NULL) {
+    printf("%u[%d] -> (nil)\n", (unsigned)parent, nth_child);
     return;
   }
 
@@ -126,8 +127,9 @@ void tree_print(ast_node_base_t *root, uint16_t parent) {
     ""
   };
 
-  printf("%u -> NODE %u, ANK = %s, ANS = %s",
+  printf("%u[%d] -> NODE %u, ANK = %s, ANS = %s",
          (unsigned)parent,
+         nth_child,
          (unsigned)root->node_uid,
          ank_strs[root->node_kind],
          ans_strs[root->node_sema_info]);
@@ -152,33 +154,38 @@ void tree_print(ast_node_base_t *root, uint16_t parent) {
     break;
 
   case ANK_SINGLE_CHILD:
-    tree_print(((ast_schild_t*)root)->child, root->node_uid);
+    tree_print(((ast_schild_t*)root)->child, root->node_uid, 0);
     break;
 
   case ANK_SINGLE_CHILD_WDATA:
-    tree_print(((ast_schild_wdata_t*)root)->child, root->node_uid);
+    tree_print(((ast_schild_wdata_t*)root)->child, root->node_uid, 0);
     break;
 
   case ANK_DUAL_CHILD:
-    tree_print(((ast_dchild_t*)root)->children[0], root->node_uid);
-    tree_print(((ast_dchild_t*)root)->children[1], root->node_uid);
+    tree_print(((ast_dchild_t*)root)->children[0], root->node_uid, 0);
+    tree_print(((ast_dchild_t*)root)->children[1], root->node_uid, 1);
     break;
 
   case ANK_DUAL_CHILD_WDATA:
-    tree_print(((ast_dchild_wdata_t*)root)->children[0], root->node_uid);
-    tree_print(((ast_dchild_wdata_t*)root)->children[1], root->node_uid);
+    tree_print(((ast_dchild_wdata_t*)root)->children[0],
+               root->node_uid, 0);
+    tree_print(((ast_dchild_wdata_t*)root)->children[1],
+               root->node_uid, 1);
     break;
 
   case ANK_TRIPLE_CHILD:
-    tree_print(((ast_tchild_t*)root)->children[0], root->node_uid);
-    tree_print(((ast_tchild_t*)root)->children[1], root->node_uid);
-    tree_print(((ast_tchild_t*)root)->children[2], root->node_uid);
+    tree_print(((ast_tchild_t*)root)->children[0], root->node_uid, 0);
+    tree_print(((ast_tchild_t*)root)->children[1], root->node_uid, 1);
+    tree_print(((ast_tchild_t*)root)->children[2], root->node_uid, 2);
     break;
 
   case ANK_TRIPLE_CHILD_WDATA:
-    tree_print(((ast_tchild_wdata_t*)root)->children[0], root->node_uid);
-    tree_print(((ast_tchild_wdata_t*)root)->children[1], root->node_uid);
-    tree_print(((ast_tchild_wdata_t*)root)->children[2], root->node_uid);
+    tree_print(((ast_tchild_wdata_t*)root)->children[0], 
+               root->node_uid, 0);
+    tree_print(((ast_tchild_wdata_t*)root)->children[1],
+               root->node_uid, 1);
+    tree_print(((ast_tchild_wdata_t*)root)->children[2], 
+               root->node_uid, 2);
     break;
   }
 }
