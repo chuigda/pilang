@@ -43,7 +43,7 @@ y.output
 
 # Markdown output
 *.html
-pilang/docs
+pilang/doc/docs
 
 # VSCode config
 .vscode/
