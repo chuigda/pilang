@@ -2,6 +2,7 @@
 #define CLIST_H
 
 #include <stddef.h>
+#include <stdbool.h>
 
 struct _clistimpl;
 
@@ -36,8 +37,12 @@ const_iter_t list_cend(list_t const* list);
 
 any_t iter_deref(iter_t iter);
 const_any_t const_iter_deref(const_iter_t iter);
+
 iter_t iter_next(iter_t iter);
 iter_t iter_prev(iter_t iter);
+
+bool iter_eq(iter_t lhs, iter_t rhs);
+
 const_iter_t const_iter_next(const_iter_t iter);
 const_iter_t const_iter_prev(const_iter_t iter);
 

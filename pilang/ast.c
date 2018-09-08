@@ -210,6 +210,19 @@ void tree_print(ast_node_base_t *root, uint16_t parent, int nth_child) {
     tree_print(((ast_tchild_wdata_t*)root)->children[2], 
                root->node_uid, 2);
     break;
+
+  case ANK_LIST: {
+    ast_list_t *list = (ast_list_t*)root;
+    int i = 0;
+    for (iter_t it = list_begin(&(list->list)); 
+         !iter_eq(it, list_end(&(list->list))); 
+         it = iter_next(it)) {
+      tree_print((ast_node_base_t*)iter_deref(it), root->node_uid, i);
+      i++;
+    }
+    break;
+  }
+
   }
 }
 

@@ -93,6 +93,10 @@ const_any_t const_iter_deref(const_iter_t iter) {
     return ((const node_t*)iter.opaque)->any;
 }
 
+bool iter_eq(iter_t lhs, iter_t rhs) {
+  return lhs.opaque == rhs.opaque;
+}
+
 iter_t iter_next(iter_t iter) {
     return create_iter(((node_t*)iter.opaque)->next);
 }
