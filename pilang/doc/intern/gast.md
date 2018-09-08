@@ -16,7 +16,9 @@ GAST has the following kinds of nodes:
   <li>dual child with data    (`ast_dchild_wdata_t`)</li>
   <li>triple child node       (`ast_tchild_t`)</li>
   <li>triple child with data  (`ast_tchild_wdata_t`)</li>
+  <li>list                    (`ast_list_t`)<sup>[1]</sup><li> 
 </lo>
+<sup>[1]</sup> List values should only be AST nodes.
 
 To create these nodes, here's utility functions:
 
@@ -48,6 +50,15 @@ To create these nodes, here's utility functions:
     ast_node_base_t *node3_wdata(ast_sema_info_t, jjvalue_t,
                                  ast_node_base_t*, ast_node_base_t*,
                                  ast_node_base_t*);
+
+    // yields ast_list_t
+    ast_node_base_t *node_list(ast_sema_info_t);
+
+What's more, there are two more manipulation functions for `ast_list_t`:
+
+    void ast_list_prepend(ast_node_base_t*, ast_node_base_t*);
+
+    void ast_list_append(ast_node_base_t*, ast_node_base_t*);
 
 And they all have a common base `ast_node_base_t`. As we all know, C
 language does not have inheritance. So we use special trick to simulate

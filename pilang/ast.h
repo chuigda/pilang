@@ -2,7 +2,9 @@
 #define AST_H
 
 #include <stdint.h>
+
 #include "jjvalue.h"
+#include "clist.h"
 
 typedef enum {
   #define ANK_DECLARE(KEY) KEY,
@@ -79,6 +81,11 @@ typedef struct {
   ast_node_base_t *children[3];
 } ast_tchild_wdata_t;
 
+typedef struct {
+  AST_NODE_COMMON
+  list_t list;
+} ast_list_t;
+
 extern ast_node_base_t *leaf(ast_node_sema_t sema_info);
 
 extern ast_node_base_t *leaf_wdata(ast_node_sema_t sema_info, 
@@ -110,6 +117,14 @@ extern ast_node_base_t *node3_wdata(ast_node_sema_t sema_info,
                                     ast_node_base_t *child0,
                                     ast_node_base_t *child1,
                                     ast_node_base_t *child2);
+
+extern ast_node_base_t *node_list(ast_node_sema_t sema_info);
+
+extern void ast_list_prepend(ast_node_base_t *node,
+                             ast_node_base_t *data);
+
+extern void ast_list_append(ast_node_base_t *node,
+                            ast_node_base_t *data);
 
 extern void tree_print(ast_node_base_t *root, uint16_t parent,
                        int nth_child);

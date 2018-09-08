@@ -1,6 +1,7 @@
 #include "ast.h"
 #include "mstring.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -106,6 +107,27 @@ ast_node_base_t *node3_wdata(ast_node_sema_t sema_info, jjvalue_t data,
   return (ast_node_base_t*)ret;
 }
 
+ast_node_base_t *node_list(ast_node_sema_t sema_info) {
+  ast_list_t *ret = NEW(ast_list_t);
+  ret->node_kind = ANK_LIST;
+  ret->node_sema_info = sema_info;
+  ret->node_uid = get_next_uid();
+  create_list(&(ret->list), malloc, free);
+  return (ast_node_base_t*)ret;
+}
+
+void ast_list_prepend(ast_node_base_t *node, ast_node_base_t *data) {
+  assert(node->node_kind == ANK_LIST);
+  ast_list_t *list = (ast_list_t*)node;
+  list_push_front(&(list->list), data);
+}
+
+void ast_list_append(ast_node_base_t *node, ast_node_base_t *data) {
+  assert(node->node_kind == ANK_LIST);
+  ast_list_t *list = (ast_list_t*)node;
+  list_push_back(&(list->list), data);
+}
+
 void tree_print(ast_node_base_t *root, uint16_t parent, int nth_child) {
   _Static_assert(ANS_COMMENCE_ == 0, "Incorrect ANS order!");
   _Static_assert(ANK_COMMENCE_ == 0, "Incorrect ANK order!");
@@ -136,7 +158,8 @@ void tree_print(ast_node_base_t *root, uint16_t parent, int nth_child) {
 
   if (strstr(ank_strs[root->node_kind], "WDATA")) {
     if (root->node_sema_info == ANS_ID
-        || root->node_sema_info == ANS_IDREF) {
+        || root->node_sema_info == ANS_IDREF
+        || root->node_sema_info == ANS_FUNCTION) {
       printf(", SDATA = %s",
              get_string(((ast_node_wdata_base_t*)root)->data.svalue));
     }
