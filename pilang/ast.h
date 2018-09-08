@@ -19,7 +19,8 @@ typedef enum {
 #define AST_NODE_COMMON \
   uint16_t node_kind; \
   uint16_t node_sema_info; \
-  uint32_t : 32; // padding
+  uint16_t node_uid; \
+  uint16_t : 16; // padding
 
 typedef struct {
   AST_NODE_COMMON
@@ -102,8 +103,7 @@ extern ast_node_base_t *node3_wdata(ast_node_sema_t sema_info,
                                     ast_node_base_t *child1,
                                     ast_node_base_t *child2);
 
-typedef jjvalue_t (*skywalker_t)(ast_node_base_t*);
-
-extern jjvalue_t traverse(ast_node_base_t *root, skywalker_t walker);
+extern void tree_print(ast_node_base_t *root);
 
 #endif
+

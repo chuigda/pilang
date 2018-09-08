@@ -56,14 +56,18 @@ inheritance. We made each kind of node start with `AST_NODE_COMMON`:
     #define AST_NODE_COMMON \
       uint16_t node_kind; \
       uint16_t sema_info; \
-      uint32_t : 32; // padding
+      uint16_t node_uid; \
+      uint16_t : 16; // padding
 
 As a result, pointer to any kind of node can be safely converted to 
 pointer to `ast_node_base_t`. The current size of `AST_NODE_COMMON` is 8
 bytes and suits most CPUs.
 
-For each kind of node, there is a node kind ID starting with `ANK_`. for 
+For each kind of node, there is a __node kind__ starting with `ANK_`. for
 example, the ID for `ast_leaf_t` is `ANK_LEAF`.
+
+For each node, a unique __UID__ is set. This is used for AST printing and
+debugging.
 
 ## Extra semantics info
 GAST allows extra semantics info to be attached with an AST node. In
