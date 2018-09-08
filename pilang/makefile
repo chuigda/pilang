@@ -30,4 +30,4 @@ clean:
 	rm -rf *.o
 	rm -rf pli
 	cd doc && make clean && cd ..
-	rm docs
+	rm -rf docs

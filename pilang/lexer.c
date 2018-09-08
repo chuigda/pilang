@@ -27,8 +27,8 @@ FILE *fp_lex_in;
 
 static int peeked_char_ = '\0';
 
-static char curchar_ = 31;
-static uint16_t currow_ = 1;
+static char curchar_ = '\n';
+static uint16_t currow_ = 0;
 static uint16_t curcol_ = 0;
 
 static void peek_one_char(void) {
@@ -313,7 +313,6 @@ static int lex_common_sym(void) {
 }
 
 int yylex(void) {
-  get_next_char();
   while (1) {
     switch (curchar()) {
     case '\0':
