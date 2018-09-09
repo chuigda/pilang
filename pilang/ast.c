@@ -127,3 +127,9 @@ void ast_list_append(ast_node_base_t *node, ast_node_base_t *data) {
   ast_list_t *list = (ast_list_t*)node;
   list_push_back(&(list->list), data);
 }
+
+void ast_attach_srcloc(ast_node_base_t *node,
+                       uint16_t row, uint16_t col) {
+  node->row = row;
+  node->col = col;
+}

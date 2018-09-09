@@ -127,5 +127,7 @@ extern void ast_list_prepend(ast_node_base_t *node,
 extern void ast_list_append(ast_node_base_t *node,
                             ast_node_base_t *data);
 
-#endif
+extern void ast_attach_srcloc(ast_node_base_t *node, 
+                              uint16_t row, uint16_t col);
 
+#endif
