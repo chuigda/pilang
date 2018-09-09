@@ -1,9 +1,9 @@
 # PiLang GAST documentation
 
 ## What is & Why GAST
-__GAST__ (__G__eneral __A__bstract __S__yntax __T__ree) is an AST library
-for DSL designers. It allows several kinds of tree nodes to be created
-and some informations to be attached with these created nodes.
+__GAST__ (__G__eneral __A__bstract __S__yntax __T__ree) is an AST 
+library for DSL designers. It allows several kinds of tree nodes to be 
+created and some informations to be attached with these created nodes.
 
 ## GAST nodes
 GAST has the following kinds of nodes:
@@ -75,11 +75,11 @@ As a result, pointer to any kind of node can be safely converted to
 pointer to `ast_node_base_t`. The current size of `AST_NODE_COMMON` is 8
 bytes and suits most CPUs.
 
-For each kind of node, there is a __node kind__ starting with `ANK_`. for
-example, the ID for `ast_leaf_t` is `ANK_LEAF`.
+For each kind of node, there is a __node kind__ starting with `ANK_`. 
+for example, the ID for `ast_leaf_t` is `ANK_LEAF`.
 
-For each node, a unique __UID__ is set. This is used for AST printing and
-debugging.
+For each node, a unique __UID__ is set. This is used for AST printing 
+and debugging.
 
 ## Extra source location info
 GAST allows extra source location info to be attached with an AST node.

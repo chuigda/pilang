@@ -23,7 +23,8 @@ typedef void(*deallocator_t)(void*);
 typedef void *any_t;
 typedef const void *const_any_t;
 
-void create_list(list_t *list, allocator_t alloc, deallocator_t dealloc);
+void create_list(list_t *list, allocator_t alloc,
+                 deallocator_t dealloc);
 void destroy_list(list_t *list);
 void list_push_back(list_t *list, any_t any);
 void list_push_front(list_t *list, any_t any);
