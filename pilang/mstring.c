@@ -29,7 +29,7 @@ static hash_map_item_t *glob_hash_map[STRING_HASHMAP_BUCKET_COUNT] = {0};
 static hash_map_item_t *new_hash_map_item(const char *value,
                                           int64_t handle) {
   hash_map_item_t *entry = malloc(sizeof(hash_map_item_t));
-  entry->value = malloc(strlen(value));
+  entry->value = malloc(strlen(value) + 1);
   strcpy(entry->value, value);
   entry->next = NULL;
   entry->handle = handle;
