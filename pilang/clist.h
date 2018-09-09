@@ -7,15 +7,15 @@
 struct _clistimpl;
 
 typedef struct _clist {
-    struct _clistimpl *impl;
+  struct _clistimpl *impl;
 } list_t;
 
 typedef struct _citerator {
-    void* opaque;
+  void* opaque;
 } iter_t;
 
 typedef struct _cciterator {
-    const void* opaque;
+  const void* opaque;
 } const_iter_t;
 
 typedef void*(*allocator_t)(size_t);
