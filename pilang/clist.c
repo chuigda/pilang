@@ -47,7 +47,7 @@ void list_insert_before(list_t *list, iter_t iter, any_t any) {
     new_node->next = iter_node;
     new_node->prev = iter_node->prev;
     iter_node->prev->next = new_node;
-    iter_node->next->prev = new_node;
+    iter_node->prev = new_node;
 }
 
 void list_remove(list_t *list, iter_t iter) {

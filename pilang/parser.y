@@ -34,8 +34,12 @@ ast_node_base_t *glob_ast = NULL;
 program: functions { glob_ast = $1.ast; $$ = $1; } ;
 
 functions: 
-  functions function { $$.ast = node2(ANS_LIST, $1.ast, $2.ast); } 
-  | { $$.ast = NULL; } ;
+  functions function 
+  {
+    $$.ast = $1.ast;
+    ast_list_append($$.ast, $2.ast);
+  }
+  | { $$.ast = node_list(ANS_FUNCTIONS); } ;
 
 function: 
   TK_FUNCTION TK_ID TK_TAKES id_list TK_RETURNS id_list function_body
@@ -55,9 +59,10 @@ function_body:
 statements:
   statements statement
   {
-    $$.ast = node2(ANS_LIST, $1.ast, $2.ast);
+    $$.ast = $1.ast;
+    ast_list_append($$.ast, $2.ast);
   }
-  | { $$.ast = NULL; }
+  | { $$.ast = node_list(ANS_STATEMENTS); }
   ;
 
 statement: expr_statement { $$ = $1; } 
@@ -66,7 +71,7 @@ statement: expr_statement { $$ = $1; }
            | for_statement { $$ = $1; } 
            | empty_statement { $$ = $1; } ;
 
-expr_statement: expr TK_SYM_SEMI { $$ = $1; printf("Reduced expr_stmt\n"); } ;
+expr_statement: expr TK_SYM_SEMI { $$ = $1; } ;
 
 if_statement: 
   TK_IF expr TK_THEN statements TK_END TK_IF
@@ -104,7 +109,6 @@ assign_expr:
     jjvalue_t t;
     t.ivalue = TK_ESYM_EQ;
     $$.ast = node2_wdata(ANS_BINEXPR, t, $1.ast, $3.ast);
-    printf("Reduced assign_expr\n");
   }
   | logic_expr { $$ = $1; } 
   ;
@@ -160,9 +164,10 @@ unary_op_chain:
   {
     jjvalue_t t;
     t.ivalue = $2.token.token_kind;
-    $$.ast = node1_wdata(ANS_LIST, t, $1.ast);
+    ast_node_base_t *tnode = node1_wdata(ANS_UNARYOP, t, $1.ast);
+    ast_list_append($$.ast, tnode);
   }
-  | { $$.ast = NULL; };
+  | { $$.ast = node_list(ANS_UNARYOPS); };
 
 bin_logicop: TK_ESYM_AMPAMP { $$ = $1; }
              | TK_ESYM_PIPEPIPE { $$ = $1; } 
@@ -211,9 +216,17 @@ empty_statement: TK_SYM_SEMI { $$.ast = leaf(ANS_NULL); } ;
 id_list: 
   id_list idref_expr
   {
-    $$.ast = node2(ANS_LIST, $1.ast, $2.ast);
+    printf("found id_list id_ref_expr, shifting.\n");
+    printf("id_ref_expr.value = %s\n", 
+           get_string(((ast_node_wdata_base_t*)$2.ast)->data.svalue));
+    $$.ast = $1.ast;
+    ast_list_append($$.ast, $2.ast);
   }
-  | { $$.ast = NULL; } 
+  | 
+  {
+    printf("creating new id_list\n");
+    $$.ast = node_list(ANS_IDS); 
+  }
   ;
 
 %%
