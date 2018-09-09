@@ -157,10 +157,11 @@ mul_expr:
   ;
 
 unary_expr:
-  unary_op_chain atom_expr
-  { $$.ast = node2(ANS_UNARYEXPR, $1.ast, $2.ast); }
+  atom_expr
+  // { $$.ast = node2(ANS_UNARYEXPR, $1.ast, $2.ast); }
+  { $$.ast = $1.ast; }
   ;
-
+/*
 unary_op_chain:
   unary_op_chain unary_op
   {
@@ -170,6 +171,7 @@ unary_op_chain:
     ast_list_append($$.ast, tnode);
   }
   | { $$.ast = node_list(ANS_UNARYOPS); };
+*/
 
 bin_logicop: TK_ESYM_AMPAMP { $$ = $1; }
              | TK_ESYM_PIPEPIPE { $$ = $1; } 
@@ -191,12 +193,13 @@ bin_mulop: TK_ESYM_ASTER { $$ = $1; }
 bin_addop: TK_ESYM_PLUS { $$ = $1; } 
            | TK_ESYM_MINUS { $$ = $1; } 
            ;
-
+/*
 unary_op: TK_ESYM_PLUS { $$ = $1; }
           | TK_ESYM_MINUS { $$ = $1; }
           | TK_ESYM_NOT { $$ = $1; }
           | TK_ESYM_CARET { $$ = $1; } 
           ;
+*/
 
 atom_expr: int_expr { $$ = $1; } 
            | float_expr { $$ = $1; } 
