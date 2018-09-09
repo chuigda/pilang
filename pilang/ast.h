@@ -126,8 +126,5 @@ extern void ast_list_prepend(ast_node_base_t *node,
 extern void ast_list_append(ast_node_base_t *node,
                             ast_node_base_t *data);
 
-extern void tree_print(ast_node_base_t *root, uint16_t parent,
-                       int nth_child);
-
 #endif
 

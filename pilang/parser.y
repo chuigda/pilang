@@ -10,6 +10,8 @@
 
 #include "yystype.h"
 
+#include "tree_dump.h"
+
 extern int yylex(void);
 extern void yyerror(const char *err);
 
@@ -257,6 +259,6 @@ int main(int argc, char *argv[]) {
   }
 
   printf("glob_ast = %p\n", glob_ast);
-  tree_print(glob_ast, 0, 0);
+  tree_dump(glob_ast);
 }
 
