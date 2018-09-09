@@ -16,7 +16,7 @@ GAST has the following kinds of nodes:
   <li>dual child with data    (`ast_dchild_wdata_t`)</li>
   <li>triple child node       (`ast_tchild_t`)</li>
   <li>triple child with data  (`ast_tchild_wdata_t`)</li>
-  <li>list                    (`ast_list_t`)<sup>[1]</sup><li> 
+  <li>list                    (`ast_list_t`)<sup>[1]</sup></li>
 </lo>
 <sup>[1]</sup> List values should only be AST nodes.
 
@@ -81,6 +81,18 @@ example, the ID for `ast_leaf_t` is `ANK_LEAF`.
 For each node, a unique __UID__ is set. This is used for AST printing and
 debugging.
 
+## Extra source location info
+GAST allows extra source location info to be attached with an AST node.
+In `AST_NODE_COMMON`, there are two fields `uint16_t row` and 
+`uint16_t col`, where you can put in your source location information.
+This is quite limited. If you need better machanism, see "Extending
+GAST structure".
+
+What's more, one utility function is also provided for attaching source
+location info:
+
+    void ast_attach_srcloc(ast_node_base_t*, uint16_t, uint16_t);
+
 ## Extra semantics info
 GAST allows extra semantics info to be attached with an AST node. In
 `AST_NODE_COMMON`, there is a `uint16_t sema_info` where you can put in
@@ -93,7 +105,7 @@ pass them when creating nodes with utility functions.
 ## Traversing GAST productions
 > FIXME: GAST traversing is not finished.
 
-## Expanding GAST structure
+## Extending GAST structure
 > FIXME: GAST traversing is not finished.
 To add a new kind of AST node for GAST, for example, you want a kind of
 node which have 4 children and 2 pieces of extra data:
