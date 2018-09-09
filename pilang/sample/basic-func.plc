@@ -1,5 +1,9 @@
 function main takes argc argv returns status
 begin
   if argc == 2 then
+    status = success;
+  else
+    status = fail;
   end if
 end function
+
