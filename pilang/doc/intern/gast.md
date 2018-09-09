@@ -65,10 +65,11 @@ language does not have inheritance. So we use special trick to simulate
 inheritance. We made each kind of node start with `AST_NODE_COMMON`:
 
     #define AST_NODE_COMMON \
-      uint16_t node_kind; \
-      uint16_t sema_info; \
+      uint8_t node_kind; \
+      uint8_t sema_info; \
       uint16_t node_uid; \
-      uint16_t : 16; // padding
+      uint16_t row; \
+      uint16_t col;
 
 As a result, pointer to any kind of node can be safely converted to 
 pointer to `ast_node_base_t`. The current size of `AST_NODE_COMMON` is 8

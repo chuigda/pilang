@@ -19,10 +19,11 @@ typedef enum {
 } ast_node_sema_t;
 
 #define AST_NODE_COMMON \
-  uint16_t node_kind; \
-  uint16_t node_sema_info; \
+  uint8_t node_kind; \
+  uint8_t node_sema_info; \
   uint16_t node_uid; \
-  uint16_t : 16; // padding
+  uint16_t row; \
+  uint16_t col;
 
 typedef struct {
   AST_NODE_COMMON
