@@ -67,10 +67,10 @@ statements:
   | { $$.ast = node_list(ANS_STATEMENTS); }
   ;
 
-statement: expr_statement { $$ = $1; } 
-           | if_statement { $$ = $1; } 
-           | while_statement { $$ = $1; } 
-           | for_statement { $$ = $1; } 
+statement: expr_statement { $$ = $1; }
+           | if_statement { $$ = $1; }
+           | while_statement { $$ = $1; }
+           | for_statement { $$ = $1; }
            | empty_statement { $$ = $1; } ;
 
 expr_statement: expr TK_SYM_SEMI { $$ = $1; } ;
