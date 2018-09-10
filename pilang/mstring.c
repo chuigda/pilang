@@ -1,5 +1,7 @@
 #include "mstring.h"
 
+#include "util.h"
+
 #include <assert.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -32,8 +34,8 @@ static hash_map_item_t
 
 static hash_map_item_t *new_hash_map_item(const char *value,
                                           int64_t handle) {
-  hash_map_item_t *entry = malloc(sizeof(hash_map_item_t));
-  entry->value = malloc(strlen(value) + 1);
+  hash_map_item_t *entry = NEW(hash_map_item_t);
+  entry->value = NEWN(char, strlen(value) + 1);
   strcpy(entry->value, value);
   entry->next = NULL;
   entry->handle = handle;

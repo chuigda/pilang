@@ -15,7 +15,7 @@ ast.o : ast.c jjvalue.h mstring.h util.h
 clist.o : clist.c clist.h
 	$(CC) -c clist.c -o clist.o -g
 
-mstring.o : mstring.c mstring.h
+mstring.o : mstring.c mstring.h util.h
 	$(CC) -c mstring.c -o mstring.o -g
 
 parser.o : y.tab.c mstring.h jjvalue.h tree_dump.h
