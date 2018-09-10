@@ -1,11 +1,11 @@
 #include "clist.h"
 
-typedef struct _node {
+typedef struct node_ {
   any_t any;
-  struct _node *prev, *next;
+  struct node_ *prev, *next;
 } node_t;
 
-typedef struct _clistimpl {
+typedef struct clistimpl_ {
   allocator_t alloc;
   deallocator_t dealloc;
   node_t head_node;

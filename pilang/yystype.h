@@ -1,8 +1,8 @@
 #ifndef YYSTYPE_H
 #define YYSTYPE_H
 
-#include "jjvalue.h"
 #include "ast.h"
+#include "jjvalue.h"
 
 typedef struct {
   jjvalue_t val;

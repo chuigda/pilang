@@ -1,6 +1,7 @@
 #include "tree_dump.h"
 
 #include "mstring.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -34,8 +35,7 @@ tree_dump_impl(ast_node_base_t *root, uint16_t parent, int nth_child) {
          ans_strs[root->node_sema_info]);
 
   if (strstr(ank_strs[root->node_kind], "WDATA")) {
-    if (root->node_sema_info == ANS_ID
-        || root->node_sema_info == ANS_IDREF
+    if (root->node_sema_info == ANS_IDREF
         || root->node_sema_info == ANS_FUNCTION) {
       printf(", SDATA = %s",
              get_string(((ast_node_wdata_base_t*)root)->data.svalue));

@@ -5,7 +5,15 @@
 
 #define STRING_HASHMAP_BUCKET_COUNT 4396
 
-extern int64_t create_string(const char* str);
-extern char const* get_string(int64_t hStr);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int64_t create_string(const char* str);
+char const* get_string(int64_t hStr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // CMALT_MSTRING_H

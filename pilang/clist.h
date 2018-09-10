@@ -1,20 +1,24 @@
 #ifndef CLIST_H
 #define CLIST_H
 
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
 
-struct _clistimpl;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-typedef struct _clist {
-  struct _clistimpl *impl;
+struct clistimpl_;
+
+typedef struct clist_ {
+  struct clistimpl_ *impl;
 } list_t;
 
-typedef struct _citerator {
+typedef struct citerator_ {
   void* opaque;
 } iter_t;
 
-typedef struct _cciterator {
+typedef struct cciterator_ {
   const void* opaque;
 } const_iter_t;
 
@@ -47,5 +51,8 @@ bool iter_eq(iter_t lhs, iter_t rhs);
 const_iter_t const_iter_next(const_iter_t iter);
 const_iter_t const_iter_prev(const_iter_t iter);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // CLIST_H

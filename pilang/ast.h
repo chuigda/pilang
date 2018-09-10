@@ -1,10 +1,14 @@
 #ifndef AST_H
 #define AST_H
 
+#include "clist.h"
+#include "jjvalue.h"
+
 #include <stdint.h>
 
-#include "jjvalue.h"
-#include "clist.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef enum {
   #define ANK_DECLARE(KEY) KEY,
@@ -34,11 +38,12 @@ typedef struct {
   jjvalue_t data;
 } ast_node_wdata_base_t;
 
+#if __STDC_VERSION__ >= 201112L
 _Static_assert(sizeof(ast_node_base_t) == 8,
                "Unexpected size difference");
-
 _Static_assert(sizeof(ast_node_wdata_base_t) == 16,
                "Unexpected size difference");
+#endif
 
 typedef struct {
   AST_NODE_COMMON
@@ -87,47 +92,45 @@ typedef struct {
   list_t list;
 } ast_list_t;
 
-extern ast_node_base_t *leaf(ast_node_sema_t sema_info);
+ast_node_base_t *leaf(ast_node_sema_t sema_info);
 
-extern ast_node_base_t *leaf_wdata(ast_node_sema_t sema_info, 
-                                   jjvalue_t data);
+ast_node_base_t *leaf_wdata(ast_node_sema_t sema_info, jjvalue_t data);
 
-extern ast_node_base_t *node1(ast_node_sema_t sema_info, 
-                              ast_node_base_t *child);
+ast_node_base_t *node1(ast_node_sema_t sema_info, 
+                       ast_node_base_t *child);
 
-extern ast_node_base_t *node1_wdata(ast_node_sema_t sema_info, 
-                                    jjvalue_t data,
-                                    ast_node_base_t *child);
+ast_node_base_t *node1_wdata(ast_node_sema_t sema_info, jjvalue_t data,
+                             ast_node_base_t *child);
 
-extern ast_node_base_t *node2(ast_node_sema_t sema_info, 
-                              ast_node_base_t *lchild, 
-                              ast_node_base_t *rchild);
+ast_node_base_t *node2(ast_node_sema_t sema_info, 
+                       ast_node_base_t *lchild, 
+                       ast_node_base_t *rchild);
 
-extern ast_node_base_t *node2_wdata(ast_node_sema_t sema_info,
-                                    jjvalue_t data,
-                                    ast_node_base_t *lchild,
-                                    ast_node_base_t *rchild);
+ast_node_base_t *node2_wdata(ast_node_sema_t sema_info, jjvalue_t data,
+                             ast_node_base_t *lchild,
+                             ast_node_base_t *rchild);
 
-extern ast_node_base_t *node3(ast_node_sema_t sema_info,
-                              ast_node_base_t *child0,
-                              ast_node_base_t *child1,
-                              ast_node_base_t *child2);
+ast_node_base_t *node3(ast_node_sema_t sema_info, 
+                       ast_node_base_t *child0,
+                       ast_node_base_t *child1,
+                       ast_node_base_t *child2);
 
-extern ast_node_base_t *node3_wdata(ast_node_sema_t sema_info,
-                                    jjvalue_t data,
-                                    ast_node_base_t *child0,
-                                    ast_node_base_t *child1,
-                                    ast_node_base_t *child2);
+ast_node_base_t *node3_wdata(ast_node_sema_t sema_info, jjvalue_t data,
+                             ast_node_base_t *child0,
+                             ast_node_base_t *child1,
+                             ast_node_base_t *child2);
 
-extern ast_node_base_t *node_list(ast_node_sema_t sema_info);
+ast_node_base_t *node_list(ast_node_sema_t sema_info);
 
-extern void ast_list_prepend(ast_node_base_t *node,
-                             ast_node_base_t *data);
+void ast_list_prepend(ast_node_base_t *node, ast_node_base_t *data);
 
-extern void ast_list_append(ast_node_base_t *node,
-                            ast_node_base_t *data);
+void ast_list_append(ast_node_base_t *node, ast_node_base_t *data);
 
-extern void ast_attach_srcloc(ast_node_base_t *node, 
-                              uint16_t row, uint16_t col);
+void ast_attach_srcloc(ast_node_base_t *node, 
+                       uint16_t row, uint16_t col);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

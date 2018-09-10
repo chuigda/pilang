@@ -1,16 +1,14 @@
 %{
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-
-#include "mstring.h"
-#include "jjvalue.h"
 #include "ast.h"
-
+#include "jjvalue.h"
+#include "mstring.h"
+#include "tree_dump.h"
 #include "yystype.h"
 
-#include "tree_dump.h"
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
 
 extern int yylex(void);
 extern void yyerror(const char *err);

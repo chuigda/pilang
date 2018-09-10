@@ -1,5 +1,6 @@
-#include "yystype.h"
 #include "mstring.h"
+#include "yystype.h"
+
 #include "y.tab.h"
 
 #include <assert.h>

@@ -5,8 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if __STDC_VERSION__ >= 201112L
 _Static_assert(STRING_HASHMAP_BUCKET_COUNT < 100000,
                "Too many buckets");
+#endif
 
 uint64_t BKDR_hash(const char *str) {
   uint64_t hash = 0;
@@ -19,9 +21,9 @@ uint64_t BKDR_hash(const char *str) {
   return hash;
 }
 
-typedef struct glob_hash_mapItem {
+typedef struct glob_hash_map_item {
   char *value;
-  struct glob_hash_mapItem *next;
+  struct glob_hash_map_item *next;
   int64_t handle;
 } hash_map_item_t;
 
@@ -71,11 +73,11 @@ int64_t create_string(const char *str) {
   }
 }
 
-const char *get_string(int64_t hStr) {
-  size_t bucket = hStr / 10;
+const char *get_string(int64_t hstr) {
+  size_t bucket = hstr / 10;
   hash_map_item_t *item = glob_hash_map[bucket];
   while (item != NULL) {
-    if (item->handle == hStr) {
+    if (item->handle == hstr) {
       return item->value;
     }
     item = item->next;
