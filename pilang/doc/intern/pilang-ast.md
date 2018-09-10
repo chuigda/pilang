@@ -120,6 +120,12 @@ fixing that bug
 * __ANS__: `ANS_IDREF`
 * __Data__: with `svalue` field valid, value of `TK_ID`
 
+### `str_expr` node _[wrapper]_
+* __Production__: `TK_STR`
+* __ANK__: `ANK_LEAF_WDATA`
+* __ANS__: `ANS_STR`
+* __Data__: with `svalue` field valid, value of `TK_ID`
+
 ### `func_call_expr` node _[wrapper]_
 * __Production__:
 `idref_expr TK_SYM_LBRACKET semi_sep_list TK_SYM_RBRACKET`

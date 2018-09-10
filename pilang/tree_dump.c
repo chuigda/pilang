@@ -36,7 +36,8 @@ tree_dump_impl(ast_node_base_t *root, uint16_t parent, int nth_child) {
 
   if (strstr(ank_strs[root->node_kind], "WDATA")) {
     if (root->node_sema_info == ANS_IDREF
-        || root->node_sema_info == ANS_FUNCTION) {
+        || root->node_sema_info == ANS_FUNCTION
+        || root->node_sema_info == ANS_STR) {
       printf(", SDATA = %s",
              get_string(((ast_node_wdata_base_t*)root)->data.svalue));
     }

@@ -1,0 +1,9 @@
+function pipe takes a b returns c
+begin
+  c = a + b + b + a;
+end function
+
+function main takes returns
+begin
+  print[ pipe[ 'aaa' ; 'bbb' ] ];
+end function

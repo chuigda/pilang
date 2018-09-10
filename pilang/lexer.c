@@ -1,6 +1,6 @@
 #include "mstring.h"
+#include "util.h"
 #include "yystype.h"
-
 #include "y.tab.h"
 
 #include <assert.h>
@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 static bool my_strcmpi(const char *s1, const char *s2) {
@@ -319,6 +320,59 @@ static int lex_common_sym(void) {
   return yylval.token.token_kind;
 }
 
+static int lex_string(void) {
+  yylval.token.token_kind = TK_STR;
+  yylval.token.row = currow();
+  yylval.token.col = curcol();
+  yylval.token.replaced = 0;
+  
+  // TODO: Shall we make out a mutable string?
+  size_t cap = 64;
+  size_t size = 0;
+  char *buffer = NEWN(char, 64);
+  get_next_char();
+  while (curchar() != '\'' && curchar() != '\0') {
+    if (cap == size - 1) {
+      char *new_buffer = NEWN(char, cap * 2);
+      strncpy(new_buffer, buffer, cap);
+      cap *= 2;
+      free(buffer);
+      buffer = new_buffer;
+    }
+    
+    if (curchar() == '\\') {
+      peek_one_char();
+      switch (peeked_char()) {
+      case '\\': get_next_char(); buffer[size] = '\\'; break;
+      case 'n':  get_next_char(); buffer[size] = '\n'; break;
+      case 't':  get_next_char(); buffer[size] = '\t'; break;
+      case 'f':  get_next_char(); buffer[size] = '\f'; break;
+      case 'v':  get_next_char(); buffer[size] = '\v'; break;
+      case '\'': get_next_char(); buffer[size] = '\''; break;
+      default:
+        lex_warn("Invalid conversion sequence, ignoring",
+                 currow(), curcol());
+      }
+    }
+    else {
+      buffer[size] = curchar();
+    }
+    ++size;
+    get_next_char();
+  }
+  
+  if (curchar() == '\0') {
+    lex_warn("Unclosed string, ignoring", currow(), curcol());
+  }
+  else {
+    get_next_char();
+  }
+  
+  yylval.token.val.svalue = create_string(buffer);
+  free(buffer);
+  return yylval.token.token_kind;
+}
+
 int yylex(void) {
   while (1) {
     switch (curchar()) {
@@ -347,6 +401,9 @@ int yylex(void) {
     case '1': case '2': case '3': case '4': case '5': case '6':
     case '7': case '8': case '9': case '0':
       return lex_number();
+
+    case '\'':
+      return lex_string();
 
     case ' ': case '\n': case '\t': case '\v': case '\f':
       get_next_char();

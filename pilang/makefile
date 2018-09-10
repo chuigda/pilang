@@ -21,7 +21,7 @@ mstring.o : mstring.c mstring.h util.h
 parser.o : y.tab.c mstring.h jjvalue.h tree_dump.h
 	$(CC) -c y.tab.c -o parser.o -g
 
-lexer.o : lexer.c y.tab.h
+lexer.o : lexer.c y.tab.h util.h
 	$(CC) -c lexer.c -o lexer.o -g
 
 y.tab.c y.tab.h : parser.y

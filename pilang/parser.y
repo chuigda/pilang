@@ -202,6 +202,7 @@ unary_op: TK_ESYM_PLUS { $$ = $1; }
 atom_expr: int_expr { $$ = $1; } 
            | float_expr { $$ = $1; } 
            | idref_expr { $$ = $1; }
+           | str_expr { $$ = $1; }
            | TK_SYM_LBRACKET expr TK_SYM_RBRACKET { $$ = $2; }
            | func_call_expr { $$ = $1; }
            ;
@@ -214,6 +215,9 @@ float_expr:
 
 idref_expr:
   TK_ID { $$.ast = leaf_wdata(ANS_IDREF, $1.token.val); } ;
+
+str_expr:
+  TK_STR { $$.ast = leaf_wdata(ANS_STR, $1.token.val); } ;
 
 func_call_expr:
   idref_expr TK_SYM_LBRACKET semi_sep_list TK_SYM_RBRACKET
