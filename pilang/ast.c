@@ -1,13 +1,12 @@
 #include "ast.h"
 
 #include "mstring.h"
+#include "util.h"
 
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define NEW(TYPE) (TYPE*)malloc(sizeof(TYPE))
 
 static uint16_t glob_uid_ = 0;
 

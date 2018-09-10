@@ -9,7 +9,7 @@ pli : mstring.o lexer.o parser.o clist.o ast.o tree_dump.o
 tree_dump.o: tree_dump.c tree_dump.h ast.h mstring.h
 	$(CC) -c tree_dump.c -o tree_dump.o -g
 
-ast.o : ast.c jjvalue.h mstring.h
+ast.o : ast.c jjvalue.h mstring.h util.h
 	$(CC) -c ast.c -o ast.o -g
 
 clist.o : clist.c clist.h
