@@ -40,20 +40,23 @@ plstkobj_t *stack_allocate(plstack_t *stack, const char *name) {
     abort();
   }
 
+  plstkobj_t *obj = stack->storage + stack->stack_usage;
+  obj->name = copied_name;
+
   plstkframe_t *cur_frame = 
     (plstkframe_t*)iter_deref(iter_prev(list_end(&(stack->frames))));
-  
   stack->stack_usage++;
   cur_frame->objs_end++;
-  return stack->storage + stack->stack_usage - 1;
+  return obj;
 }
 
 void stack_allocate_n(plstack_t *stack, size_t n,
                       plstkobj_t **begin, plstkobj_t **end) {
-  // TODO
-  (void)stack;
-  (void)n;
-  (void)begin;
-  (void)end;
+  plstkobj_t *first = stack_allocate(stack, NULL);
+  for (int i = 1; i < n; i++) {
+    stack_allocate(stack, NULL);
+  }
+  *begin = first;
+  *end = first + n;
 }
 
