@@ -3,9 +3,13 @@ all: docs pli
 docs: doc/makefile
 	cd doc && make && tree -P "*.html" > docs && cd ..
 
-pli : mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plheap.o
+pli : mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plheap.o \
+      stack.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o plheap.o \
-	      -o pli
+	      stack.o -o pli
+
+stack.o: stack.c stack.h clist.h util.h
+	$(CC) -c stack.c -o stack.o -g
 
 plheap.o: plheap.c plheap.h clist.h util.h
 	$(CC) -c plheap.c -o plheap.o -g

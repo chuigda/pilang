@@ -37,7 +37,7 @@ static void destroy_object(plobj_t *obj) {
   case OID_LIST:
     destroy_list_object(obj);
     break;
-  
+
 // TODO: do this after we have a set implementation
 //  case OID_SET:
 //    destroy_set_object(obj);
