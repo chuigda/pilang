@@ -1,14 +1,20 @@
-all: docs pli
+all: docs pli test_stack
 
 docs: doc/makefile
 	cd doc && make && tree -P "*.html" > docs && cd ..
 
-pli : mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plheap.o \
-      stack.o
+pli: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plheap.o \
+     stack.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o plheap.o \
 	      stack.o -o pli
 
-stack.o: stack.c stack.h clist.h util.h
+test_stack: stack.o test_stack.o clist.o mstring.o
+	$(CC) stack.o test_stack.o clist.o mstring.o -o test_stack
+
+test_stack.o: test_stack.c stack.h
+	$(CC) -c test_stack.c -o test_stack.o -g
+
+stack.o: stack.c stack.h clist.h mstring.h util.h
 	$(CC) -c stack.c -o stack.o -g
 
 plheap.o: plheap.c plheap.h clist.h util.h

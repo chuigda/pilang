@@ -41,15 +41,16 @@ typedef struct {
 
 void init_stack(plstack_t *stack);
 
-void stack_enter_frame(plstack_t *stack, size_t param_count,
+void stack_enter_frame(plstack_t *stack,
+                       size_t param_count,
                        size_t returns_count);
 
+// FIXME: how to initialize parameters and return values (at least their
+//        names properly?
+// void stack_init_param(size_t nth, int64_t name, plstkobj_t *object);
+// void stack_init_return(size_t nth, int64_t name);
+
 void stack_exit_frame(plstack_t *stack);
-
-plstkobj_t *stack_allocate(plstack_t *stack, int64_t name);
-
-void stack_allocate_n(plstack_t *stack, size_t n, plstkobj_t **begin,
-                      plstkobj_t **end);
 
 plstkobj_t *stack_get(plstack_t *stack, int64_t name);
 
