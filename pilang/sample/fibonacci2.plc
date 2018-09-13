@@ -1,0 +1,14 @@
+function fibonacci takes a returns b
+begin
+  if a == 0 then
+    b = 0;
+    return
+  end if
+  
+  if a == 1 then
+    b = 1;
+    return;
+  end if
+
+  b = fibonacci[a - 1] + fibonacci[a - 2];
+end function

@@ -18,7 +18,7 @@ ast_node_base_t *glob_ast = NULL;
 %}
 
 %token TK_FUNCTION TK_TAKES TK_RETURNS TK_BEGIN TK_END TK_IF TK_THEN
-%token TK_ELSE TK_WHILE TK_FOR TK_TO 
+%token TK_ELSE TK_WHILE TK_FOR TK_TO TK_RETURN
 %token TK_ID
 %token TK_NUM_INT TK_NUM_FLOAT TK_STR
 %token TK_SYM_COMMA TK_SYM_SEMI TK_SYM_DOT
@@ -69,6 +69,7 @@ statement: expr_statement { $$ = $1; }
            | if_statement { $$ = $1; }
            | while_statement { $$ = $1; }
            | for_statement { $$ = $1; }
+           | return_statement { $$ = $1; }
            | empty_statement { $$ = $1; } ;
 
 expr_statement: expr TK_SYM_SEMI { $$ = $1; } ;
@@ -99,6 +100,10 @@ for_statement:
       node3(ANS_FOR_HEAD, $2.ast, $4.ast, $6.ast);
     $$.ast = node2(ANS_FOR, for_head, $8.ast);
   }
+  ;
+
+return_statement:
+  TK_RETURN { $$.ast = leaf(ANS_RETURN); }
   ;
 
 expr: assign_expr { $$ = $1; } ;
