@@ -12,3 +12,8 @@ begin
 
   b = fibonacci[a - 1] + fibonacci[a - 2];
 end function
+
+function main takes returns
+begin
+  print[fibonacci[40]];
+end function
