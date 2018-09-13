@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 int64_t create_string(const char* str);
-char const* get_string(int64_t hStr);
+char const* get_string(int64_t hstr);
 
 #ifdef __cplusplus
 }

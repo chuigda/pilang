@@ -4,6 +4,7 @@
 #include "plheap.h"
 
 #include "clist.h"
+#include "mstring.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -11,11 +12,12 @@
 typedef enum {
   SOID_INT,
   SOID_FLOAT,
-  SOID_REF
+  SOID_REF,
+  SOID_UNDEFINED
 } pstkobj_id_t;
 
 typedef struct {
-  const char *name;
+  int64_t name;
   union {
     int64_t ivalue;
     double fvalue;
@@ -44,15 +46,14 @@ void stack_enter_frame(plstack_t *stack, size_t param_count,
 
 void stack_exit_frame(plstack_t *stack);
 
-plstkobj_t *stack_allocate(plstack_t *stack, const char *name);
+plstkobj_t *stack_allocate(plstack_t *stack, int64_t name);
 
 void stack_allocate_n(plstack_t *stack, size_t n, plstkobj_t **begin,
                       plstkobj_t **end);
 
-plstkobj_t *stack_get(const char *name);
+plstkobj_t *stack_get(plstack_t *stack, int64_t name);
 
 #define DFL_STACK_SIZE 65536
 #define DFL_STACKFRAME_COUNT 512
 
 #endif
-

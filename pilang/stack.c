@@ -24,16 +24,7 @@ void stack_enter_frame(plstack_t *stack, size_t param_count,
                    &(frame->returns_end));
 }
 
-plstkobj_t *stack_allocate(plstack_t *stack, const char *name) {
-  char *copied_name;
-  if (name == NULL) {
-    copied_name = NULL;
-  }
-  else {
-    copied_name = NEWN(char, strlen(name) + 1);
-    strcpy(copied_name, name);
-  }
-
+plstkobj_t *stack_allocate(plstack_t *stack, int64_t name) {
   if (stack->stack_usage == stack->stack_size) {
     fprintf(stderr, "pilang pivm: stack overflow, "
                     "with DFL_STACK_SIZE = %d\n", DFL_STACK_SIZE);
@@ -41,7 +32,7 @@ plstkobj_t *stack_allocate(plstack_t *stack, const char *name) {
   }
 
   plstkobj_t *obj = stack->storage + stack->stack_usage;
-  obj->name = copied_name;
+  obj->name = name;
 
   plstkframe_t *cur_frame = 
     (plstkframe_t*)iter_deref(iter_prev(list_end(&(stack->frames))));
@@ -52,11 +43,44 @@ plstkobj_t *stack_allocate(plstack_t *stack, const char *name) {
 
 void stack_allocate_n(plstack_t *stack, size_t n,
                       plstkobj_t **begin, plstkobj_t **end) {
-  plstkobj_t *first = stack_allocate(stack, NULL);
+  plstkobj_t *first = stack_allocate(stack, -1);
   for (int i = 1; i < n; i++) {
-    stack_allocate(stack, NULL);
+    stack_allocate(stack, -1);
   }
   *begin = first;
   *end = first + n;
 }
 
+void stack_exit_frame(plstack_t *stack) {
+  plstkframe_t *curframe =
+    (plstkframe_t*)iter_deref(iter_prev(list_end(&(stack->frames))));
+  stack->stack_usage -= (curframe->objs_end - curframe->objs_begin);
+  list_remove(&(stack->frames), iter_prev(list_end(&(stack->frames))));
+}
+
+static plstkobj_t *frame_get(plstkframe_t *frame, int64_t name) {
+  for (plstkobj_t *obj = frame->objs_begin;
+       obj != frame->objs_end;
+       ++obj) {
+    if (name == obj->name) {
+      return obj;
+    }
+  }
+  return NULL;
+}
+
+plstkobj_t *stack_get(plstack_t *stack, int64_t name) {
+  for (iter_t it = iter_prev(list_end(&(stack->frames)));
+       !iter_eq(iter_prev(list_begin(&(stack->frames))), it);
+       it = iter_prev(it)) {
+    plstkobj_t *find_result = frame_get((plstkframe_t*)iter_deref(it),
+                                        name);
+    if (find_result != NULL) {
+      return find_result;
+    }
+  }
+
+  plstkobj_t *result = stack_allocate(stack, name);
+  result->soid = SOID_UNDEFINED;
+  return result;
+}
