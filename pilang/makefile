@@ -46,5 +46,6 @@ clean:
 	rm -rf y.output
 	rm -rf *.o
 	rm -rf pli
+	rm -rf test_stack
 	cd doc && make clean && cd ..
 	rm -rf doc/docs
