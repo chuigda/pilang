@@ -55,6 +55,8 @@ void init_stack(plstack_t *stack) {
 void stack_enter_frame(plstack_t *stack, size_t param_count,
                        size_t return_count) {
   plstkframe_t *frame = NEW(plstkframe_t);
+  frame->objs_begin = stack->storage + stack->stack_usage;
+  frame->objs_end = stack->storage + stack->stack_usage;
   list_push_back(&(stack->frames), frame);
   stack_allocate_n(stack, param_count, &(frame->params_begin),
                    &(frame->params_end));
@@ -67,6 +69,7 @@ void stack_exit_frame(plstack_t *stack) {
     (plstkframe_t*)iter_deref(iter_prev(list_end(&(stack->frames))));
   stack->stack_usage -= (curframe->objs_end - curframe->objs_begin);
   list_remove(&(stack->frames), iter_prev(list_end(&(stack->frames))));
+  free(curframe);
 }
 
 plstkobj_t *stack_get(plstack_t *stack, int64_t name) {

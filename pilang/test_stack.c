@@ -33,4 +33,8 @@ int main() {
   assert(stack_get(&stack, create_string("b")) == o2);
   
   stack_exit_frame(&stack);
+  
+  free(stack.storage);
+  destroy_list(&(stack.frames));
+  return 0;
 }

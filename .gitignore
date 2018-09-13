@@ -36,6 +36,9 @@ cicosh
 baka
 pli
 
+# Test output
+pilang/test_stack
+
 # YACC output
 y.tab.h
 y.tab.c
