@@ -5,5 +5,5 @@ end function
 
 function main takes returns
 begin
-  print[ pipe[ 'aaa' ; 'bbb' ] ];
+  print[ pipe[ 'a\naa' ; 'bb\'b' ] ];
 end function
