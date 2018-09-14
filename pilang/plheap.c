@@ -60,6 +60,13 @@ void init_heap() {
   heap_usage = 0;
 }
 
+void close_heap() {
+  for (int i = 0; i < heap_cap; i++) {
+    free(heap[i]);
+  }
+  free(heap);
+}
+
 static void expand_heap(void) {
   size_t new_cap = heap_cap * 1.6;
   plobj_t **new_heap = NEWN(plobj_t*, new_cap);
@@ -80,11 +87,11 @@ static plobj_t *plalloc(void) {
     // TODO gc should be implemented by stack side code
     // heap_request_gc();
   }
-  
+
   if (0.8 * heap_cap < heap_usage) {
     expand_heap();
   }
-  
+
   for (int i = 0; i < heap_cap; i++) {
     if (heap[i]->used == 0) {
       ++heap_usage;
@@ -92,8 +99,43 @@ static plobj_t *plalloc(void) {
       return heap[i];
     }
   }
-  
+
   assert(0);
+}
+
+plobj_t *plobj_create_int(int64_t value) {
+  plobj_t *ret = plalloc();
+  ret->oid = OID_INT;
+  ret->value.ivalue = value;
+  return ret;
+}
+
+plobj_t *plobj_create_float(double value) {
+  plobj_t *ret = plalloc();  
+  ret->oid = OID_FLOAT;
+  ret->value.fvalue = value;
+  return ret;
+}
+
+plobj_t *plobj_create_list(list_t list) {
+  plobj_t *ret = plalloc();
+  ret->oid = OID_LIST;
+  ret->value.lsvalue = list;
+  return ret;
+}
+
+plobj_t *plobj_create_str(int64_t str) {
+  plobj_t *ret = plalloc();
+  ret->oid = OID_STR;
+  ret->value.svalue = str;
+  return ret;
+}
+
+plobj_t *plobj_create_ref(plobj_t *source) {
+  plobj_t *ret = plalloc();
+  ret->oid = OID_REF;
+  ret->value.pvalue = source;
+  return ret;
 }
 
 void gc_start() {

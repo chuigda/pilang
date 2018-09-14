@@ -34,9 +34,10 @@ plobj_t *plobj_create_str(int64_t h_str);
 plobj_t *plobj_create_list(list_t list);
 plobj_t *plobj_create_object(void);
 
-#define HEAP_INIT_SIZE 4396
+#define HEAP_INIT_SIZE 114514
 
 void init_heap(void);
+void close_heap(void);
 
 void gc_start(void);
 void gc_mark_white(plobj_t *obj);
