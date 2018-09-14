@@ -54,6 +54,6 @@ clean:
 	rm -rf y.output
 	rm -rf *.o
 	rm -rf pli
-	rm -rf test_stack
+	rm -rf test_stack test_gc
 	cd doc && make clean && cd ..
 	rm -rf doc/docs

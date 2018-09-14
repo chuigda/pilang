@@ -38,6 +38,7 @@ pli
 
 # Test output
 pilang/test_stack
+pilang/test_gc
 
 # YACC output
 y.tab.h
