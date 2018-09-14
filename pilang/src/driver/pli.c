@@ -1,4 +1,5 @@
 #include "ast.h"
+#include "eval.h"
 #include "tree_dump.h"
 #include "y.tab.h"
 
@@ -30,7 +31,7 @@ int main(int argc, char *argv[]) {
     fclose(fp_lex_in);
   }
 
-  printf("glob_ast = %p\n", glob_ast);
-  tree_dump(glob_ast);
+  eval_ast(glob_ast);
   return 0;
 }
+
