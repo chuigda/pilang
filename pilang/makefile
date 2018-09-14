@@ -1,12 +1,11 @@
-all: docs pli tests
+all: docs plast tests
 
 docs: doc/makefile
 	cd doc && make && tree -P "*.html" > docs && cd ..
 
-pli: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plheap.o \
-     stack.o eval.o
-	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o plheap.o \
-	      stack.o eval.o -o pli
+plast: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
+	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o plast.o \
+	      -o plast
 
 tests: test_stack test_gc
 
@@ -21,6 +20,9 @@ test_stack: stack.o test_stack.o clist.o mstring.o
 
 test_stack.o: test/test_stack.c
 	$(CC) -c -I include test/test_stack.c -o test_stack.o -g
+
+plast.o: src/driver/plast.c y.tab.h
+	$(CC) -c -I include -I ./ src/driver/plast.c -o plast.o -g
 
 eval.o: src/eval/eval.c y.tab.h
 	$(CC) -c -I include -I ./ src/eval/eval.c -o eval.o -g
@@ -56,7 +58,7 @@ clean:
 	rm -rf y.tab.*
 	rm -rf y.output
 	rm -rf *.o
-	rm -rf pli
+	rm -rf pli plast
 	rm -rf test_stack test_gc
 	cd doc && make clean && cd ..
 	rm -rf doc/docs
