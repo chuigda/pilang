@@ -9,8 +9,8 @@
 
 static plstkobj_t *stack_allocate(plstack_t *stack, int64_t name) {
   if (stack->stack_usage == stack->stack_size) {
-    fprintf(stderr, "pilang pivm: stack overflow, "
-                    "with DFL_STACK_SIZE = %d\n", DFL_STACK_SIZE);
+    eprintf("pilang pivm: stack overflow, "
+            "with DFL_STACK_SIZE = %d\n", DFL_STACK_SIZE);
     abort();
   }
 
@@ -24,16 +24,6 @@ static plstkobj_t *stack_allocate(plstack_t *stack, int64_t name) {
   return obj;
 }
 
-static void stack_allocate_n(plstack_t *stack, size_t n,
-                             plstkobj_t **begin, plstkobj_t **end) {
-  plstkobj_t *first = stack_allocate(stack, -1);
-  for (int i = 1; i < n; i++) {
-    stack_allocate(stack, -1);
-  }
-  *begin = first;
-  *end = first + n;
-}
-
 void init_stack(plstack_t *stack) {
   stack->storage = NEWN(plstkobj_t, DFL_STACK_SIZE);
   stack->stack_size = DFL_STACK_SIZE;
@@ -41,16 +31,11 @@ void init_stack(plstack_t *stack) {
   create_list(&(stack->frames), malloc, free);
 }
 
-void stack_enter_frame(plstack_t *stack, size_t param_count,
-                       size_t return_count) {
+void stack_enter_frame(plstack_t *stack) {
   plstkframe_t *frame = NEW(plstkframe_t);
   frame->objs_begin = stack->storage + stack->stack_usage;
   frame->objs_end = stack->storage + stack->stack_usage;
   list_push_back(&(stack->frames), frame);
-  stack_allocate_n(stack, param_count, &(frame->params_begin),
-                   &(frame->params_end));
-  stack_allocate_n(stack, return_count, &(frame->returns_begin),
-                   &(frame->returns_end));
 }
 
 void stack_exit_frame(plstack_t *stack) {

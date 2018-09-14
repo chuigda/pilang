@@ -7,7 +7,7 @@
 int main() {
   plstack_t stack;
   init_stack(&stack);
-  stack_enter_frame(&stack, 1, 1);
+  stack_enter_frame(&stack);
   
   int64_t name_a = create_string("a");
   int64_t name_b = create_string("b");
@@ -19,7 +19,7 @@ int main() {
   o2->soid = SOID_FLOAT;
   o2->value.fvalue = 9.0;
   
-  stack_enter_frame(&stack, 1, 1);
+  stack_enter_frame(&stack);
   plstkobj_t *o3 = stack_get(&stack, name_b);
   o1->soid = SOID_INT;
   o1->value.ivalue = 9;

@@ -28,8 +28,6 @@ typedef struct {
 
 typedef struct {
   plstkobj_t *objs_begin, *objs_end;
-  plstkobj_t *params_begin, *params_end;
-  plstkobj_t *returns_begin, *returns_end;
 } plstkframe_t;
 
 typedef struct {
@@ -41,14 +39,7 @@ typedef struct {
 
 void init_stack(plstack_t *stack);
 
-void stack_enter_frame(plstack_t *stack,
-                       size_t param_count,
-                       size_t returns_count);
-
-// FIXME: how to initialize parameters and return values (at least their
-//        names properly?
-// void stack_init_param(size_t nth, int64_t name, plstkobj_t *object);
-// void stack_init_return(size_t nth, int64_t name);
+void stack_enter_frame(plstack_t *stack);
 
 void stack_exit_frame(plstack_t *stack);
 
