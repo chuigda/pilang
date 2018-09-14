@@ -13,44 +13,44 @@ tests: test_stack test_gc
 test_gc: test_gc.o plheap.o clist.o mstring.o
 	$(CC) test_gc.o plheap.o clist.o mstring.o -o test_gc
 
-test_gc.o: test_gc.c plheap.h mstring.h
-	$(CC) -c test_gc.c -o test_gc.o -g
+test_gc.o: test/test_gc.c
+	$(CC) -c -I include test/test_gc.c -o test_gc.o -g
 
 test_stack: stack.o test_stack.o clist.o mstring.o
 	$(CC) stack.o test_stack.o clist.o mstring.o -o test_stack
 
-test_stack.o: test_stack.c stack.h
-	$(CC) -c test_stack.c -o test_stack.o -g
+test_stack.o: test/test_stack.c
+	$(CC) -c -I include test/test_stack.c -o test_stack.o -g
 
-eval.o: eval.c eval.h y.tab.h ast.h plheap.h stack.h
-	$(CC) -c eval.c -o eval.o -g
+eval.o: src/eval/eval.c y.tab.h
+	$(CC) -c -I include -I ./ src/eval/eval.c -o eval.o -g
 
-stack.o: stack.c stack.h clist.h mstring.h util.h
-	$(CC) -c stack.c -o stack.o -g
+stack.o: src/eval/stack.c
+	$(CC) -c -I include src/eval/stack.c -o stack.o -g
 
-plheap.o: plheap.c plheap.h clist.h util.h
-	$(CC) -c plheap.c -o plheap.o -g
+plheap.o: src/eval/plheap.c
+	$(CC) -c -I include src/eval/plheap.c -o plheap.o -g
 
-tree_dump.o: tree_dump.c tree_dump.h ast.h mstring.h
-	$(CC) -c tree_dump.c -o tree_dump.o -g
+tree_dump.o: src/ast/tree_dump.c
+	$(CC) -c -I include src/ast/tree_dump.c -o tree_dump.o -g
 
-ast.o : ast.c jjvalue.h mstring.h util.h
-	$(CC) -c ast.c -o ast.o -g
+ast.o : src/ast/ast.c
+	$(CC) -c -I include src/ast/ast.c -o ast.o -g
 
-clist.o : clist.c clist.h
-	$(CC) -c clist.c -o clist.o -g
+clist.o : src/support/clist.c
+	$(CC) -c -I include src/support/clist.c -o clist.o -g
 
-mstring.o : mstring.c mstring.h util.h
-	$(CC) -c mstring.c -o mstring.o -g
+mstring.o : src/support/mstring.c
+	$(CC) -c -I include src/support/mstring.c -o mstring.o -g
 
-parser.o : y.tab.c mstring.h jjvalue.h tree_dump.h
-	$(CC) -c y.tab.c -o parser.o -g
+parser.o : y.tab.c
+	$(CC) -c -I include y.tab.c -o parser.o -g
 
-lexer.o : lexer.c y.tab.h util.h
-	$(CC) -c lexer.c -o lexer.o -g
+lexer.o : src/frontend/lexer.c y.tab.h
+	$(CC) -c -I include src/frontend/lexer.c -I ./ -o lexer.o -g
 
-y.tab.c y.tab.h : parser.y
-	yacc -d -v parser.y
+y.tab.c y.tab.h : src/frontend/parser.y
+	yacc -d -v src/frontend/parser.y
 
 clean:
 	rm -rf y.tab.*
