@@ -45,6 +45,8 @@ void stack_exit_frame(plstack_t *stack);
 
 plstkobj_t *stack_get(plstack_t *stack, int64_t name);
 
+void close_stack(plstack_t *stack);
+
 #define DFL_STACK_SIZE 65536
 #define DFL_STACKFRAME_COUNT 512
 

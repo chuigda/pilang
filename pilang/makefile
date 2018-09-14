@@ -4,9 +4,9 @@ docs: doc/makefile
 	cd doc && make && tree -P "*.html" > docs && cd ..
 
 pli: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plheap.o \
-     stack.o
+     stack.o eval.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o plheap.o \
-	      stack.o -o pli
+	      stack.o eval.o -o pli
 
 tests: test_stack test_gc
 
@@ -21,6 +21,9 @@ test_stack: stack.o test_stack.o clist.o mstring.o
 
 test_stack.o: test_stack.c stack.h
 	$(CC) -c test_stack.c -o test_stack.o -g
+
+eval.o: eval.c eval.h y.tab.h ast.h plheap.h stack.h
+	$(CC) -c eval.c -o eval.o -g
 
 stack.o: stack.c stack.h clist.h mstring.h util.h
 	$(CC) -c stack.c -o stack.o -g

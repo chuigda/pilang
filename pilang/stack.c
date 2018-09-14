@@ -62,3 +62,8 @@ plstkobj_t *stack_get(plstack_t *stack, int64_t name) {
   obj->soid = SOID_UNDEFINED;
   return obj;
 }
+
+void close_stack(plstack_t *stack) {
+  destroy_list(&(stack->frames));
+  free(stack->storage);
+}
