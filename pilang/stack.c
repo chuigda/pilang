@@ -34,17 +34,6 @@ static void stack_allocate_n(plstack_t *stack, size_t n,
   *end = first + n;
 }
 
-static plstkobj_t *frame_get(plstkframe_t *frame, int64_t name) {
-  for (plstkobj_t *obj = frame->objs_begin;
-       obj != frame->objs_end;
-       ++obj) {
-    if (name == obj->name) {
-      return obj;
-    }
-  }
-  return NULL;
-}
-
 void init_stack(plstack_t *stack) {
   stack->storage = NEWN(plstkobj_t, DFL_STACK_SIZE);
   stack->stack_size = DFL_STACK_SIZE;
@@ -73,17 +62,18 @@ void stack_exit_frame(plstack_t *stack) {
 }
 
 plstkobj_t *stack_get(plstack_t *stack, int64_t name) {
-  for (iter_t it = iter_prev(list_end(&(stack->frames)));
-       !iter_eq(iter_prev(list_begin(&(stack->frames))), it);
-       it = iter_prev(it)) {
-    plstkobj_t *find_result = frame_get((plstkframe_t*)iter_deref(it),
-                                        name);
-    if (find_result != NULL) {
-      return find_result;
+  plstkframe_t *frame = 
+    (plstkframe_t*)iter_deref(iter_prev(list_end(&(stack->frames))));
+
+  for (plstkobj_t *obj = frame->objs_begin;
+       obj != frame->objs_end;
+       ++obj) {
+    if (name == obj->name) {
+      return obj;
     }
   }
-
-  plstkobj_t *result = stack_allocate(stack, name);
-  result->soid = SOID_UNDEFINED;
-  return result;
+  
+  plstkobj_t *obj = stack_allocate(stack, name);
+  obj->soid = SOID_UNDEFINED;
+  return obj;
 }
