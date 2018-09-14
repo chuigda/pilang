@@ -12,20 +12,7 @@ static plobj_t **heap;
 static size_t heap_cap;
 static size_t heap_usage;
 
-static void destroy_list_object(plobj_t *obj);
-static void destroy_object(plobj_t *obj);
-
-static void destroy_list_object(plobj_t *obj) {
-  list_t list = obj->value.lsvalue;
-  for (iter_t it = list_begin(&list);
-       !iter_eq(it, list_end(&list));
-       it = iter_next(it)) {
-    destroy_object((plobj_t*)iter_deref(it));
-  }
-  destroy_list(&list);
-}
-
-static void destroy_object(plobj_t *obj) {
+void destroy_object(plobj_t *obj) {
   switch(obj->oid) {
   default:
   
@@ -35,7 +22,7 @@ static void destroy_object(plobj_t *obj) {
     break;
 
   case OID_LIST:
-    destroy_list_object(obj);
+    destroy_list(&(obj->value.lsvalue));
     break;
 
 // TODO: do this after we have a set implementation

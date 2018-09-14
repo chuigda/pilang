@@ -34,6 +34,8 @@ plobj_t *plobj_create_str(int64_t h_str);
 plobj_t *plobj_create_list(list_t list);
 plobj_t *plobj_create_object(void);
 
+void destroy_object(plobj_t *obj);
+
 #define HEAP_INIT_SIZE 114514
 
 void init_heap(void);
