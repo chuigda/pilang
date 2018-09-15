@@ -157,6 +157,54 @@ static plobj_t *fetch_referred(plregobj_t obj) {
   return NULL;
 }
 
+static void putin_int(plregobj_t *obj, int64_t value) {
+  jjvalue_t *storage = fetch_storage(obj);
+  if (storage == NULL) {
+    return;
+  }
+  if (obj->pvt == PT_LIST) {
+    destroy_list(&(storage->lsvalue));
+  }
+  obj->pvt = PT_INT;
+  storage->ivalue = value;
+}
+
+static void putin_float(plregobj_t *obj, double value) {
+  jjvalue_t *storage = fetch_storage(obj);
+  if (storage == NULL) {
+    return;
+  }
+  if (obj->pvt == PT_LIST) {
+    destroy_list(&(storage->lsvalue));
+  }
+  obj->pvt = PT_FLOAT;
+  storage->fvalue = value;
+}
+
+static void putin_str(plregobj_t *obj, int64_t value) {
+  jjvalue_t *storage = fetch_storage(obj);
+  if (storage == NULL) {
+    return;
+  }
+  if (obj->pvt == PT_LIST) {
+    destroy_list(&(storage->lsvalue));
+  }
+  obj->pvt = PT_STR;
+  storage->svalue = value;
+}
+
+static void putin_list(plregobj_t *obj, list_t value) {
+  jjvalue_t *storage = fetch_storage(obj);
+  if (storage == NULL) {
+    return;
+  }
+  if (obj->pvt == PT_LIST) {
+    destroy_list(&(storage->lsvalue));
+  }
+  obj->pvt = PT_LIST;
+  storage->lsvalue = value;
+}
+
 void eval_ast(ast_node_base_t *program) {
   (void)program;
 }
