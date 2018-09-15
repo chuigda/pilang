@@ -56,7 +56,14 @@ static jjvalue_t *fetch_storage(plregobj_t *obj) {
   switch (obj->roc) {
   case ROC_INREG: return &(obj->data);
   case ROC_ONHEAP: return &(((plobj_t*)obj->data.pvalue)->value);
-  case ROC_ONSTACK: return &(((plstkobj_t*)obj->data.pvalue)->value);
+  case ROC_ONSTACK: {
+    plstkobj_t *stkobj = (plstkobj_t*)(obj->data.pvalue);
+    if (stkobj->soid == SOID_REF) {
+      plobj_t *heapobj = (plobj_t*)(stkobj->value.pvalue);
+      return &(heapobj->value);
+    }
+    return &(stkobj->value);
+  }
   case ROC_NONE: return NULL;
   }
   assert(0 && "unreachable");
