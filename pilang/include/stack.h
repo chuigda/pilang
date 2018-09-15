@@ -1,10 +1,9 @@
 #ifndef STACK_H
 #define STACK_H
 
-#include "plheap.h"
-
 #include "clist.h"
 #include "mstring.h"
+#include "plheap.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -17,12 +16,8 @@ typedef enum {
 } pstkobj_id_t;
 
 typedef struct {
+  jjvalue_t value;
   int64_t name;
-  union {
-    int64_t ivalue;
-    double fvalue;
-    plobj_t *refto;
-  } value;
   int8_t soid;
 } plstkobj_t;
 

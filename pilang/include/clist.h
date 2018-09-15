@@ -35,6 +35,7 @@ void list_push_front(list_t *list, any_t any);
 void list_insert_before(list_t *list, iter_t iter, any_t any);
 void list_insert_after(list_t *list, iter_t iter, any_t ant);
 void list_remove(list_t *list, iter_t iter);
+size_t list_size(list_t const* list);
 iter_t list_begin(list_t *list);
 iter_t list_end(list_t *list);
 const_iter_t list_cbegin(list_t const* list);
@@ -47,6 +48,7 @@ iter_t iter_next(iter_t iter);
 iter_t iter_prev(iter_t iter);
 
 bool iter_eq(iter_t lhs, iter_t rhs);
+bool const_iter_eq(const_iter_t lhs, const_iter_t rhs);
 
 const_iter_t const_iter_next(const_iter_t iter);
 const_iter_t const_iter_prev(const_iter_t iter);
