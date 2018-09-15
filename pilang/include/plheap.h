@@ -5,7 +5,6 @@
 #include "jjvalue.h"
 
 typedef enum {
-  OID_REF,
   OID_INT,
   OID_FLOAT,
   OID_STR,

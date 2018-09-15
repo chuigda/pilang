@@ -13,14 +13,11 @@ int main() {
   plobj_t *o2 = plobj_create_float(39.0);
   plobj_t *o3 = plobj_create_str(create_string("fuck"));
   plobj_t *o4 = plobj_create_str(create_string("shit"));
-  plobj_t *ro1 = plobj_create_ref(o1);
-  plobj_t *ro2 = plobj_create_ref(o2);
-  plobj_t *ro3 = plobj_create_ref(o3);
   
   list_t list;
   create_list(&list, malloc, free);
-  list_push_back(&list, ro1);
-  list_push_back(&list, ro2);
+  list_push_back(&list, o1);
+  list_push_back(&list, o2);
   
   plobj_t *lsobj = plobj_create_list(list);
   
@@ -30,9 +27,6 @@ int main() {
   
   assert(o4->gcmark == GCM_WHITE);
   assert(lsobj->gcmark == GCM_WHITE);
-  assert(ro1->gcmark == GCM_WHITE);
-  assert(ro2->gcmark == GCM_WHITE);
-  assert(ro3->gcmark == GCM_BLACK);
   assert(o1->gcmark == GCM_WHITE);
   assert(o2->gcmark == GCM_WHITE);
   assert(o3->gcmark == GCM_BLACK);
@@ -41,17 +35,13 @@ int main() {
   
   assert(o4->used == 1);
   assert(lsobj->used == 1);
-  assert(ro1->used == 1);
-  assert(ro2->used == 1);
-  assert(ro3->used == 0);
   assert(o1->used == 1);
   assert(o2->used == 1);
   assert(o3->used == 0);
   
   gc_start();
   gc_cleanup();
-  
   close_heap();
-  
+
   return 0;
 }

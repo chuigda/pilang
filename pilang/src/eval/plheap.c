@@ -118,13 +118,6 @@ plobj_t *plobj_create_str(int64_t str) {
   return ret;
 }
 
-plobj_t *plobj_create_ref(plobj_t *source) {
-  plobj_t *ret = plalloc();
-  ret->oid = OID_REF;
-  ret->value.pvalue = source;
-  return ret;
-}
-
 void gc_start() {
   for (int i = 0; i < heap_cap; i++) {
     if (heap[i]->used) {
@@ -151,10 +144,6 @@ void gc_mark_white(plobj_t *obj) {
   switch (obj->oid) {
   case OID_STRUCT:
     // TODO struct marking stuffs
-    break;
-  
-  case OID_REF:
-    gc_mark_ref(obj);
     break;
     
   case OID_LIST:
