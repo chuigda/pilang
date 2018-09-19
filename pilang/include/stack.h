@@ -1,10 +1,9 @@
 #ifndef STACK_H
 #define STACK_H
 
-#include "plheap.h"
-
 #include "clist.h"
 #include "mstring.h"
+#include "plheap.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -17,19 +16,13 @@ typedef enum {
 } pstkobj_id_t;
 
 typedef struct {
+  jjvalue_t value;
   int64_t name;
-  union {
-    int64_t ivalue;
-    double fvalue;
-    plobj_t *refto;
-  } value;
   int8_t soid;
 } plstkobj_t;
 
 typedef struct {
   plstkobj_t *objs_begin, *objs_end;
-  plstkobj_t *params_begin, *params_end;
-  plstkobj_t *returns_begin, *returns_end;
 } plstkframe_t;
 
 typedef struct {
@@ -41,18 +34,13 @@ typedef struct {
 
 void init_stack(plstack_t *stack);
 
-void stack_enter_frame(plstack_t *stack,
-                       size_t param_count,
-                       size_t returns_count);
-
-// FIXME: how to initialize parameters and return values (at least their
-//        names properly?
-// void stack_init_param(size_t nth, int64_t name, plstkobj_t *object);
-// void stack_init_return(size_t nth, int64_t name);
+void stack_enter_frame(plstack_t *stack);
 
 void stack_exit_frame(plstack_t *stack);
 
 plstkobj_t *stack_get(plstack_t *stack, int64_t name);
+
+void close_stack(plstack_t *stack);
 
 #define DFL_STACK_SIZE 65536
 #define DFL_STACKFRAME_COUNT 512

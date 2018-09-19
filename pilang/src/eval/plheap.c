@@ -12,20 +12,7 @@ static plobj_t **heap;
 static size_t heap_cap;
 static size_t heap_usage;
 
-static void destroy_list_object(plobj_t *obj);
-static void destroy_object(plobj_t *obj);
-
-static void destroy_list_object(plobj_t *obj) {
-  list_t list = obj->value.lsvalue;
-  for (iter_t it = list_begin(&list);
-       !iter_eq(it, list_end(&list));
-       it = iter_next(it)) {
-    destroy_object((plobj_t*)iter_deref(it));
-  }
-  destroy_list(&list);
-}
-
-static void destroy_object(plobj_t *obj) {
+void destroy_object(plobj_t *obj) {
   switch(obj->oid) {
   default:
   
@@ -35,7 +22,7 @@ static void destroy_object(plobj_t *obj) {
     break;
 
   case OID_LIST:
-    destroy_list_object(obj);
+    destroy_list(&(obj->value.lsvalue));
     break;
 
 // TODO: do this after we have a set implementation
@@ -60,6 +47,13 @@ void init_heap() {
   heap_usage = 0;
 }
 
+void close_heap() {
+  for (int i = 0; i < heap_cap; i++) {
+    free(heap[i]);
+  }
+  free(heap);
+}
+
 static void expand_heap(void) {
   size_t new_cap = heap_cap * 1.6;
   plobj_t **new_heap = NEWN(plobj_t*, new_cap);
@@ -80,11 +74,11 @@ static plobj_t *plalloc(void) {
     // TODO gc should be implemented by stack side code
     // heap_request_gc();
   }
-  
+
   if (0.8 * heap_cap < heap_usage) {
     expand_heap();
   }
-  
+
   for (int i = 0; i < heap_cap; i++) {
     if (heap[i]->used == 0) {
       ++heap_usage;
@@ -92,8 +86,36 @@ static plobj_t *plalloc(void) {
       return heap[i];
     }
   }
-  
+
   assert(0);
+}
+
+plobj_t *plobj_create_int(int64_t value) {
+  plobj_t *ret = plalloc();
+  ret->oid = OID_INT;
+  ret->value.ivalue = value;
+  return ret;
+}
+
+plobj_t *plobj_create_float(double value) {
+  plobj_t *ret = plalloc();  
+  ret->oid = OID_FLOAT;
+  ret->value.fvalue = value;
+  return ret;
+}
+
+plobj_t *plobj_create_list(list_t list) {
+  plobj_t *ret = plalloc();
+  ret->oid = OID_LIST;
+  ret->value.lsvalue = list;
+  return ret;
+}
+
+plobj_t *plobj_create_str(int64_t str) {
+  plobj_t *ret = plalloc();
+  ret->oid = OID_STR;
+  ret->value.svalue = str;
+  return ret;
 }
 
 void gc_start() {
@@ -122,10 +144,6 @@ void gc_mark_white(plobj_t *obj) {
   switch (obj->oid) {
   case OID_STRUCT:
     // TODO struct marking stuffs
-    break;
-  
-  case OID_REF:
-    gc_mark_ref(obj);
     break;
     
   case OID_LIST:

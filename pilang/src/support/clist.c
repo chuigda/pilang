@@ -57,6 +57,16 @@ void list_remove(list_t *list, iter_t iter) {
   list->impl->dealloc(iter_node);
 }
 
+size_t list_size(list_t const* list) {
+  size_t ret = 0;
+  for (const_iter_t iter = list_cbegin(list);
+       !const_iter_eq(iter, list_cend(list));
+       iter = const_iter_next(iter)) {
+    ++ret;
+  }
+  return ret;
+}
+
 static iter_t create_iter(void* opaque) {
   iter_t iter;
   iter.opaque = opaque;
@@ -77,11 +87,11 @@ iter_t list_end(list_t *list) {
   return create_iter(&(list->impl->head_node));
 }
 
-const_iter_t list_const_begin(const list_t *list) {
+const_iter_t list_cbegin(const list_t *list) {
   return create_const_iter(list->impl->head_node.next);
 }
 
-const_iter_t list_const_end(const list_t *list) {
+const_iter_t list_cend(const list_t *list) {
   return create_const_iter(&(list->impl->head_node));
 }
 
@@ -94,6 +104,10 @@ const_any_t const_iter_deref(const_iter_t iter) {
 }
 
 bool iter_eq(iter_t lhs, iter_t rhs) {
+  return lhs.opaque == rhs.opaque;
+}
+
+bool const_iter_eq(const_iter_t lhs, const_iter_t rhs) {
   return lhs.opaque == rhs.opaque;
 }
 
