@@ -6,9 +6,11 @@
 #include "y.tab.h"
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 typedef enum {
   ROC_INREG,
@@ -46,7 +48,7 @@ static plregobj_t create_onheap(plobj_t *storage) {
   return ret;
 }
 
-static plregobj_t create_inreg(plobj_t *storage) {
+static plregobj_t create_inreg() {
   plregobj_t ret;
   ret.roc = ROC_INREG;
   return ret;
@@ -131,7 +133,7 @@ static result_t fetch_str(plregobj_t obj) {
   switch (obj.pvt) {
   case PT_INT: {
     char buffer[24]; 
-    sprintf(buffer, "%lld", storage->ivalue);
+    sprintf(buffer, "%" PRId64, storage->ivalue);
     jjvalue_t shell;
     shell.svalue = create_string(buffer);
     return success_result(shell);
@@ -177,6 +179,7 @@ static result_t fetch_list(plregobj_t obj) {
 
 static result_t fetch_referred(plregobj_t obj) {
   // TODO I don't know the correct semantics
+  (void)obj;
   assert(0 && "not implemented");
 }
 

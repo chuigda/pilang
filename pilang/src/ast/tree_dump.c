@@ -2,6 +2,7 @@
 
 #include "mstring.h"
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -42,7 +43,7 @@ tree_dump_impl(ast_node_base_t *root, uint16_t parent, int nth_child) {
              get_string(((ast_node_wdata_base_t*)root)->data.svalue));
     }
     else {
-      printf(", IDATA = %lld", 
+      printf(", IDATA = %" PRId64, 
              ((ast_node_wdata_base_t*)root)->data.ivalue);
     }
   }

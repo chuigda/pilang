@@ -4,6 +4,8 @@
 #include "util.h"
 
 #include <assert.h>
+#include <inttypes.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -48,7 +50,7 @@ void init_heap() {
 }
 
 void close_heap() {
-  for (int i = 0; i < heap_cap; i++) {
+  for (size_t i = 0; i < heap_cap; i++) {
     free(heap[i]);
   }
   free(heap);
@@ -57,10 +59,10 @@ void close_heap() {
 static void expand_heap(void) {
   size_t new_cap = heap_cap * 1.6;
   plobj_t **new_heap = NEWN(plobj_t*, new_cap);
-  for (int i = 0; i < heap_cap; i++) {
+  for (size_t i = 0; i < heap_cap; i++) {
     new_heap[i] = heap[i];
   }
-  for (int i = heap_cap; i < new_cap; i++) {
+  for (size_t i = heap_cap; i < new_cap; i++) {
     new_heap[i] = NEW(plobj_t);
     new_heap[i]->used = 0;
   }
@@ -79,7 +81,7 @@ static plobj_t *plalloc(void) {
     expand_heap();
   }
 
-  for (int i = 0; i < heap_cap; i++) {
+  for (size_t i = 0; i < heap_cap; i++) {
     if (heap[i]->used == 0) {
       ++heap_usage;
       heap[i]->used = 1;
@@ -119,7 +121,7 @@ plobj_t *plobj_create_str(int64_t str) {
 }
 
 void gc_start() {
-  for (int i = 0; i < heap_cap; i++) {
+  for (size_t i = 0; i < heap_cap; i++) {
     if (heap[i]->used) {
       heap[i]->gcmark = GCM_BLACK;
     }
@@ -156,7 +158,7 @@ void gc_mark_white(plobj_t *obj) {
 }
 
 void gc_cleanup() {
-  for (int i = 0; i < heap_cap; i++) {
+  for (size_t i = 0; i < heap_cap; i++) {
     if ((heap[i]->used) && (heap[i]->gcmark == GCM_BLACK)) {
       heap[i]->used = 0;
       destroy_object(heap[i]);

@@ -7,8 +7,8 @@ docs: doc/makefile
 
 pli: mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o plheap.o \
      pli.o
-	$(CC) mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o plheap.o \
-        pli.o -o pli
+	$(CC) mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
+          plheap.o pli.o -o pli
 
 plast: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o plast.o \
