@@ -64,104 +64,120 @@ static jjvalue_t *fetch_storage(plregobj_t *obj) {
     }
     return &(stkobj->value);
   }
-  case ROC_NONE: return NULL;
   }
   assert(0 && "unreachable");
   return NULL;
 }
 
-static int64_t fetch_int(plregobj_t obj) {
+static result_t fetch_int(plregobj_t obj) {
   jjvalue_t *storage = fetch_storage(&obj);
   if (storage == NULL) {
-    return 0;
+    return failed_result("assert ign: object does not have storage?");
   }
   
   switch (obj.pvt) {
-  case PT_INT: return storage->ivalue;
-  case PT_FLOAT: return (int)(storage->fvalue);
-  case PT_STR: return (int)strlen(get_string(storage->svalue));
-  case PT_LIST: return (int)list_size(&(storage->lsvalue));
-  // FIXME I don't know the correct semantics
-  case PT_REF: return (int)(storage->pvalue);
-  case PT_UNDEFINED: return 0;
+  case PT_INT: 
+    return success_result(*storage);
+  case PT_FLOAT: {
+    jjvalue_t shell;
+    shell.fvalue = (int)(storage->ivalue);
+    return success_result(shell);
+  }
+  case PT_STR:
+    return failed_result("cannot autocast from Str to Int");
+  case PT_LIST:
+    return failed_result("cannot autocast from List to Int");
+  case PT_REF:
+    return failed_result("cannot autocast from (stack ref) to Int");
+  case PT_UNDEFINED: 
+    return failed_result("cannot autocast from Nothing to Int");
   }
 
   assert(0 && "unreachable");
-  return 0;
 }
 
-static double fetch_float(plregobj_t obj) {
+static result_t fetch_float(plregobj_t obj) {
   jjvalue_t *storage = fetch_storage(&obj);
   if (storage == NULL) {
-    return 0.0;
-  }
-  
-  switch (obj.pvt) {
-  case PT_INT: return (double)(storage->ivalue);
-  case PT_FLOAT: return storage->fvalue;
-  case PT_STR: return 0.0;
-  case PT_LIST: return 0.0;
-  case PT_REF: return 0.0;
-  case PT_UNDEFINED: return 0.0;
-  }
-  
-  assert(0 && "unreachable");
-  return 0;
-}
-
-static int64_t fetch_str(plregobj_t obj) {
-  jjvalue_t *storage = fetch_storage(&obj);
-  if (storage == NULL) {
-    return 0.0;
+    return failed_result("assert ign: object does not have storage?");
   }
   
   switch (obj.pvt) {
   case PT_INT: {
-    char buffer[24]; sprintf(buffer, "%lld", storage->ivalue);
-    return create_string(buffer);
+    jjvalue_t shell;
+    shell.fvalue = (double)(storage->ivalue);
+    return success_result(shell);
+  }
+  case PT_FLOAT: return success_result(*storage);
+  case PT_STR: 
+    return failed_result("cannot autocast from Str to Float");
+  case PT_LIST:
+    return failed_result("cannot autocast from List to Float");
+  case PT_REF:
+    return failed_result("cannot autocast from (stack ref) to Float");
+  case PT_UNDEFINED: 
+    return failed_result("cannot autocast from Nothing to Float");
+  }
+
+  assert(0 && "unreachable");
+}
+
+static result_t fetch_str(plregobj_t obj) {
+  jjvalue_t *storage = fetch_storage(&obj);
+  if (storage == NULL) {
+    return failed_result("assert ign: object does not have storage?");
+  }
+
+  switch (obj.pvt) {
+  case PT_INT: {
+    char buffer[24]; 
+    sprintf(buffer, "%lld", storage->ivalue);
+    jjvalue_t shell;
+    shell.svalue = create_string(buffer);
+    return success_result(shell);
   }
   case PT_FLOAT: {
-    char buffer[24]; sprintf(buffer, "%lf", storage->fvalue);
-    return create_string(buffer);
+    char buffer[24]; 
+    sprintf(buffer, "%lf", storage->fvalue);
+    jjvalue_t shell;
+    shell.svalue = create_string(buffer);
+    return success_result(shell);
   }
-  case PT_STR: return storage->svalue;
-  case PT_LIST: return create_string("");
-  case PT_REF: return create_string("");
+  case PT_STR: return success_result(*storage);
+  case PT_LIST: 
+    return failed_result("cannot autocast fron List to Str");
+  case PT_REF: 
+    return failed_result("cannot autocast from (stack ref) to Str");
   }
   
   assert(0 && "unreachable");
-  return create_string("");
 }
 
-static list_t fetch_list(plregobj_t obj) {
-  void* (*m)(size_t) = malloc;
-  void (*f)(void*) = free;
-  
+static result_t fetch_list(plregobj_t obj) {
   jjvalue_t *storage = fetch_storage(&obj);
   if (storage == NULL) {
-    list_t list;
-    create_list(&list, m, f);
-    return list;
+    return failed_result("assert ign: object does not have storage?");
   }
   
   switch (obj.pvt) {
-  case PT_INT: { list_t list; create_list(&list, m, f); return list; }
-  case PT_FLOAT: { list_t list; create_list(&list, m, f); return list; }
-  case PT_STR: { list_t list; create_list(&list, m, f); return list; }
-  case PT_LIST: return storage->lsvalue;
-  case PT_REF: { list_t list; create_list(&list, m, f); return list; }
+  case PT_INT:
+    return failed_result("cannot autocast from Int to List");
+  case PT_FLOAT: 
+    return failed_result("cannot autocast from Float to List");
+  case PT_STR: 
+    return failed_result("cannot autocast from Str to List");
+  case PT_LIST: 
+    return success_result(*storage);
+  case PT_REF:
+    return failed_result("cannot autocast from (stack ref) to List");
   }
   
   assert(0 && "unreachable");
-  list_t list;
-  create_list(&list, m, f);
-  return list;
 }
 
-static plobj_t *fetch_referred(plregobj_t obj) {
+static result_t fetch_referred(plregobj_t obj) {
   // TODO I don't know the correct semantics
   assert(0 && "not implemented");
-  return NULL;
 }
 
 static void putin_int(plregobj_t *obj, int64_t value) {

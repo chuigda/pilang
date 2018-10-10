@@ -4,7 +4,7 @@
 
 ## 前言
 我天泽一向偏向于手写解析器代码，觉得把一切掌握在自己手里才是最好的。不过最近突发奇想，打算开发一门
-DSL，名为PiLang。该语言致力于减少Shift键的使用。一个简单的a + b程序写起来就像下面这样：
+DSL，名为PiLang。该语言致力于减少Shift键的使用。一个简单的a + b程序写起来就像下面这样：`
 
     function main takes returns
     begin
