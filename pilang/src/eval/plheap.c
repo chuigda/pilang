@@ -162,6 +162,7 @@ void gc_cleanup() {
     if ((heap[i]->used) && (heap[i]->gcmark == GCM_BLACK)) {
       heap[i]->used = 0;
       destroy_object(heap[i]);
+      --heap_usage;
     }
   }
 }
