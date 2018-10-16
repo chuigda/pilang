@@ -18,7 +18,8 @@ GAST has the following kinds of nodes:
   <li>triple child with data  (`ast_tchild_wdata_t`)</li>
   <li>list                    (`ast_list_t`)<sup>[1]</sup></li>
 </lo>
-<sup>[1]</sup> List values should only be AST nodes.
+<sup>[1]</sup> List elements shall only be AST nodes since further
+cleanup only knows how to correctly destroy AST nodes.
 
 To create these nodes, here's utility functions:
 

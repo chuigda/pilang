@@ -3,6 +3,13 @@ This is a documentation introducing PiLang AST node kinds.
 
 ## PiLang node kinds
 
+* _[shell]_: this production does not have concrete AST node but simply
+forward others ASTs
+* _[wrapper]_: this production has an AST which simply wraps other
+AST nodes
+* _[list]_: this production has an AST list node
+* _[entity]_: this production does have concrete AST node
+
 ### `program` node _[shell]_
 * __Production__: `program: functions` <br/>
 
