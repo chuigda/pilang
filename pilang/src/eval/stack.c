@@ -64,6 +64,11 @@ plstkobj_t *stack_get(plstack_t *stack, int64_t name) {
 }
 
 void close_stack(plstack_t *stack) {
+  for (iter_t it = list_begin(&(stack->frames));
+       !iter_eq(it, list_end(&(stack->frames))); 
+       it = iter_next(it)) {
+    free(iter_deref(it));
+  }
   destroy_list(&(stack->frames));
   free(stack->storage);
 }
