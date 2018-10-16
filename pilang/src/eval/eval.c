@@ -231,6 +231,82 @@ static void putin_list(plregobj_t *obj, list_t value) {
   storage->lsvalue = value;
 }
 
+#define EITHER_IS(VALUETYPE, LHS, RHS) \
+  ((LHS).pvt == VALUETYPE || (RHS).pvt == VALUETYPE)
+
+static int64_t int_failsafe(result_t maybe) {
+  return maybe.success ? maybe.value.ivalue : 0;
+}
+
+static double float_failsafe(result_t maybe) {
+  return maybe.success ? maybe.value.fvalue : 0.0;
+}
+
+static int64_t str_failsafe(result_t maybe) {
+  return maybe.success ? maybe.value.svalue 
+                       : create_string("undefined");
+}
+
+typedef enum {
+  ALF_ADD, ALF_SUB, ALF_MUL, ALF_DIV, ALF_MOD
+} algebraic_function_t;
+
+static plregobj_t algebraic_calc(plregobj_t lhs, plregobj_t rhs,
+                                 algebraic_function_t alf) {
+  if (alf == ALF_ADD) {
+    if (EITHER_IS(PT_STR, lhs, rhs)) {
+      const char* strl = get_string(str_failsafe(fetch_str(lhs)));
+      const char* strr = get_string(str_failsafe(fetch_str(rhs)));
+      char *temp = NEWN(char, strlen(strl) + strlen(strr) + 1);
+      strcpy(temp, strl);
+      strcat(temp, strr);
+      int newstr = create_string(temp);
+      free(temp);
+    
+      plregobj_t ret = create_inreg();
+      ret.pvt = PT_STR;
+      ret.data.svalue = newstr;
+      return ret;
+    }
+  }
+  
+  if (EITHER_IS(PT_FLOAT, lhs, rhs) && alf != ALF_MOD) {
+    float f1 = float_failsafe(fetch_float(lhs));
+    float f2 = float_failsafe(fetch_float(rhs));
+    
+    plregobj_t ret = create_inreg();
+    ret.pvt = PT_FLOAT;
+    switch (alf) {
+    case ALF_ADD: ret.data.fvalue = f1 + f2; break;
+    case ALF_SUB: ret.data.fvalue = f1 - f2; break;
+    case ALF_MUL: ret.data.fvalue = f1 * f2; break;
+    case ALF_DIV: ret.data.fvalue = f1 / f2; break;
+    default: assert(0 && "unreachable");
+    }
+    return ret;
+  }
+  else if (EITHER_IS(PT_INT, lhs, rhs)) {
+    int64_t i1 = int_failsafe(fetch_int(lhs));
+    int64_t i2 = int_failsafe(fetch_int(rhs));
+    
+    plregobj_t ret = create_inreg();
+    ret.pvt = PT_INT;
+    switch (alf) {
+    case ALF_ADD: ret.data.ivalue = i1 + i2; break;
+    case ALF_SUB: ret.data.ivalue = i1 - i2; break;
+    case ALF_MUL: ret.data.ivalue = i1 * i2; break;
+    case ALF_DIV: ret.data.ivalue = i1 / i2; break;
+    case ALF_MOD: ret.data.ivalue = i1 % i2; break;
+    }
+    return ret;
+  }
+  else {
+    plregobj_t ret = create_inreg();
+    ret.pvt = PT_UNDEFINED;
+    return ret;
+  }
+}
+
 void eval_ast(ast_node_base_t *program) {
   (void)program;
 }
