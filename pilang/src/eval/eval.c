@@ -221,6 +221,14 @@ static void putin_list(plregobj_t *obj, list_t value) {
   storage->lsvalue = value;
 }
 
+static void set_undefined(plregobj_t *obj) {
+  jjvalue_t *storage = fetch_storage(obj);
+  if (obj->pvt == PT_LIST) {
+    destroy_list(&(storage->lsvalue));
+  }
+  obj->pvt = PT_UNDEFINED;
+}
+
 #define EITHER_IS(VALUETYPE, LHS, RHS) \
   ((LHS).pvt == VALUETYPE || (RHS).pvt == VALUETYPE)
 
@@ -291,6 +299,17 @@ plregobj_t algebraic_calc(plregobj_t lhs, plregobj_t rhs,
     ret.pvt = PT_UNDEFINED;
     return ret;
   }
+}
+
+plregobj_t assign(plregobj_t lhs, plregobj_t rhs) {
+  switch (rhs.pvt) {
+    case PT_INT:   putin_int(&lhs, rhs.value.ivalue);   break;
+    case PT_FLOAT: putin_float(&lhs, rhs.value.fvalue); break;
+    case PT_STR:   putin_str(&lhs, rhs.value.svalue);   break;
+    case PT_LIST:  putin_list(&lhs, rhs.value.lsvalue); break;
+    default:       set_undefined(&lhs);                 break;
+  }
+  return lhs;
 }
 
 void eval_ast(ast_node_base_t *program) {
