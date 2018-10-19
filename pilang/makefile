@@ -76,6 +76,6 @@ clean:
 	rm -rf y.output
 	rm -rf *.o
 	rm -rf pli plast
-	rm -rf test_stack test_gc
+	rm -rf test_stack test_gc test_calc
 	cd doc && make clean && cd ..
 	rm -rf doc/docs
