@@ -1,7 +1,6 @@
+#define EVAL_C
 #include "eval.h"
 
-#include "stack.h"
-#include "plheap.h"
 #include "util.h"
 #include "y.tab.h"
 
@@ -12,43 +11,21 @@
 #include <string.h>
 #include <stdint.h>
 
-typedef enum {
-  ROC_INREG,
-  ROC_ONSTACK,
-  ROC_ONHEAP,
-  ROC_NONE
-} plregobj_cont_t;
-
-typedef enum {
-  PT_INT,
-  PT_FLOAT,
-  PT_STR,
-  PT_LIST,
-  PT_REF,
-  PT_UNDEFINED
-} pl_value_type_t;
-
-typedef struct {
-  jjvalue_t data;
-  int16_t roc;
-  int16_t pvt;
-} plregobj_t;
-
-static plregobj_t create_onstack(plstkobj_t *storage) {
+plregobj_t create_onstack(plstkobj_t *storage) {
   plregobj_t ret;
   ret.roc = ROC_ONSTACK;
   ret.data.pvalue = storage;
   return ret;
 }
 
-static plregobj_t create_onheap(plobj_t *storage) {
+plregobj_t create_onheap(plobj_t *storage) {
   plregobj_t ret;
   ret.roc = ROC_ONHEAP;
   ret.data.pvalue = storage;
   return ret;
 }
 
-static plregobj_t create_inreg() {
+plregobj_t create_inreg() {
   plregobj_t ret;
   ret.roc = ROC_INREG;
   return ret;
@@ -247,12 +224,8 @@ static int64_t str_failsafe(result_t maybe) {
                        : create_string("undefined");
 }
 
-typedef enum {
-  ALF_ADD, ALF_SUB, ALF_MUL, ALF_DIV, ALF_MOD
-} algebraic_function_t;
-
-static plregobj_t algebraic_calc(plregobj_t lhs, plregobj_t rhs,
-                                 algebraic_function_t alf) {
+plregobj_t algebraic_calc(plregobj_t lhs, plregobj_t rhs,
+                          algebraic_function_t alf) {
   if (alf == ALF_ADD) {
     if (EITHER_IS(PT_STR, lhs, rhs)) {
       const char* strl = get_string(str_failsafe(fetch_str(lhs)));
