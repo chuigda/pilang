@@ -14,6 +14,12 @@
 plregobj_t create_onstack(plstkobj_t *storage) {
   plregobj_t ret;
   ret.roc = ROC_ONSTACK;
+  switch (storage->soid) {
+    case SOID_INT:   ret.pvt = PT_INT;   break;
+    case SOID_FLOAT: ret.pvt = PT_FLOAT; break;
+    case SOID_REF:   ret.pvt = PT_REF;   break;
+    default:         ret.pvt = PT_UNDEFINED;
+  }
   ret.data.pvalue = storage;
   return ret;
 }
@@ -21,6 +27,13 @@ plregobj_t create_onstack(plstkobj_t *storage) {
 plregobj_t create_onheap(plobj_t *storage) {
   plregobj_t ret;
   ret.roc = ROC_ONHEAP;
+  switch (storage->oid) {
+    case OID_INT:   ret.pvt = PT_INT;   break;
+    case OID_FLOAT: ret.pvt = PT_FLOAT; break;
+    case OID_STR:   ret.pvt = PT_STR;   break;
+    case OID_LIST:  ret.pvt = PT_LIST;  break;
+    default:        ret.pvt = PT_UNDEFINED;
+  }
   ret.data.pvalue = storage;
   return ret;
 }
