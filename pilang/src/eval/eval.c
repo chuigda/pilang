@@ -1,7 +1,6 @@
+#define EVAL_C
 #include "eval.h"
 
-#include "stack.h"
-#include "plheap.h"
 #include "util.h"
 #include "y.tab.h"
 
@@ -12,43 +11,34 @@
 #include <string.h>
 #include <stdint.h>
 
-typedef enum {
-  ROC_INREG,
-  ROC_ONSTACK,
-  ROC_ONHEAP,
-  ROC_NONE
-} plregobj_cont_t;
-
-typedef enum {
-  PT_INT,
-  PT_FLOAT,
-  PT_STR,
-  PT_LIST,
-  PT_REF,
-  PT_UNDEFINED
-} pl_value_type_t;
-
-typedef struct {
-  jjvalue_t data;
-  int16_t roc;
-  int16_t pvt;
-} plregobj_t;
-
-static plregobj_t create_onstack(plstkobj_t *storage) {
+plregobj_t create_onstack(plstkobj_t *storage) {
   plregobj_t ret;
   ret.roc = ROC_ONSTACK;
+  switch (storage->soid) {
+    case SOID_INT:   ret.pvt = PT_INT;   break;
+    case SOID_FLOAT: ret.pvt = PT_FLOAT; break;
+    case SOID_REF:   ret.pvt = PT_REF;   break;
+    default:         ret.pvt = PT_UNDEFINED;
+  }
   ret.data.pvalue = storage;
   return ret;
 }
 
-static plregobj_t create_onheap(plobj_t *storage) {
+plregobj_t create_onheap(plobj_t *storage) {
   plregobj_t ret;
   ret.roc = ROC_ONHEAP;
+  switch (storage->oid) {
+    case OID_INT:   ret.pvt = PT_INT;   break;
+    case OID_FLOAT: ret.pvt = PT_FLOAT; break;
+    case OID_STR:   ret.pvt = PT_STR;   break;
+    case OID_LIST:  ret.pvt = PT_LIST;  break;
+    default:        ret.pvt = PT_UNDEFINED;
+  }
   ret.data.pvalue = storage;
   return ret;
 }
 
-static plregobj_t create_inreg() {
+plregobj_t create_inreg() {
   plregobj_t ret;
   ret.roc = ROC_INREG;
   return ret;
@@ -231,6 +221,14 @@ static void putin_list(plregobj_t *obj, list_t value) {
   storage->lsvalue = value;
 }
 
+static void set_undefined(plregobj_t *obj) {
+  jjvalue_t *storage = fetch_storage(obj);
+  if (obj->pvt == PT_LIST) {
+    destroy_list(&(storage->lsvalue));
+  }
+  obj->pvt = PT_UNDEFINED;
+}
+
 #define EITHER_IS(VALUETYPE, LHS, RHS) \
   ((LHS).pvt == VALUETYPE || (RHS).pvt == VALUETYPE)
 
@@ -247,12 +245,8 @@ static int64_t str_failsafe(result_t maybe) {
                        : create_string("undefined");
 }
 
-typedef enum {
-  ALF_ADD, ALF_SUB, ALF_MUL, ALF_DIV, ALF_MOD
-} algebraic_function_t;
-
-static plregobj_t algebraic_calc(plregobj_t lhs, plregobj_t rhs,
-                                 algebraic_function_t alf) {
+plregobj_t algebraic_calc(plregobj_t lhs, plregobj_t rhs,
+                          algebraic_function_t alf) {
   if (alf == ALF_ADD) {
     if (EITHER_IS(PT_STR, lhs, rhs)) {
       const char* strl = get_string(str_failsafe(fetch_str(lhs)));
@@ -305,6 +299,17 @@ static plregobj_t algebraic_calc(plregobj_t lhs, plregobj_t rhs,
     ret.pvt = PT_UNDEFINED;
     return ret;
   }
+}
+
+plregobj_t assign(plregobj_t lhs, plregobj_t rhs) {
+  switch (rhs.pvt) {
+    case PT_INT:   putin_int(&lhs, rhs.value.ivalue);   break;
+    case PT_FLOAT: putin_float(&lhs, rhs.value.fvalue); break;
+    case PT_STR:   putin_str(&lhs, rhs.value.svalue);   break;
+    case PT_LIST:  putin_list(&lhs, rhs.value.lsvalue); break;
+    default:       set_undefined(&lhs);                 break;
+  }
+  return lhs;
 }
 
 void eval_ast(ast_node_base_t *program) {
