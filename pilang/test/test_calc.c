@@ -2,6 +2,7 @@
 #include "eval.h"
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdio.h>
 
 int main() {
@@ -26,7 +27,8 @@ int main() {
   
   fprintf(stderr, "sum_ab.roc == %d\n", sum_ab.roc);
   fprintf(stderr, "sum_ab.pvt == %d\n", sum_ab.pvt);
-  fprintf(stderr, "sum_ab.data.ivalue == %ld\n", sum_ab.data.ivalue);
+  fprintf(stderr, "sum_ab.data.ivalue == %" PRId64 "\n",
+          sum_ab.data.ivalue);
 
   assert(sum_ab.roc == ROC_INREG);
   assert(sum_ab.pvt == PT_INT);

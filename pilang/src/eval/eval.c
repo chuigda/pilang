@@ -303,11 +303,11 @@ plregobj_t algebraic_calc(plregobj_t lhs, plregobj_t rhs,
 
 plregobj_t assign(plregobj_t lhs, plregobj_t rhs) {
   switch (rhs.pvt) {
-    case PT_INT:   putin_int(&lhs, rhs.value.ivalue);   break;
-    case PT_FLOAT: putin_float(&lhs, rhs.value.fvalue); break;
-    case PT_STR:   putin_str(&lhs, rhs.value.svalue);   break;
-    case PT_LIST:  putin_list(&lhs, rhs.value.lsvalue); break;
-    default:       set_undefined(&lhs);                 break;
+    case PT_INT:   putin_int(&lhs, rhs.data.ivalue);   break;
+    case PT_FLOAT: putin_float(&lhs, rhs.data.fvalue); break;
+    case PT_STR:   putin_str(&lhs, rhs.data.svalue);   break;
+    case PT_LIST:  putin_list(&lhs, rhs.data.lsvalue); break;
+    default:       set_undefined(&lhs);                break;
   }
   return lhs;
 }
