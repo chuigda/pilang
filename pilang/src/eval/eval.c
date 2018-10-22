@@ -173,7 +173,41 @@ static result_t fetch_referred(plregobj_t obj) {
   assert(0 && "not implemented");
 }
 
-static void putin_int(plregobj_t *obj, int64_t value) {
+static void asgn_attach_typeinfo(plregobj_t *obj, int16_t pvt) {
+  obj->pvt = pvt;
+  switch (obj->roc) {
+    case ROC_ONHEAP: {
+      plstkobj_t *stkobj = (plstkobj_t*)obj->data.pvalue;
+      int16_t soid;
+      switch (pvt) {
+        case PT_INT:   soid = SOID_INT;   break;
+        case PT_FLOAT: soid = SOID_FLOAT; break;
+        case PT_STR:   soid = SOID_STR;   break;
+        case PT_REF:   soid = SOID_REF;   break;
+        default: assert(0 && "unreachable!");
+      }
+      stkobj->soid = soid;
+      break;
+    }
+    case ROC_ONSTACK: {
+      plobj_t *heapobj = (plobj_t*)obj->data.pvalue;
+      int16_t oid;
+      switch (pvt) {
+        case PT_INT:   oid = OID_INT;   break;
+        case PT_FLOAT: oid = OID_FLOAT; break;
+        case PT_STR:   oid = OID_STR;   break;
+        case PT_LIST:  oid = OID_LIST;  break;
+        default: assert(0 && "unreachable!");
+      }
+      heapobj->oid = oid;
+      break;
+    }
+    default:
+    assert(0 && "unreachable!");
+  }
+}
+
+static void asgn_int(plregobj_t *obj, int64_t value) {
   jjvalue_t *storage = fetch_storage(obj);
   if (storage == NULL) {
     return;
@@ -181,11 +215,11 @@ static void putin_int(plregobj_t *obj, int64_t value) {
   if (obj->pvt == PT_LIST) {
     destroy_list(&(storage->lsvalue));
   }
-  obj->pvt = PT_INT;
+  asgn_attach_typeinfo(obj, PT_INT);
   storage->ivalue = value;
 }
 
-static void putin_float(plregobj_t *obj, double value) {
+static void asgn_float(plregobj_t *obj, double value) {
   jjvalue_t *storage = fetch_storage(obj);
   if (storage == NULL) {
     return;
@@ -193,11 +227,11 @@ static void putin_float(plregobj_t *obj, double value) {
   if (obj->pvt == PT_LIST) {
     destroy_list(&(storage->lsvalue));
   }
-  obj->pvt = PT_FLOAT;
+  asgn_attach_typeinfo(obj, PT_FLOAT);
   storage->fvalue = value;
 }
 
-static void putin_str(plregobj_t *obj, int64_t value) {
+static void asgn_str(plregobj_t *obj, int64_t value) {
   jjvalue_t *storage = fetch_storage(obj);
   if (storage == NULL) {
     return;
@@ -205,11 +239,11 @@ static void putin_str(plregobj_t *obj, int64_t value) {
   if (obj->pvt == PT_LIST) {
     destroy_list(&(storage->lsvalue));
   }
-  obj->pvt = PT_STR;
+  asgn_attach_typeinfo(obj, PT_STR);
   storage->svalue = value;
 }
 
-static void putin_list(plregobj_t *obj, list_t value) {
+static void asgn_list(plregobj_t *obj, list_t value) {
   jjvalue_t *storage = fetch_storage(obj);
   if (storage == NULL) {
     return;
@@ -217,7 +251,7 @@ static void putin_list(plregobj_t *obj, list_t value) {
   if (obj->pvt == PT_LIST) {
     destroy_list(&(storage->lsvalue));
   }
-  obj->pvt = PT_LIST;
+  asgn_attach_typeinfo(obj, PT_LIST);
   storage->lsvalue = value;
 }
 
@@ -302,13 +336,19 @@ plregobj_t algebraic_calc(plregobj_t lhs, plregobj_t rhs,
 }
 
 plregobj_t assign(plregobj_t lhs, plregobj_t rhs) {
+  if (lhs.roc != ROC_ONSTACK || lhs.roc != ROC_ONHEAP) {
+    return lhs;
+  }
+
   switch (rhs.pvt) {
-    case PT_INT:   putin_int(&lhs, rhs.data.ivalue);   break;
-    case PT_FLOAT: putin_float(&lhs, rhs.data.fvalue); break;
-    case PT_STR:   putin_str(&lhs, rhs.data.svalue);   break;
-    case PT_LIST:  putin_list(&lhs, rhs.data.lsvalue); break;
+    case PT_INT:   asgn_int(&lhs, rhs.data.ivalue);   break;
+    case PT_FLOAT: asgn_float(&lhs, rhs.data.fvalue); break;
+    case PT_STR:   asgn_str(&lhs, rhs.data.svalue);   break;
+    case PT_LIST:  asgn_list(&lhs, rhs.data.lsvalue); break;
+    case PT_REF:   assert(false && "should be handled elsewhere!");
     default:       set_undefined(&lhs);                break;
   }
+
   return lhs;
 }
 

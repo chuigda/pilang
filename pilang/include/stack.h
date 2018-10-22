@@ -11,6 +11,7 @@
 typedef enum {
   SOID_INT,
   SOID_FLOAT,
+  SOID_STR,
   SOID_REF,
   SOID_UNDEFINED
 } pstkobj_id_t;
