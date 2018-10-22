@@ -1,6 +1,7 @@
 #define EVAL_C
 #include "eval.h"
 
+#include "ast.h"
 #include "util.h"
 #include "y.tab.h"
 
@@ -362,6 +363,55 @@ plregobj_t assign(plregobj_t lhs, plregobj_t rhs) {
   }
 
   return lhs;
+}
+
+plregobj_t eval_literal_expr(ast_leaf_wdata_t *node) {
+  plregobj_t ret = create_inreg();
+  switch (node->node_sema_info) {
+    case ANS_INTVAL:   ret.pvt = PT_INT;   break;
+    case ANS_FLOATVAL: ret.pvt = PT_FLOAT; break;
+    case ANS_STR:      ret.pvt = PT_STR;   break;
+  }
+  ret.data = node->data;
+  return ret;
+}
+
+plregobj_t eval_idref_expr(ast_leaf_wdata_t *node, plstack_t *stack) {
+  return create_onstack(stack_get(stack, node->data.svalue));
+}
+
+void callfunc(ast_tchild_wdata_t *func, list_t args, 
+              list_t rets, plstack_t *stack) {
+  stack_enter_frame(stack);
+  ast_list_t *param_list_node = (ast_list_t*)func->children[0];
+  list_t param_list = param_list_node->list;
+  for (iter_t it1 = list_begin(&param_list),
+              it2 = list_begin(&args);
+       !iter_eq(it1, list_end(&param_list))
+       && !iter_eq(it2, list_end(&args));
+       it1 = iter_next(it1), it2 = iter_next(it2)) {
+    ast_leaf_wdata_t *param_idref_node = 
+      (ast_leaf_wdata_t*)iter_deref(it1);
+    assign(eval_idref_expr(param_idref_node, stack),
+           *(plregobj_t*)iter_deref(it2));
+  }
+
+  // TODO
+  // eval_func_body(node->children[2], stack);
+
+  ast_list_t *rets_list_node = (ast_list_t*)func->children[1];
+  list_t rets_list = rets_list_node->list;
+  for (iter_t it = list_begin(&rets_list);
+       !iter_eq(it, list_end(&rets_list));
+       it = iter_next(it)) {
+    plregobj_t *t = NEW(plregobj_t);
+    *t = create_inreg();
+    ast_leaf_wdata_t *ret_idref_node = (ast_leaf_wdata_t*)iter_deref(it);
+    assign(*t, eval_idref_expr(ret_idref_node, stack));
+    list_push_back(&rets, t);
+  }
+
+  stack_exit_frame(stack);
 }
 
 void eval_ast(ast_node_base_t *program) {
