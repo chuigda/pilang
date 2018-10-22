@@ -255,6 +255,18 @@ static void asgn_list(plregobj_t *obj, list_t value) {
   storage->lsvalue = value;
 }
 
+static void asgn_ref(plregobj_t *obj, void *value) {
+  jjvalue_t *storage = fetch_storage(obj);
+  if (storage == NULL) {
+    return;
+  }
+  if (obj->pvt == PT_LIST) {
+    destroy_list(&(storage->lsvalue));
+  }
+  asgn_attach_typeinfo(obj, PT_REF);
+  storage->pvalue = value;
+}
+
 static void set_undefined(plregobj_t *obj) {
   jjvalue_t *storage = fetch_storage(obj);
   if (obj->pvt == PT_LIST) {
@@ -341,11 +353,11 @@ plregobj_t assign(plregobj_t lhs, plregobj_t rhs) {
   }
 
   switch (rhs.pvt) {
-    case PT_INT:   asgn_int(&lhs, rhs.data.ivalue);   break;
-    case PT_FLOAT: asgn_float(&lhs, rhs.data.fvalue); break;
-    case PT_STR:   asgn_str(&lhs, rhs.data.svalue);   break;
-    case PT_LIST:  asgn_list(&lhs, rhs.data.lsvalue); break;
-    case PT_REF:   assert(false && "should be handled elsewhere!");
+    case PT_INT:   asgn_int(&lhs, rhs.data.ivalue);    break;
+    case PT_FLOAT: asgn_float(&lhs, rhs.data.fvalue);  break;
+    case PT_STR:   asgn_str(&lhs, rhs.data.svalue);    break;
+    case PT_LIST:  asgn_list(&lhs, rhs.data.lsvalue);  break;
+    case PT_REF:   asgn_ref(&lhs, rhs.data.pvalue);    break;
     default:       set_undefined(&lhs);                break;
   }
 
