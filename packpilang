@@ -1,0 +1,6 @@
+#!/bin/bash
+git pull
+cd pilang
+make docs
+cd ..
+zip pilang.zip -r pilang/
