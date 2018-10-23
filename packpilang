@@ -1,4 +1,5 @@
 #!/bin/bash
+rm -rf pilang.zip
 git pull
 cd pilang
 make docs
