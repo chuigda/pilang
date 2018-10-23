@@ -20,7 +20,7 @@ int main() {
   stack_b->soid = SOID_INT;
   stack_b->value.ivalue = 2;
 
-  // plobj_t *heapobj = plobj_create_int(33);
+  plobj_t *heapobj = plobj_create_int(33);
 
   plregobj_t sum_ab = algebraic_calc(create_onstack(stack_a),
                                      create_onstack(stack_b), ALF_ADD);
@@ -33,6 +33,18 @@ int main() {
   assert(sum_ab.roc == ROC_INREG);
   assert(sum_ab.pvt == PT_INT);
   assert(sum_ab.data.ivalue == 3);
+
+  plregobj_t sum_abc = algebraic_calc(sum_ab, create_onheap(heapobj), 
+                                      ALF_ADD);
+
+  fprintf(stderr, "sum_abc.roc == %d\n", sum_abc.roc);
+  fprintf(stderr, "sum_abc.pvt == %d\n", sum_abc.pvt);
+  fprintf(stderr, "sum_abc.data.ivalue == %" PRId64 "\n",
+          sum_abc.data.ivalue);
+
+  assert(sum_abc.roc == ROC_INREG);
+  assert(sum_abc.pvt == PT_INT);
+  assert(sum_abc.data.ivalue == 36);
 
   return 0;
 }

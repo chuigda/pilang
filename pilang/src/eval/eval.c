@@ -380,8 +380,23 @@ plregobj_t eval_idref_expr(ast_leaf_wdata_t *node, plstack_t *stack) {
   return create_onstack(stack_get(stack, node->data.svalue));
 }
 
-void callfunc(ast_tchild_wdata_t *func, list_t args, 
-              list_t rets, plstack_t *stack) {
+void eval_stmt(ast_node_base_t *stmt, plstack_t *stack) {
+  // TODO
+  (void)stmt;
+  (void)stack;
+}
+
+void eval_func_body(ast_list_t *body, plstack_t *stack) {
+  list_t stmts = body->list;
+  for (iter_t it = list_begin(&stmts); 
+       !iter_eq(it, list_end(&stmts));
+       it = iter_next(it)) {
+    eval_stmt((ast_node_base_t*)iter_deref(it), stack);
+  }
+}
+
+static void callfunc(ast_tchild_wdata_t *func, list_t args, 
+                     list_t rets, plstack_t *stack) {
   stack_enter_frame(stack);
   ast_list_t *param_list_node = (ast_list_t*)func->children[0];
   list_t param_list = param_list_node->list;
@@ -396,8 +411,7 @@ void callfunc(ast_tchild_wdata_t *func, list_t args,
            *(plregobj_t*)iter_deref(it2));
   }
 
-  // TODO
-  // eval_func_body(node->children[2], stack);
+  eval_func_body(func->children[2], stack);
 
   ast_list_t *rets_list_node = (ast_list_t*)func->children[1];
   list_t rets_list = rets_list_node->list;
