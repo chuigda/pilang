@@ -1,12 +1,11 @@
 #include "plheap.h"
 
 #include "mstring.h"
-
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "vktest.h"
 
 int main() {
+  VK_TEST_BEGIN
+
   init_heap();
   
   plobj_t *o1 = plobj_create_int(39);
@@ -25,23 +24,25 @@ int main() {
   gc_mark_white(o4);
   gc_mark_white(lsobj);
   
-  assert(o4->gcmark == GCM_WHITE);
-  assert(lsobj->gcmark == GCM_WHITE);
-  assert(o1->gcmark == GCM_WHITE);
-  assert(o2->gcmark == GCM_WHITE);
-  assert(o3->gcmark == GCM_BLACK);
+  VK_ASSERT_EQUALS(GCM_WHITE, o4->gcmark);
+  VK_ASSERT_EQUALS(GCM_WHITE, lsobj->gcmark);
+  VK_ASSERT_EQUALS(GCM_WHITE, o1->gcmark);
+  VK_ASSERT_EQUALS(GCM_WHITE, o2->gcmark);
+  VK_ASSERT_EQUALS(GCM_BLACK, o3->gcmark);
   
   gc_cleanup();
   
-  assert(o4->used == 1);
-  assert(lsobj->used == 1);
-  assert(o1->used == 1);
-  assert(o2->used == 1);
-  assert(o3->used == 0);
+  VK_ASSERT_EQUALS(1, o4->used);
+  VK_ASSERT_EQUALS(1, lsobj->used);
+  VK_ASSERT_EQUALS(1, o1->used);
+  VK_ASSERT_EQUALS(1, o2->used);
+  VK_ASSERT_EQUALS(0, o3->used);
   
   gc_start();
   gc_cleanup();
   close_heap();
+
+  VK_TEST_END
 
   return 0;
 }
