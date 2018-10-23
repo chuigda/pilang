@@ -1,13 +1,12 @@
 #define TEST
 #include "eval.h"
+#include "vktest.h"
+#include "util.h"
 
-#include <assert.h>
-#include <inttypes.h>
-#include <stdio.h>
+void test_int_calc() {
+  VK_TEST_SECTION_BEGIN("integer calculation test")
 
-int main() {
   plstack_t test_stack;
-  init_heap();
   init_stack(&test_stack);
   stack_enter_frame(&test_stack);
 
@@ -24,27 +23,39 @@ int main() {
 
   plregobj_t sum_ab = algebraic_calc(create_onstack(stack_a),
                                      create_onstack(stack_b), ALF_ADD);
-  
-  fprintf(stderr, "sum_ab.roc == %d\n", sum_ab.roc);
-  fprintf(stderr, "sum_ab.pvt == %d\n", sum_ab.pvt);
-  fprintf(stderr, "sum_ab.data.ivalue == %" PRId64 "\n",
-          sum_ab.data.ivalue);
 
-  assert(sum_ab.roc == ROC_INREG);
-  assert(sum_ab.pvt == PT_INT);
-  assert(sum_ab.data.ivalue == 3);
+  VK_ASSERT_EQUALS(ROC_INREG, sum_ab.roc);
+  VK_ASSERT_EQUALS(PT_INT,    sum_ab.pvt);
+  VK_ASSERT_EQUALS(3,         sum_ab.data.ivalue);
 
   plregobj_t sum_abc = algebraic_calc(sum_ab, create_onheap(heapobj), 
                                       ALF_ADD);
 
-  fprintf(stderr, "sum_abc.roc == %d\n", sum_abc.roc);
-  fprintf(stderr, "sum_abc.pvt == %d\n", sum_abc.pvt);
-  fprintf(stderr, "sum_abc.data.ivalue == %" PRId64 "\n",
-          sum_abc.data.ivalue);
+  VK_ASSERT_EQUALS(ROC_INREG, sum_abc.roc);
+  VK_ASSERT_EQUALS(PT_INT,    sum_abc.pvt);
+  VK_ASSERT_EQUALS(36,        sum_abc.data.ivalue);
 
-  assert(sum_abc.roc == ROC_INREG);
-  assert(sum_abc.pvt == PT_INT);
-  assert(sum_abc.data.ivalue == 36);
+  close_stack(&test_stack);
+  
+  VK_TEST_SECTION_END("integer calculation test")
+}
 
+void test_str_add() {
+  VK_TEST_SECTION_BEGIN("string add test")
+  VK_TEST_SECTION_END("string add test")
+}
+
+int main() {
+  VK_TEST_BEGIN
+
+  init_heap();
+
+  test_int_calc();
+  test_str_add();
+
+  gc_start();
+  gc_cleanup();
+
+  VK_TEST_END
   return 0;
 }

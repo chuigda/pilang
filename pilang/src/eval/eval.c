@@ -411,7 +411,7 @@ static void callfunc(ast_tchild_wdata_t *func, list_t args,
            *(plregobj_t*)iter_deref(it2));
   }
 
-  eval_func_body(func->children[2], stack);
+  eval_func_body((ast_list_t*)(func->children[2]), stack);
 
   ast_list_t *rets_list_node = (ast_list_t*)func->children[1];
   list_t rets_list = rets_list_node->list;
