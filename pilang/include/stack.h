@@ -48,7 +48,4 @@ plstkobj_t *stack_get(plstack_t *stack, strhdl_t name);
 
 void request_stack_gc(plstack_t *stack);
 
-#define DFL_STACK_SIZE 65536
-#define DFL_STACKFRAME_COUNT 512
-
 #endif

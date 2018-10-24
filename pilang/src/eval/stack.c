@@ -1,5 +1,6 @@
 #include "stack.h"
 
+#include "config.h"
 #include "util.h"
 
 #include <assert.h>
@@ -17,8 +18,8 @@ jjtype_t soid2jt(plstkobj_id_t soid) {
 }
 
 void init_stack(plstack_t *stack) {
-  stack->storage = NEWN(plstkobj_t, DFL_STACK_SIZE);
-  stack->stack_size = DFL_STACK_SIZE;
+  stack->storage = NEWN(plstkobj_t, PLI_STACK_SIZE);
+  stack->stack_size = PLI_STACK_SIZE;
   stack->stack_usage = 0;
   create_list(&(stack->frames), malloc, free);
 }
@@ -36,7 +37,7 @@ void close_stack(plstack_t *stack) {
 static plstkobj_t *stack_allocate(plstack_t *stack, strhdl_t name) {
   if (stack->stack_usage == stack->stack_size) {
     eprintf("pilang pivm: stack overflow, "
-            "with DFL_STACK_SIZE = %d\n", DFL_STACK_SIZE);
+            "with DFL_STACK_SIZE = %d\n", PLI_STACK_SIZE);
     abort();
   }
 

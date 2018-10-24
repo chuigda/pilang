@@ -1,6 +1,7 @@
 #include "plheap.h"
 
 #include "clist.h"
+#include "config.h"
 #include "util.h"
 
 #include <assert.h>
@@ -49,12 +50,12 @@ void destroy_object(plheapobj_t *obj) {
 }
 
 void init_heap() {
-  heap = NEWN(plheapobj_t*, HEAP_INIT_SIZE);
-  for (int i = 0; i < HEAP_INIT_SIZE; i++) {
+  heap = NEWN(plheapobj_t*, PLI_HEAP_INIT_SIZE);
+  for (int i = 0; i < PLI_HEAP_INIT_SIZE; i++) {
     heap[i] = NEW(plheapobj_t);
     heap[i]->used = 0;
   }
-  heap_cap = HEAP_INIT_SIZE;
+  heap_cap = PLI_HEAP_INIT_SIZE;
   heap_usage = 0;
 }
 

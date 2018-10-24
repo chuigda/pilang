@@ -37,8 +37,6 @@ plheapobj_t *plobj_create_object(void);
 
 void destroy_object(plheapobj_t *obj);
 
-#define HEAP_INIT_SIZE 114514
-
 void init_heap(void);
 void close_heap(void);
 
