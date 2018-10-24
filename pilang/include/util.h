@@ -9,4 +9,6 @@
 #define TP(...)
 #define TEMPLATE(...)
 
+#define UNREAECHABLE { fprintf(stderr, "unreachable!\n"); abort(); }
+
 #endif

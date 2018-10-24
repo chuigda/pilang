@@ -47,7 +47,7 @@ static jjvalue_t *fetch_storage(plvalue_t *obj) {
     return &(stkobj->value);
   }
   }
-  assert(0 && "unreachable");
+  UNREAECHABLE
   return NULL;
 }
 
@@ -97,7 +97,7 @@ static result_t fetch_float(plvalue_t obj) {
     return failed_result("cannot autocast from Nothing to Float");
   }
 
-  assert(0 && "unreachable");
+  UNREAECHABLE
 }
 
 static result_t fetch_str(plvalue_t obj) {
@@ -126,7 +126,7 @@ static result_t fetch_str(plvalue_t obj) {
     return failed_result("cannot autocast fron List to Str");
   }
   
-  assert(0 && "unreachable");
+  UNREAECHABLE
 }
 
 static result_t fetch_list(plvalue_t obj) {
@@ -146,7 +146,7 @@ static result_t fetch_list(plvalue_t obj) {
     return success_result(*storage);
   }
   
-  assert(0 && "unreachable");
+  UNREAECHABLE
 }
 
 static void asgn_attach_typeinfo(plvalue_t *obj, int16_t pvt) {
@@ -163,7 +163,7 @@ static void asgn_attach_typeinfo(plvalue_t *obj, int16_t pvt) {
       break;
     }
     default:
-    assert(0 && "unreachable!");
+    UNREAECHABLE
   }
 }
 
@@ -280,7 +280,7 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
     case ALF_SUB: ret.data.fvalue = f1 - f2; break;
     case ALF_MUL: ret.data.fvalue = f1 * f2; break;
     case ALF_DIV: ret.data.fvalue = f1 / f2; break;
-    default: assert(0 && "unreachable");
+    default: UNREAECHABLE
     }
     return ret;
   }
