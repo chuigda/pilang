@@ -15,7 +15,7 @@ typedef enum {
   ROC_ONSTACK,
   ROC_ONHEAP,
   ROC_NONE
-} plregobj_cont_t;
+} plvalue_storage_t;
 
 typedef enum {
   PT_INT,
@@ -30,18 +30,18 @@ typedef struct {
   jjvalue_t data;
   int16_t roc;
   int16_t pvt;
-} plregobj_t;
+} plvalue_t;
 
-plregobj_t create_onstack(plstkobj_t *storage);
-plregobj_t create_onheap(plobj_t *storage);
-plregobj_t create_inreg();
+plvalue_t create_onstack(plstkobj_t *storage);
+plvalue_t create_onheap(plheapobj_t *storage);
+plvalue_t create_inreg();
 
 typedef enum {
   ALF_ADD, ALF_SUB, ALF_MUL, ALF_DIV, ALF_MOD
 } algebraic_function_t;
 
-plregobj_t algebraic_calc(plregobj_t lhs, plregobj_t rhs, 
-                          algebraic_function_t alf);
+plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs, 
+                         algebraic_function_t alf);
 
 #endif
 

@@ -7,6 +7,23 @@
 #include <stdlib.h>
 #include <string.h>
 
+void init_stack(plstack_t *stack) {
+  stack->storage = NEWN(plstkobj_t, DFL_STACK_SIZE);
+  stack->stack_size = DFL_STACK_SIZE;
+  stack->stack_usage = 0;
+  create_list(&(stack->frames), malloc, free);
+}
+
+void close_stack(plstack_t *stack) {
+  for (iter_t it = list_begin(&(stack->frames));
+       !iter_eq(it, list_end(&(stack->frames))); 
+       it = iter_next(it)) {
+    free(iter_deref(it));
+  }
+  destroy_list(&(stack->frames));
+  free(stack->storage);
+}
+
 static plstkobj_t *stack_allocate(plstack_t *stack, int64_t name) {
   if (stack->stack_usage == stack->stack_size) {
     eprintf("pilang pivm: stack overflow, "
@@ -22,13 +39,6 @@ static plstkobj_t *stack_allocate(plstack_t *stack, int64_t name) {
   stack->stack_usage++;
   cur_frame->objs_end++;
   return obj;
-}
-
-void init_stack(plstack_t *stack) {
-  stack->storage = NEWN(plstkobj_t, DFL_STACK_SIZE);
-  stack->stack_size = DFL_STACK_SIZE;
-  stack->stack_usage = 0;
-  create_list(&(stack->frames), malloc, free);
 }
 
 void stack_enter_frame(plstack_t *stack) {
@@ -61,14 +71,4 @@ plstkobj_t *stack_get(plstack_t *stack, int64_t name) {
   plstkobj_t *obj = stack_allocate(stack, name);
   obj->soid = SOID_UNDEFINED;
   return obj;
-}
-
-void close_stack(plstack_t *stack) {
-  for (iter_t it = list_begin(&(stack->frames));
-       !iter_eq(it, list_end(&(stack->frames))); 
-       it = iter_next(it)) {
-    free(iter_deref(it));
-  }
-  destroy_list(&(stack->frames));
-  free(stack->storage);
 }

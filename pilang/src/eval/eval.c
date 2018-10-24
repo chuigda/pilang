@@ -12,8 +12,8 @@
 #include <string.h>
 #include <stdint.h>
 
-plregobj_t create_onstack(plstkobj_t *storage) {
-  plregobj_t ret;
+plvalue_t create_onstack(plstkobj_t *storage) {
+  plvalue_t ret;
   ret.roc = ROC_ONSTACK;
   switch (storage->soid) {
     case SOID_INT:   ret.pvt = PT_INT;   break;
@@ -25,34 +25,34 @@ plregobj_t create_onstack(plstkobj_t *storage) {
   return ret;
 }
 
-plregobj_t create_onheap(plobj_t *storage) {
-  plregobj_t ret;
+plvalue_t create_onheap(plheapobj_t *storage) {
+  plvalue_t ret;
   ret.roc = ROC_ONHEAP;
   switch (storage->oid) {
-    case OID_INT:   ret.pvt = PT_INT;   break;
-    case OID_FLOAT: ret.pvt = PT_FLOAT; break;
-    case OID_STR:   ret.pvt = PT_STR;   break;
-    case OID_LIST:  ret.pvt = PT_LIST;  break;
-    default:        ret.pvt = PT_UNDEFINED;
+    case HOID_INT:   ret.pvt = PT_INT;   break;
+    case HOID_FLOAT: ret.pvt = PT_FLOAT; break;
+    case HOID_STR:   ret.pvt = PT_STR;   break;
+    case HOID_LIST:  ret.pvt = PT_LIST;  break;
+    default:         ret.pvt = PT_UNDEFINED;
   }
   ret.data.pvalue = storage;
   return ret;
 }
 
-plregobj_t create_inreg() {
-  plregobj_t ret;
+plvalue_t create_inreg() {
+  plvalue_t ret;
   ret.roc = ROC_INREG;
   return ret;
 }
 
-static jjvalue_t *fetch_storage(plregobj_t *obj) {
+static jjvalue_t *fetch_storage(plvalue_t *obj) {
   switch (obj->roc) {
   case ROC_INREG: return &(obj->data);
-  case ROC_ONHEAP: return &(((plobj_t*)obj->data.pvalue)->value);
+  case ROC_ONHEAP: return &(((plheapobj_t*)obj->data.pvalue)->value);
   case ROC_ONSTACK: {
     plstkobj_t *stkobj = (plstkobj_t*)(obj->data.pvalue);
     if (stkobj->soid == SOID_REF) {
-      plobj_t *heapobj = (plobj_t*)(stkobj->value.pvalue);
+      plheapobj_t *heapobj = (plheapobj_t*)(stkobj->value.pvalue);
       return &(heapobj->value);
     }
     return &(stkobj->value);
@@ -62,7 +62,7 @@ static jjvalue_t *fetch_storage(plregobj_t *obj) {
   return NULL;
 }
 
-static result_t fetch_int(plregobj_t obj) {
+static result_t fetch_int(plvalue_t obj) {
   jjvalue_t *storage = fetch_storage(&obj);
   if (storage == NULL) {
     return failed_result("assert ign: object does not have storage?");
@@ -89,7 +89,7 @@ static result_t fetch_int(plregobj_t obj) {
   assert(0 && "unreachable");
 }
 
-static result_t fetch_float(plregobj_t obj) {
+static result_t fetch_float(plvalue_t obj) {
   jjvalue_t *storage = fetch_storage(&obj);
   if (storage == NULL) {
     return failed_result("assert ign: object does not have storage?");
@@ -115,7 +115,7 @@ static result_t fetch_float(plregobj_t obj) {
   assert(0 && "unreachable");
 }
 
-static result_t fetch_str(plregobj_t obj) {
+static result_t fetch_str(plvalue_t obj) {
   jjvalue_t *storage = fetch_storage(&obj);
   if (storage == NULL) {
     return failed_result("assert ign: object does not have storage?");
@@ -146,7 +146,7 @@ static result_t fetch_str(plregobj_t obj) {
   assert(0 && "unreachable");
 }
 
-static result_t fetch_list(plregobj_t obj) {
+static result_t fetch_list(plvalue_t obj) {
   jjvalue_t *storage = fetch_storage(&obj);
   if (storage == NULL) {
     return failed_result("assert ign: object does not have storage?");
@@ -168,13 +168,13 @@ static result_t fetch_list(plregobj_t obj) {
   assert(0 && "unreachable");
 }
 
-static result_t fetch_referred(plregobj_t obj) {
+static result_t fetch_referred(plvalue_t obj) {
   // TODO I don't know the correct semantics
   (void)obj;
   assert(0 && "not implemented");
 }
 
-static void asgn_attach_typeinfo(plregobj_t *obj, int16_t pvt) {
+static void asgn_attach_typeinfo(plvalue_t *obj, int16_t pvt) {
   obj->pvt = pvt;
   switch (obj->roc) {
     case ROC_ONHEAP: {
@@ -191,13 +191,13 @@ static void asgn_attach_typeinfo(plregobj_t *obj, int16_t pvt) {
       break;
     }
     case ROC_ONSTACK: {
-      plobj_t *heapobj = (plobj_t*)obj->data.pvalue;
+      plheapobj_t *heapobj = (plheapobj_t*)obj->data.pvalue;
       int16_t oid;
       switch (pvt) {
-        case PT_INT:   oid = OID_INT;   break;
-        case PT_FLOAT: oid = OID_FLOAT; break;
-        case PT_STR:   oid = OID_STR;   break;
-        case PT_LIST:  oid = OID_LIST;  break;
+        case PT_INT:   oid = HOID_INT;   break;
+        case PT_FLOAT: oid = HOID_FLOAT; break;
+        case PT_STR:   oid = HOID_STR;   break;
+        case PT_LIST:  oid = HOID_LIST;  break;
         default: assert(0 && "unreachable!");
       }
       heapobj->oid = oid;
@@ -208,7 +208,7 @@ static void asgn_attach_typeinfo(plregobj_t *obj, int16_t pvt) {
   }
 }
 
-static void asgn_int(plregobj_t *obj, int64_t value) {
+static void asgn_int(plvalue_t *obj, int64_t value) {
   jjvalue_t *storage = fetch_storage(obj);
   if (storage == NULL) {
     return;
@@ -220,7 +220,7 @@ static void asgn_int(plregobj_t *obj, int64_t value) {
   storage->ivalue = value;
 }
 
-static void asgn_float(plregobj_t *obj, double value) {
+static void asgn_float(plvalue_t *obj, double value) {
   jjvalue_t *storage = fetch_storage(obj);
   if (storage == NULL) {
     return;
@@ -232,7 +232,7 @@ static void asgn_float(plregobj_t *obj, double value) {
   storage->fvalue = value;
 }
 
-static void asgn_str(plregobj_t *obj, int64_t value) {
+static void asgn_str(plvalue_t *obj, int64_t value) {
   jjvalue_t *storage = fetch_storage(obj);
   if (storage == NULL) {
     return;
@@ -244,7 +244,7 @@ static void asgn_str(plregobj_t *obj, int64_t value) {
   storage->svalue = value;
 }
 
-static void asgn_list(plregobj_t *obj, list_t value) {
+static void asgn_list(plvalue_t *obj, list_t value) {
   jjvalue_t *storage = fetch_storage(obj);
   if (storage == NULL) {
     return;
@@ -256,7 +256,7 @@ static void asgn_list(plregobj_t *obj, list_t value) {
   storage->lsvalue = value;
 }
 
-static void asgn_ref(plregobj_t *obj, void *value) {
+static void asgn_ref(plvalue_t *obj, void *value) {
   jjvalue_t *storage = fetch_storage(obj);
   if (storage == NULL) {
     return;
@@ -268,7 +268,7 @@ static void asgn_ref(plregobj_t *obj, void *value) {
   storage->pvalue = value;
 }
 
-static void set_undefined(plregobj_t *obj) {
+static void set_undefined(plvalue_t *obj) {
   jjvalue_t *storage = fetch_storage(obj);
   if (obj->pvt == PT_LIST) {
     destroy_list(&(storage->lsvalue));
@@ -292,7 +292,7 @@ static int64_t str_failsafe(result_t maybe) {
                        : create_string("undefined");
 }
 
-plregobj_t algebraic_calc(plregobj_t lhs, plregobj_t rhs,
+plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
                           algebraic_function_t alf) {
   if (alf == ALF_ADD) {
     if (EITHER_IS(PT_STR, lhs, rhs)) {
@@ -304,7 +304,7 @@ plregobj_t algebraic_calc(plregobj_t lhs, plregobj_t rhs,
       int newstr = create_string(temp);
       free(temp);
     
-      plregobj_t ret = create_inreg();
+      plvalue_t ret = create_inreg();
       ret.pvt = PT_STR;
       ret.data.svalue = newstr;
       return ret;
@@ -315,7 +315,7 @@ plregobj_t algebraic_calc(plregobj_t lhs, plregobj_t rhs,
     float f1 = float_failsafe(fetch_float(lhs));
     float f2 = float_failsafe(fetch_float(rhs));
     
-    plregobj_t ret = create_inreg();
+    plvalue_t ret = create_inreg();
     ret.pvt = PT_FLOAT;
     switch (alf) {
     case ALF_ADD: ret.data.fvalue = f1 + f2; break;
@@ -330,7 +330,7 @@ plregobj_t algebraic_calc(plregobj_t lhs, plregobj_t rhs,
     int64_t i1 = int_failsafe(fetch_int(lhs));
     int64_t i2 = int_failsafe(fetch_int(rhs));
     
-    plregobj_t ret = create_inreg();
+    plvalue_t ret = create_inreg();
     ret.pvt = PT_INT;
     switch (alf) {
     case ALF_ADD: ret.data.ivalue = i1 + i2; break;
@@ -342,13 +342,13 @@ plregobj_t algebraic_calc(plregobj_t lhs, plregobj_t rhs,
     return ret;
   }
   else {
-    plregobj_t ret = create_inreg();
+    plvalue_t ret = create_inreg();
     ret.pvt = PT_UNDEFINED;
     return ret;
   }
 }
 
-plregobj_t assign(plregobj_t lhs, plregobj_t rhs) {
+plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
   if (lhs.roc != ROC_ONSTACK || lhs.roc != ROC_ONHEAP) {
     return lhs;
   }
@@ -365,8 +365,8 @@ plregobj_t assign(plregobj_t lhs, plregobj_t rhs) {
   return lhs;
 }
 
-plregobj_t eval_literal_expr(ast_leaf_wdata_t *node) {
-  plregobj_t ret = create_inreg();
+plvalue_t eval_literal_expr(ast_leaf_wdata_t *node) {
+  plvalue_t ret = create_inreg();
   switch (node->node_sema_info) {
     case ANS_INTVAL:   ret.pvt = PT_INT;   break;
     case ANS_FLOATVAL: ret.pvt = PT_FLOAT; break;
@@ -376,7 +376,7 @@ plregobj_t eval_literal_expr(ast_leaf_wdata_t *node) {
   return ret;
 }
 
-plregobj_t eval_idref_expr(ast_leaf_wdata_t *node, plstack_t *stack) {
+plvalue_t eval_idref_expr(ast_leaf_wdata_t *node, plstack_t *stack) {
   return create_onstack(stack_get(stack, node->data.svalue));
 }
 
@@ -408,7 +408,7 @@ static void callfunc(ast_tchild_wdata_t *func, list_t args,
     ast_leaf_wdata_t *param_idref_node = 
       (ast_leaf_wdata_t*)iter_deref(it1);
     assign(eval_idref_expr(param_idref_node, stack),
-           *(plregobj_t*)iter_deref(it2));
+           *(plvalue_t*)iter_deref(it2));
   }
 
   eval_func_body((ast_list_t*)(func->children[2]), stack);
@@ -418,7 +418,7 @@ static void callfunc(ast_tchild_wdata_t *func, list_t args,
   for (iter_t it = list_begin(&rets_list);
        !iter_eq(it, list_end(&rets_list));
        it = iter_next(it)) {
-    plregobj_t *t = NEW(plregobj_t);
+    plvalue_t *t = NEW(plvalue_t);
     *t = create_inreg();
     ast_leaf_wdata_t *ret_idref_node = (ast_leaf_wdata_t*)iter_deref(it);
     assign(*t, eval_idref_expr(ret_idref_node, stack));

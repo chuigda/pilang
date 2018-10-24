@@ -8,17 +8,17 @@ int main() {
 
   init_heap();
   
-  plobj_t *o1 = plobj_create_int(39);
-  plobj_t *o2 = plobj_create_float(39.0);
-  plobj_t *o3 = plobj_create_str(create_string("fuck"));
-  plobj_t *o4 = plobj_create_str(create_string("shit"));
+  plheapobj_t *o1 = plobj_create_int(39);
+  plheapobj_t *o2 = plobj_create_float(39.0);
+  plheapobj_t *o3 = plobj_create_str(create_string("fuck"));
+  plheapobj_t *o4 = plobj_create_str(create_string("shit"));
   
   list_t list;
   create_list(&list, malloc, free);
   list_push_back(&list, o1);
   list_push_back(&list, o2);
   
-  plobj_t *lsobj = plobj_create_list(list);
+  plheapobj_t *lsobj = plobj_create_list(list);
   
   gc_start();
   gc_mark_white(o4);

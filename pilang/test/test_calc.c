@@ -19,16 +19,16 @@ void test_int_calc() {
   stack_b->soid = SOID_INT;
   stack_b->value.ivalue = 2;
 
-  plobj_t *heapobj = plobj_create_int(33);
+  plheapobj_t *heapobj = plobj_create_int(33);
 
-  plregobj_t sum_ab = algebraic_calc(create_onstack(stack_a),
+  plvalue_t sum_ab = algebraic_calc(create_onstack(stack_a),
                                      create_onstack(stack_b), ALF_ADD);
 
   VK_ASSERT_EQUALS(ROC_INREG, sum_ab.roc);
   VK_ASSERT_EQUALS(PT_INT,    sum_ab.pvt);
   VK_ASSERT_EQUALS(3,         sum_ab.data.ivalue);
 
-  plregobj_t sum_abc = algebraic_calc(sum_ab, create_onheap(heapobj), 
+  plvalue_t sum_abc = algebraic_calc(sum_ab, create_onheap(heapobj), 
                                       ALF_ADD);
 
   VK_ASSERT_EQUALS(ROC_INREG, sum_abc.roc);

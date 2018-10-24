@@ -5,18 +5,19 @@
 #include "jjvalue.h"
 
 typedef enum {
-  OID_INT,
-  OID_FLOAT,
-  OID_STR,
-  OID_LIST,
-  OID_SET,
-  OID_STRUCT
-} plobj_id_t;
+  HOID_INT,
+  HOID_FLOAT,
+  HOID_STR,
+  HOID_LIST,
+  HOID_SET,
+  HOID_STRUCT,
+  HOID_UNDEFINED
+} plheapobj_id_t;
 
 typedef enum {
   GCM_WHITE,
   GCM_BLACK
-} plobj_gcmark_t;
+} plheap_gcmark_t;
 
 typedef struct {
   jjvalue_t value;
@@ -24,16 +25,16 @@ typedef struct {
   uint8_t gcmark : 1;
   uint8_t oid : 4;
   uint32_t index : 26;
-} plobj_t;
+} plheapobj_t;
 
-plobj_t *plobj_create_ref(plobj_t *source);
-plobj_t *plobj_create_int(int64_t value);
-plobj_t *plobj_create_float(double value);
-plobj_t *plobj_create_str(int64_t h_str);
-plobj_t *plobj_create_list(list_t list);
-plobj_t *plobj_create_object(void);
+plheapobj_t *plobj_create_ref(plheapobj_t *source);
+plheapobj_t *plobj_create_int(int64_t value);
+plheapobj_t *plobj_create_float(double value);
+plheapobj_t *plobj_create_str(int64_t h_str);
+plheapobj_t *plobj_create_list(list_t list);
+plheapobj_t *plobj_create_object(void);
 
-void destroy_object(plobj_t *obj);
+void destroy_object(plheapobj_t *obj);
 
 #define HEAP_INIT_SIZE 114514
 
@@ -41,7 +42,7 @@ void init_heap(void);
 void close_heap(void);
 
 void gc_start(void);
-void gc_mark_white(plobj_t *obj);
+void gc_mark_white(plheapobj_t *obj);
 void gc_cleanup(void);
 
 #endif

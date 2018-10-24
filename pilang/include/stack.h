@@ -35,13 +35,13 @@ typedef struct {
 
 void init_stack(plstack_t *stack);
 
+void close_stack(plstack_t *stack);
+
 void stack_enter_frame(plstack_t *stack);
 
 void stack_exit_frame(plstack_t *stack);
 
 plstkobj_t *stack_get(plstack_t *stack, int64_t name);
-
-void close_stack(plstack_t *stack);
 
 void request_stack_gc(plstack_t *stack);
 
