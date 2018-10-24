@@ -18,7 +18,7 @@ typedef enum {
 
 typedef struct {
   jjvalue_t value;
-  int64_t name;
+  strhdl_t name;
   int8_t soid;
 } plstkobj_t;
 
@@ -30,7 +30,7 @@ typedef struct {
   plstkobj_t *storage;
   int32_t stack_size;
   int32_t stack_usage;
-  list_t frames;
+  list_t TP(plstkframe_t) frames;
 } plstack_t;
 
 plstkobj_id_t jt2soid(jjtype_t jt);
@@ -44,7 +44,7 @@ void stack_enter_frame(plstack_t *stack);
 
 void stack_exit_frame(plstack_t *stack);
 
-plstkobj_t *stack_get(plstack_t *stack, int64_t name);
+plstkobj_t *stack_get(plstack_t *stack, strhdl_t name);
 
 void request_stack_gc(plstack_t *stack);
 

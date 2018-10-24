@@ -3,16 +3,14 @@
 
 #include "clist.h"
 #include "mstring.h"
+#include "util.h"
 
 #include <stdint.h>
-
-#define TP(...)
-#define TEMPLATE(...)
 
 typedef union {
   int64_t ivalue;
   double fvalue;
-  int64_t svalue;
+  strhdl_t svalue;
   list_t lsvalue;
   void *pvalue;
 } jjvalue_t;
@@ -28,7 +26,7 @@ typedef enum {
 
 TEMPLATE(T)
 typedef struct {
-  jjvalue_t TP(T) value;
+  jjvalue_t value;
   bool success;
 } result_t;
 

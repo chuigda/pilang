@@ -9,8 +9,10 @@
 extern "C" {
 #endif
 
-int64_t create_string(const char* str);
-char const* get_string(int64_t hstr);
+typedef int64_t strhdl_t;
+
+strhdl_t create_string(const char* str);
+char const* get_string(strhdl_t hstr);
 
 #ifdef __cplusplus
 }

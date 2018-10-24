@@ -26,7 +26,7 @@ uint64_t BKDR_hash(const char *str) {
 typedef struct glob_hash_map_item {
   char *value;
   struct glob_hash_map_item *next;
-  int64_t handle;
+  strhdl_t handle;
 } hash_map_item_t;
 
 static hash_map_item_t
@@ -42,7 +42,7 @@ static hash_map_item_t *new_hash_map_item(const char *value,
   return entry;
 }
 
-int64_t create_string(const char *str) {
+strhdl_t create_string(const char *str) {
   uint64_t str_hash = BKDR_hash(str);
   size_t bucket = str_hash % STRING_HASHMAP_BUCKET_COUNT;
 
@@ -75,7 +75,7 @@ int64_t create_string(const char *str) {
   }
 }
 
-const char *get_string(int64_t hstr) {
+const char *get_string(strhdl_t hstr) {
   size_t bucket = hstr / 10;
   hash_map_item_t *item = glob_hash_map[bucket];
   while (item != NULL) {

@@ -31,7 +31,7 @@ jjtype_t hoid2jt(plheapobj_id_t hoid);
 plheapobj_t *plobj_create_ref(plheapobj_t *source);
 plheapobj_t *plobj_create_int(int64_t value);
 plheapobj_t *plobj_create_float(double value);
-plheapobj_t *plobj_create_str(int64_t h_str);
+plheapobj_t *plobj_create_str(strhdl_t h_str);
 plheapobj_t *plobj_create_list(list_t list);
 plheapobj_t *plobj_create_object(void);
 

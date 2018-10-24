@@ -33,7 +33,7 @@ void close_stack(plstack_t *stack) {
   free(stack->storage);
 }
 
-static plstkobj_t *stack_allocate(plstack_t *stack, int64_t name) {
+static plstkobj_t *stack_allocate(plstack_t *stack, strhdl_t name) {
   if (stack->stack_usage == stack->stack_size) {
     eprintf("pilang pivm: stack overflow, "
             "with DFL_STACK_SIZE = %d\n", DFL_STACK_SIZE);
@@ -65,7 +65,7 @@ void stack_exit_frame(plstack_t *stack) {
   free(curframe);
 }
 
-plstkobj_t *stack_get(plstack_t *stack, int64_t name) {
+plstkobj_t *stack_get(plstack_t *stack, strhdl_t name) {
   plstkframe_t *frame = 
     (plstkframe_t*)iter_deref(iter_prev(list_end(&(stack->frames))));
 

@@ -3,6 +3,7 @@
 
 #include "clist.h"
 #include "jjvalue.h"
+#include "util.h"
 
 #include <stdint.h>
 
@@ -89,7 +90,7 @@ typedef struct {
 
 typedef struct {
   AST_NODE_COMMON
-  list_t list;
+  list_t TP(ast_node_base_t*) list;
 } ast_list_t;
 
 ast_node_base_t *leaf(ast_node_sema_t sema_info);

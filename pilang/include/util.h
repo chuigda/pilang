@@ -6,4 +6,7 @@
 #define eprintf(fmt, ...) fprintf(stderr, fmt, __VA_ARGS__)
 #define eprintf0(str) fprintf(stderr, "%s", str)
 
+#define TP(...)
+#define TEMPLATE(...)
+
 #endif
