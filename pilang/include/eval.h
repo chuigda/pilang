@@ -11,7 +11,7 @@ void eval_ast(ast_node_base_t *program);
 #include "plheap.h"
 
 typedef enum {
-  ROC_INREG,
+  ROC_TEMP,
   ROC_ONSTACK,
   ROC_ONHEAP,
   ROC_NONE
@@ -25,7 +25,7 @@ typedef struct {
 
 plvalue_t create_onstack(plstkobj_t *storage);
 plvalue_t create_onheap(plheapobj_t *storage);
-plvalue_t create_inreg();
+plvalue_t create_temp();
 
 typedef enum {
   ALF_ADD, ALF_SUB, ALF_MUL, ALF_DIV, ALF_MOD

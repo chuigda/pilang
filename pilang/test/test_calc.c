@@ -24,14 +24,14 @@ void test_int_calc() {
   plvalue_t sum_ab = algebraic_calc(create_onstack(stack_a),
                                      create_onstack(stack_b), ALF_ADD);
 
-  VK_ASSERT_EQUALS(ROC_INREG, sum_ab.roc);
+  VK_ASSERT_EQUALS(ROC_TEMP, sum_ab.roc);
   VK_ASSERT_EQUALS(JT_INT,    sum_ab.pvt);
   VK_ASSERT_EQUALS(3,         sum_ab.data.ivalue);
 
   plvalue_t sum_abc = algebraic_calc(sum_ab, create_onheap(heapobj), 
                                       ALF_ADD);
 
-  VK_ASSERT_EQUALS(ROC_INREG, sum_abc.roc);
+  VK_ASSERT_EQUALS(ROC_TEMP, sum_abc.roc);
   VK_ASSERT_EQUALS(JT_INT,    sum_abc.pvt);
   VK_ASSERT_EQUALS(36,        sum_abc.data.ivalue);
 
