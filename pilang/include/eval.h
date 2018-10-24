@@ -17,15 +17,6 @@ typedef enum {
   ROC_NONE
 } plvalue_storage_t;
 
-typedef enum {
-  PT_INT,
-  PT_FLOAT,
-  PT_STR,
-  PT_LIST,
-  PT_REF,
-  PT_UNDEFINED
-} pl_value_type_t;
-
 typedef struct {
   jjvalue_t data;
   int16_t roc;

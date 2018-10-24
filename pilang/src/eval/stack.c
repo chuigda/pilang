@@ -7,6 +7,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+plstkobj_id_t jt2soid(jjtype_t jt) {
+  assert(jt != JT_LIST);
+  return (plstkobj_id_t)jt;
+}
+
+jjtype_t soid2jt(plstkobj_id_t soid) {
+  return (jjtype_t)soid;
+}
+
 void init_stack(plstack_t *stack) {
   stack->storage = NEWN(plstkobj_t, DFL_STACK_SIZE);
   stack->stack_size = DFL_STACK_SIZE;

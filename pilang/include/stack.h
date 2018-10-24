@@ -9,12 +9,12 @@
 #include <stdint.h>
 
 typedef enum {
-  SOID_INT,
-  SOID_FLOAT,
-  SOID_STR,
-  SOID_REF,
-  SOID_UNDEFINED
-} pstkobj_id_t;
+  SOID_INT       = JT_INT,
+  SOID_FLOAT     = JT_FLOAT,
+  SOID_STR       = JT_STR,
+  SOID_REF       = JT_REF,
+  SOID_UNDEFINED = JT_UNDEFINED
+} plstkobj_id_t;
 
 typedef struct {
   jjvalue_t value;
@@ -32,6 +32,9 @@ typedef struct {
   int32_t stack_usage;
   list_t frames;
 } plstack_t;
+
+plstkobj_id_t jt2soid(jjtype_t jt);
+jjtype_t soid2jt(plstkobj_id_t soid);
 
 void init_stack(plstack_t *stack);
 

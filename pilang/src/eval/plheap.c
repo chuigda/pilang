@@ -10,6 +10,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+plheapobj_id_t jt2hoid(jjtype_t jt) {
+  assert(jt != JT_REF);
+  return (plheapobj_id_t)jt;
+}
+
+jjtype_t hoid2jt(plheapobj_id_t hoid) {
+  return (jjtype_t)hoid;
+}
+
 static plheapobj_t **heap;
 static size_t heap_cap;
 static size_t heap_usage;
@@ -144,10 +153,6 @@ static void gc_mark_ref(plheapobj_t *obj) {
 void gc_mark_white(plheapobj_t *obj) {
   obj->gcmark = GCM_WHITE;
   switch (obj->oid) {
-  case HOID_STRUCT:
-    // TODO struct marking stuffs
-    break;
-    
   case HOID_LIST:
     gc_mark_list(obj);
     break;

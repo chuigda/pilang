@@ -16,10 +16,10 @@ plvalue_t create_onstack(plstkobj_t *storage) {
   plvalue_t ret;
   ret.roc = ROC_ONSTACK;
   switch (storage->soid) {
-    case SOID_INT:   ret.pvt = PT_INT;   break;
-    case SOID_FLOAT: ret.pvt = PT_FLOAT; break;
-    case SOID_REF:   ret.pvt = PT_REF;   break;
-    default:         ret.pvt = PT_UNDEFINED;
+    case SOID_INT:   ret.pvt = JT_INT;   break;
+    case SOID_FLOAT: ret.pvt = JT_FLOAT; break;
+    case SOID_REF:   ret.pvt = JT_REF;   break;
+    default:         ret.pvt = JT_UNDEFINED;
   }
   ret.data.pvalue = storage;
   return ret;
@@ -29,11 +29,11 @@ plvalue_t create_onheap(plheapobj_t *storage) {
   plvalue_t ret;
   ret.roc = ROC_ONHEAP;
   switch (storage->oid) {
-    case HOID_INT:   ret.pvt = PT_INT;   break;
-    case HOID_FLOAT: ret.pvt = PT_FLOAT; break;
-    case HOID_STR:   ret.pvt = PT_STR;   break;
-    case HOID_LIST:  ret.pvt = PT_LIST;  break;
-    default:         ret.pvt = PT_UNDEFINED;
+    case HOID_INT:   ret.pvt = JT_INT;   break;
+    case HOID_FLOAT: ret.pvt = JT_FLOAT; break;
+    case HOID_STR:   ret.pvt = JT_STR;   break;
+    case HOID_LIST:  ret.pvt = JT_LIST;  break;
+    default:         ret.pvt = JT_UNDEFINED;
   }
   ret.data.pvalue = storage;
   return ret;
@@ -69,20 +69,20 @@ static result_t fetch_int(plvalue_t obj) {
   }
   
   switch (obj.pvt) {
-  case PT_INT: 
+  case JT_INT: 
     return success_result(*storage);
-  case PT_FLOAT: {
+  case JT_FLOAT: {
     jjvalue_t shell;
     shell.fvalue = (int)(storage->ivalue);
     return success_result(shell);
   }
-  case PT_STR:
+  case JT_STR:
     return failed_result("cannot autocast from Str to Int");
-  case PT_LIST:
+  case JT_LIST:
     return failed_result("cannot autocast from List to Int");
-  case PT_REF:
+  case JT_REF:
     return failed_result("cannot autocast from (stack ref) to Int");
-  case PT_UNDEFINED: 
+  case JT_UNDEFINED: 
     return failed_result("cannot autocast from Nothing to Int");
   }
 
@@ -96,19 +96,19 @@ static result_t fetch_float(plvalue_t obj) {
   }
   
   switch (obj.pvt) {
-  case PT_INT: {
+  case JT_INT: {
     jjvalue_t shell;
     shell.fvalue = (double)(storage->ivalue);
     return success_result(shell);
   }
-  case PT_FLOAT: return success_result(*storage);
-  case PT_STR: 
+  case JT_FLOAT: return success_result(*storage);
+  case JT_STR: 
     return failed_result("cannot autocast from Str to Float");
-  case PT_LIST:
+  case JT_LIST:
     return failed_result("cannot autocast from List to Float");
-  case PT_REF:
+  case JT_REF:
     return failed_result("cannot autocast from (stack ref) to Float");
-  case PT_UNDEFINED: 
+  case JT_UNDEFINED: 
     return failed_result("cannot autocast from Nothing to Float");
   }
 
@@ -122,24 +122,24 @@ static result_t fetch_str(plvalue_t obj) {
   }
 
   switch (obj.pvt) {
-  case PT_INT: {
+  case JT_INT: {
     char buffer[24]; 
     sprintf(buffer, "%" PRId64, storage->ivalue);
     jjvalue_t shell;
     shell.svalue = create_string(buffer);
     return success_result(shell);
   }
-  case PT_FLOAT: {
+  case JT_FLOAT: {
     char buffer[24]; 
     sprintf(buffer, "%lf", storage->fvalue);
     jjvalue_t shell;
     shell.svalue = create_string(buffer);
     return success_result(shell);
   }
-  case PT_STR: return success_result(*storage);
-  case PT_LIST: 
+  case JT_STR: return success_result(*storage);
+  case JT_LIST: 
     return failed_result("cannot autocast fron List to Str");
-  case PT_REF: 
+  case JT_REF: 
     return failed_result("cannot autocast from (stack ref) to Str");
   }
   
@@ -153,15 +153,15 @@ static result_t fetch_list(plvalue_t obj) {
   }
   
   switch (obj.pvt) {
-  case PT_INT:
+  case JT_INT:
     return failed_result("cannot autocast from Int to List");
-  case PT_FLOAT: 
+  case JT_FLOAT: 
     return failed_result("cannot autocast from Float to List");
-  case PT_STR: 
+  case JT_STR: 
     return failed_result("cannot autocast from Str to List");
-  case PT_LIST: 
+  case JT_LIST: 
     return success_result(*storage);
-  case PT_REF:
+  case JT_REF:
     return failed_result("cannot autocast from (stack ref) to List");
   }
   
@@ -181,10 +181,10 @@ static void asgn_attach_typeinfo(plvalue_t *obj, int16_t pvt) {
       plstkobj_t *stkobj = (plstkobj_t*)obj->data.pvalue;
       int16_t soid;
       switch (pvt) {
-        case PT_INT:   soid = SOID_INT;   break;
-        case PT_FLOAT: soid = SOID_FLOAT; break;
-        case PT_STR:   soid = SOID_STR;   break;
-        case PT_REF:   soid = SOID_REF;   break;
+        case JT_INT:   soid = SOID_INT;   break;
+        case JT_FLOAT: soid = SOID_FLOAT; break;
+        case JT_STR:   soid = SOID_STR;   break;
+        case JT_REF:   soid = SOID_REF;   break;
         default: assert(0 && "unreachable!");
       }
       stkobj->soid = soid;
@@ -194,10 +194,10 @@ static void asgn_attach_typeinfo(plvalue_t *obj, int16_t pvt) {
       plheapobj_t *heapobj = (plheapobj_t*)obj->data.pvalue;
       int16_t oid;
       switch (pvt) {
-        case PT_INT:   oid = HOID_INT;   break;
-        case PT_FLOAT: oid = HOID_FLOAT; break;
-        case PT_STR:   oid = HOID_STR;   break;
-        case PT_LIST:  oid = HOID_LIST;  break;
+        case JT_INT:   oid = HOID_INT;   break;
+        case JT_FLOAT: oid = HOID_FLOAT; break;
+        case JT_STR:   oid = HOID_STR;   break;
+        case JT_LIST:  oid = HOID_LIST;  break;
         default: assert(0 && "unreachable!");
       }
       heapobj->oid = oid;
@@ -213,10 +213,10 @@ static void asgn_int(plvalue_t *obj, int64_t value) {
   if (storage == NULL) {
     return;
   }
-  if (obj->pvt == PT_LIST) {
+  if (obj->pvt == JT_LIST) {
     destroy_list(&(storage->lsvalue));
   }
-  asgn_attach_typeinfo(obj, PT_INT);
+  asgn_attach_typeinfo(obj, JT_INT);
   storage->ivalue = value;
 }
 
@@ -225,10 +225,10 @@ static void asgn_float(plvalue_t *obj, double value) {
   if (storage == NULL) {
     return;
   }
-  if (obj->pvt == PT_LIST) {
+  if (obj->pvt == JT_LIST) {
     destroy_list(&(storage->lsvalue));
   }
-  asgn_attach_typeinfo(obj, PT_FLOAT);
+  asgn_attach_typeinfo(obj, JT_FLOAT);
   storage->fvalue = value;
 }
 
@@ -237,10 +237,10 @@ static void asgn_str(plvalue_t *obj, int64_t value) {
   if (storage == NULL) {
     return;
   }
-  if (obj->pvt == PT_LIST) {
+  if (obj->pvt == JT_LIST) {
     destroy_list(&(storage->lsvalue));
   }
-  asgn_attach_typeinfo(obj, PT_STR);
+  asgn_attach_typeinfo(obj, JT_STR);
   storage->svalue = value;
 }
 
@@ -249,10 +249,10 @@ static void asgn_list(plvalue_t *obj, list_t value) {
   if (storage == NULL) {
     return;
   }
-  if (obj->pvt == PT_LIST) {
+  if (obj->pvt == JT_LIST) {
     destroy_list(&(storage->lsvalue));
   }
-  asgn_attach_typeinfo(obj, PT_LIST);
+  asgn_attach_typeinfo(obj, JT_LIST);
   storage->lsvalue = value;
 }
 
@@ -261,19 +261,19 @@ static void asgn_ref(plvalue_t *obj, void *value) {
   if (storage == NULL) {
     return;
   }
-  if (obj->pvt == PT_LIST) {
+  if (obj->pvt == JT_LIST) {
     destroy_list(&(storage->lsvalue));
   }
-  asgn_attach_typeinfo(obj, PT_REF);
+  asgn_attach_typeinfo(obj, JT_REF);
   storage->pvalue = value;
 }
 
 static void set_undefined(plvalue_t *obj) {
   jjvalue_t *storage = fetch_storage(obj);
-  if (obj->pvt == PT_LIST) {
+  if (obj->pvt == JT_LIST) {
     destroy_list(&(storage->lsvalue));
   }
-  obj->pvt = PT_UNDEFINED;
+  obj->pvt = JT_UNDEFINED;
 }
 
 #define EITHER_IS(VALUETYPE, LHS, RHS) \
@@ -295,7 +295,7 @@ static int64_t str_failsafe(result_t maybe) {
 plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
                           algebraic_function_t alf) {
   if (alf == ALF_ADD) {
-    if (EITHER_IS(PT_STR, lhs, rhs)) {
+    if (EITHER_IS(JT_STR, lhs, rhs)) {
       const char* strl = get_string(str_failsafe(fetch_str(lhs)));
       const char* strr = get_string(str_failsafe(fetch_str(rhs)));
       char *temp = NEWN(char, strlen(strl) + strlen(strr) + 1);
@@ -305,18 +305,18 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
       free(temp);
     
       plvalue_t ret = create_inreg();
-      ret.pvt = PT_STR;
+      ret.pvt = JT_STR;
       ret.data.svalue = newstr;
       return ret;
     }
   }
   
-  if (EITHER_IS(PT_FLOAT, lhs, rhs) && alf != ALF_MOD) {
+  if (EITHER_IS(JT_FLOAT, lhs, rhs) && alf != ALF_MOD) {
     float f1 = float_failsafe(fetch_float(lhs));
     float f2 = float_failsafe(fetch_float(rhs));
     
     plvalue_t ret = create_inreg();
-    ret.pvt = PT_FLOAT;
+    ret.pvt = JT_FLOAT;
     switch (alf) {
     case ALF_ADD: ret.data.fvalue = f1 + f2; break;
     case ALF_SUB: ret.data.fvalue = f1 - f2; break;
@@ -326,12 +326,12 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
     }
     return ret;
   }
-  else if (EITHER_IS(PT_INT, lhs, rhs)) {
+  else if (EITHER_IS(JT_INT, lhs, rhs)) {
     int64_t i1 = int_failsafe(fetch_int(lhs));
     int64_t i2 = int_failsafe(fetch_int(rhs));
     
     plvalue_t ret = create_inreg();
-    ret.pvt = PT_INT;
+    ret.pvt = JT_INT;
     switch (alf) {
     case ALF_ADD: ret.data.ivalue = i1 + i2; break;
     case ALF_SUB: ret.data.ivalue = i1 - i2; break;
@@ -343,7 +343,7 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
   }
   else {
     plvalue_t ret = create_inreg();
-    ret.pvt = PT_UNDEFINED;
+    ret.pvt = JT_UNDEFINED;
     return ret;
   }
 }
@@ -354,11 +354,11 @@ plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
   }
 
   switch (rhs.pvt) {
-    case PT_INT:   asgn_int(&lhs, rhs.data.ivalue);    break;
-    case PT_FLOAT: asgn_float(&lhs, rhs.data.fvalue);  break;
-    case PT_STR:   asgn_str(&lhs, rhs.data.svalue);    break;
-    case PT_LIST:  asgn_list(&lhs, rhs.data.lsvalue);  break;
-    case PT_REF:   asgn_ref(&lhs, rhs.data.pvalue);    break;
+    case JT_INT:   asgn_int(&lhs, rhs.data.ivalue);    break;
+    case JT_FLOAT: asgn_float(&lhs, rhs.data.fvalue);  break;
+    case JT_STR:   asgn_str(&lhs, rhs.data.svalue);    break;
+    case JT_LIST:  asgn_list(&lhs, rhs.data.lsvalue);  break;
+    case JT_REF:   asgn_ref(&lhs, rhs.data.pvalue);    break;
     default:       set_undefined(&lhs);                break;
   }
 
@@ -368,9 +368,9 @@ plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
 plvalue_t eval_literal_expr(ast_leaf_wdata_t *node) {
   plvalue_t ret = create_inreg();
   switch (node->node_sema_info) {
-    case ANS_INTVAL:   ret.pvt = PT_INT;   break;
-    case ANS_FLOATVAL: ret.pvt = PT_FLOAT; break;
-    case ANS_STR:      ret.pvt = PT_STR;   break;
+    case ANS_INTVAL:   ret.pvt = JT_INT;   break;
+    case ANS_FLOATVAL: ret.pvt = JT_FLOAT; break;
+    case ANS_STR:      ret.pvt = JT_STR;   break;
   }
   ret.data = node->data;
   return ret;

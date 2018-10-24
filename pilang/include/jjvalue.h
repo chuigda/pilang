@@ -14,6 +14,15 @@ typedef union {
   void *pvalue;
 } jjvalue_t;
 
+typedef enum {
+  JT_INT,
+  JT_FLOAT,
+  JT_STR,
+  JT_LIST,
+  JT_REF,
+  JT_UNDEFINED
+} jjtype_t;
+
 typedef struct {
   jjvalue_t value;
   bool success;
