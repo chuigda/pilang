@@ -15,12 +15,7 @@
 plvalue_t create_onstack(plstkobj_t *storage) {
   plvalue_t ret;
   ret.roc = ROC_ONSTACK;
-  switch (storage->soid) {
-    case SOID_INT:   ret.pvt = JT_INT;   break;
-    case SOID_FLOAT: ret.pvt = JT_FLOAT; break;
-    case SOID_REF:   ret.pvt = JT_REF;   break;
-    default:         ret.pvt = JT_UNDEFINED;
-  }
+  ret.pvt = soid2jt(storage->soid);
   ret.data.pvalue = storage;
   return ret;
 }
@@ -28,13 +23,7 @@ plvalue_t create_onstack(plstkobj_t *storage) {
 plvalue_t create_onheap(plheapobj_t *storage) {
   plvalue_t ret;
   ret.roc = ROC_ONHEAP;
-  switch (storage->oid) {
-    case HOID_INT:   ret.pvt = JT_INT;   break;
-    case HOID_FLOAT: ret.pvt = JT_FLOAT; break;
-    case HOID_STR:   ret.pvt = JT_STR;   break;
-    case HOID_LIST:  ret.pvt = JT_LIST;  break;
-    default:         ret.pvt = JT_UNDEFINED;
-  }
+  ret.pvt = hoid2jt(storage->oid);
   ret.data.pvalue = storage;
   return ret;
 }
@@ -179,28 +168,12 @@ static void asgn_attach_typeinfo(plvalue_t *obj, int16_t pvt) {
   switch (obj->roc) {
     case ROC_ONHEAP: {
       plstkobj_t *stkobj = (plstkobj_t*)obj->data.pvalue;
-      int16_t soid;
-      switch (pvt) {
-        case JT_INT:   soid = SOID_INT;   break;
-        case JT_FLOAT: soid = SOID_FLOAT; break;
-        case JT_STR:   soid = SOID_STR;   break;
-        case JT_REF:   soid = SOID_REF;   break;
-        default: assert(0 && "unreachable!");
-      }
-      stkobj->soid = soid;
+      stkobj->soid = jt2soid(pvt);
       break;
     }
     case ROC_ONSTACK: {
       plheapobj_t *heapobj = (plheapobj_t*)obj->data.pvalue;
-      int16_t oid;
-      switch (pvt) {
-        case JT_INT:   oid = HOID_INT;   break;
-        case JT_FLOAT: oid = HOID_FLOAT; break;
-        case JT_STR:   oid = HOID_STR;   break;
-        case JT_LIST:  oid = HOID_LIST;  break;
-        default: assert(0 && "unreachable!");
-      }
-      heapobj->oid = oid;
+      heapobj->oid = jt2hoid(pvt);
       break;
     }
     default:
