@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="1">
+    <builddir>pilang-cppcheck-build-dir</builddir>
+    <platform>Unspecified</platform>
+    <analyze-all-vs-configs>true</analyze-all-vs-configs>
+    <includedir>
+        <dir name="include/"/>
+        <dir name="test/"/>
+    </includedir>
+    <paths>
+        <dir name="src"/>
+        <dir name="test"/>
+    </paths>
+</project>
