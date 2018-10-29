@@ -36,7 +36,10 @@ plvalue_t create_temp() {
 static jjvalue_t *fetch_storage(plvalue_t *obj) {
   switch (obj->roc) {
   case ROC_TEMP: return &(obj->data);
-  case ROC_ONHEAP: return &(((plheapobj_t*)obj->data.pvalue)->value);
+  case ROC_ONHEAP: {
+    plheapobj_t *heapobj = (plheapobj_t*)(obj->data.pvalue);
+    return &(heapobj->value);
+  }
   case ROC_ONSTACK: {
     plstkobj_t *stkobj = (plstkobj_t*)(obj->data.pvalue);
     if (stkobj->soid == SOID_REF) {
@@ -301,6 +304,12 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
 plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
   if (lhs.roc != ROC_ONSTACK && lhs.roc != ROC_ONHEAP) {
     return lhs;
+  }
+
+  if (lhs.roc == ROC_ONSTACK && lhs.pvt == JT_REF) {
+    plstkobj_t *stkobj = (plstkobj_t*)lhs.data.pvalue;
+    plheapobj_t *referred_heapobj = (plheapobj_t*)(stkobj->value.pvalue);
+    return assign(create_onheap(referred_heapobj), rhs);
   }
 
   switch (rhs.pvt) {
