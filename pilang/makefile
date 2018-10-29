@@ -12,13 +12,13 @@ pli: mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o plheap.o \
 
 plast: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o plast.o \
-	      -o plast
+        -o plast
 
 tests: test_stack test_gc test_calc
 
 test_calc: test_calc.o plheap.o stack.o clist.o mstring.o eval.o
 	$(CC) test_calc.o plheap.o stack.o clist.o mstring.o eval.o \
-	      -o test_calc
+        -o test_calc
 
 test_calc.o: test/test_calc.c
 	$(CC) -c -I include test/test_calc.c -o test_calc.o $(CFLAGS)
@@ -41,7 +41,7 @@ plast.o: src/driver/plast.c y.tab.h
 pli.o: src/driver/pli.c y.tab.h
 	$(CC) -c -I include -I ./ src/driver/pli.c -o pli.o $(CFLAGS)
 
-eval.o: src/eval/eval.c y.tab.h
+eval.o: src/eval/eval.c
 	$(CC) -c -I include -I ./ src/eval/eval.c -o eval.o $(CFLAGS)
 
 stack.o: src/eval/stack.c

@@ -3,7 +3,6 @@
 
 #include "ast.h"
 #include "util.h"
-#include "y.tab.h"
 
 #include <assert.h>
 #include <inttypes.h>
