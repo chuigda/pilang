@@ -46,14 +46,13 @@ static jjvalue_t *fetch_storage(plvalue_t *obj) {
     return &(stkobj->value);
   }
   }
-  UNREAECHABLE
   return NULL;
 }
 
 static result_t fetch_int(plvalue_t obj) {
   jjvalue_t *storage = fetch_storage(&obj);
   if (storage == NULL) {
-    return failed_result("assert ign: object does not have storage?");
+    return failed_result("object does not have storage");
   }
   
   switch (obj.pvt) {
@@ -72,13 +71,13 @@ static result_t fetch_int(plvalue_t obj) {
     return failed_result("cannot autocast from Nothing to Int");
   }
 
-  assert(0 && "unreachable");
+  UNREAECHABLE
 }
 
 static result_t fetch_float(plvalue_t obj) {
   jjvalue_t *storage = fetch_storage(&obj);
   if (storage == NULL) {
-    return failed_result("assert ign: object does not have storage?");
+    return failed_result("object does not have storage");
   }
   
   switch (obj.pvt) {
@@ -102,7 +101,7 @@ static result_t fetch_float(plvalue_t obj) {
 static result_t fetch_str(plvalue_t obj) {
   jjvalue_t *storage = fetch_storage(&obj);
   if (storage == NULL) {
-    return failed_result("assert ign: object does not have storage?");
+    return failed_result("object does not have storage");
   }
 
   switch (obj.pvt) {
@@ -131,7 +130,7 @@ static result_t fetch_str(plvalue_t obj) {
 static result_t fetch_list(plvalue_t obj) {
   jjvalue_t *storage = fetch_storage(&obj);
   if (storage == NULL) {
-    return failed_result("assert ign: object does not have storage?");
+    return failed_result("object does not have storage");
   }
   
   switch (obj.pvt) {
