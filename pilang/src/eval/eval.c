@@ -165,14 +165,18 @@ static void asgn_attach_typeinfo(plvalue_t *obj, int16_t pvt) {
   }
 }
 
+static void storage_precleanup(plvalue_t *obj) {
+  if (obj->roc == ROC_ONHEAP) {
+    destroy_object((plheapobj_t*)(obj->data.pvalue));
+  }
+}
+
 static void asgn_int(plvalue_t *obj, int64_t value) {
   jjvalue_t *storage = fetch_storage(obj);
   if (storage == NULL) {
     return;
   }
-  if (obj->roc == ROC_ONHEAP) {
-    destroy_object((plheapobj_t*)(obj->data.pvalue));
-  }
+  storage_precleanup(obj);
   asgn_attach_typeinfo(obj, JT_INT);
   storage->ivalue = value;
 }
@@ -182,9 +186,7 @@ static void asgn_float(plvalue_t *obj, double value) {
   if (storage == NULL) {
     return;
   }
-  if (obj->roc == ROC_ONHEAP) {
-    destroy_object((plheapobj_t*)(obj->data.pvalue));
-  }
+  storage_precleanup(obj);
   asgn_attach_typeinfo(obj, JT_FLOAT);
   storage->fvalue = value;
 }
@@ -194,9 +196,7 @@ static void asgn_str(plvalue_t *obj, int64_t value) {
   if (storage == NULL) {
     return;
   }
-  if (obj->roc == ROC_ONHEAP) {
-    destroy_object((plheapobj_t*)(obj->data.pvalue));
-  }
+  storage_precleanup(obj);
   asgn_attach_typeinfo(obj, JT_STR);
   storage->svalue = value;
 }
@@ -206,9 +206,7 @@ static void asgn_list(plvalue_t *obj, list_t value) {
   if (storage == NULL) {
     return;
   }
-  if (obj->roc == ROC_ONHEAP) {
-    destroy_object((plheapobj_t*)(obj->data.pvalue));
-  }
+  storage_precleanup(obj);
   asgn_attach_typeinfo(obj, JT_LIST);
   storage->lsvalue = value;
 }
@@ -218,17 +216,13 @@ static void asgn_ref(plvalue_t *obj, void *value) {
   if (storage == NULL) {
     return;
   }
-  if (obj->roc == ROC_ONHEAP) {
-    destroy_object((plheapobj_t*)(obj->data.pvalue));
-  }
+  storage_precleanup(obj);
   asgn_attach_typeinfo(obj, JT_REF);
   storage->pvalue = value;
 }
 
 static void set_undefined(plvalue_t *obj) {
-  if (obj->roc == ROC_ONHEAP) {
-    destroy_object((plheapobj_t*)(obj->data.pvalue));
-  }
+  storage_precleanup(obj);
   obj->pvt = JT_UNDEFINED;
 }
 
