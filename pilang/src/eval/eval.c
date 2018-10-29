@@ -27,7 +27,7 @@ plvalue_t create_onheap(plheapobj_t *storage) {
   return ret;
 }
 
-plvalue_t create_inreg() {
+plvalue_t create_temp() {
   plvalue_t ret;
   ret.roc = ROC_TEMP;
   return ret;
@@ -144,19 +144,19 @@ static result_t fetch_list(plvalue_t obj) {
   case JT_LIST: 
     return success_result(*storage);
   }
-  
+
   UNREAECHABLE
 }
 
 static void asgn_attach_typeinfo(plvalue_t *obj, int16_t pvt) {
   obj->pvt = pvt;
   switch (obj->roc) {
-    case ROC_ONHEAP: {
+    case ROC_ONSTACK: {
       plstkobj_t *stkobj = (plstkobj_t*)obj->data.pvalue;
       stkobj->soid = jt2soid(pvt);
       break;
     }
-    case ROC_ONSTACK: {
+    case ROC_ONHEAP: {
       plheapobj_t *heapobj = (plheapobj_t*)obj->data.pvalue;
       heapobj->oid = jt2hoid(pvt);
       break;
@@ -261,7 +261,7 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
       int newstr = create_string(temp);
       free(temp);
     
-      plvalue_t ret = create_inreg();
+      plvalue_t ret = create_temp();
       ret.pvt = JT_STR;
       ret.data.svalue = newstr;
       return ret;
@@ -272,7 +272,7 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
     float f1 = float_failsafe(fetch_float(lhs));
     float f2 = float_failsafe(fetch_float(rhs));
     
-    plvalue_t ret = create_inreg();
+    plvalue_t ret = create_temp();
     ret.pvt = JT_FLOAT;
     switch (alf) {
     case ALF_ADD: ret.data.fvalue = f1 + f2; break;
@@ -287,7 +287,7 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
     int64_t i1 = int_failsafe(fetch_int(lhs));
     int64_t i2 = int_failsafe(fetch_int(rhs));
     
-    plvalue_t ret = create_inreg();
+    plvalue_t ret = create_temp();
     ret.pvt = JT_INT;
     switch (alf) {
     case ALF_ADD: ret.data.ivalue = i1 + i2; break;
@@ -299,14 +299,14 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
     return ret;
   }
   else {
-    plvalue_t ret = create_inreg();
+    plvalue_t ret = create_temp();
     ret.pvt = JT_UNDEFINED;
     return ret;
   }
 }
 
 plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
-  if (lhs.roc != ROC_ONSTACK || lhs.roc != ROC_ONHEAP) {
+  if (lhs.roc != ROC_ONSTACK && lhs.roc != ROC_ONHEAP) {
     return lhs;
   }
 
@@ -323,7 +323,7 @@ plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
 }
 
 plvalue_t eval_literal_expr(ast_leaf_wdata_t *node) {
-  plvalue_t ret = create_inreg();
+  plvalue_t ret = create_temp();
   switch (node->node_sema_info) {
     case ANS_INTVAL:   ret.pvt = JT_INT;   break;
     case ANS_FLOATVAL: ret.pvt = JT_FLOAT; break;
@@ -376,7 +376,7 @@ static void callfunc(ast_tchild_wdata_t *func, list_t args,
        !iter_eq(it, list_end(&rets_list));
        it = iter_next(it)) {
     plvalue_t *t = NEW(plvalue_t);
-    *t = create_inreg();
+    *t = create_temp();
     ast_leaf_wdata_t *ret_idref_node = (ast_leaf_wdata_t*)iter_deref(it);
     assign(*t, eval_idref_expr(ret_idref_node, stack));
     list_push_back(&rets, t);

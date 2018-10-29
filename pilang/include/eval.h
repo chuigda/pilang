@@ -33,6 +33,7 @@ typedef enum {
 
 plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs, 
                          algebraic_function_t alf);
+plvalue_t assign(plvalue_t lhs, plvalue_t rhs);
 
 #endif
 

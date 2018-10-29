@@ -41,6 +41,7 @@ plast
 pilang/test_stack
 pilang/test_gc
 pilang/test_calc
+pilang/test_assign
 
 # YACC output
 y.tab.h

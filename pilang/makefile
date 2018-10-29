@@ -14,11 +14,18 @@ plast: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o plast.o \
         -o plast
 
-tests: test_stack test_gc test_calc
+tests: test_stack test_gc test_calc test_assign
+
+test_assign: test_assign.o plheap.o stack.o clist.o mstring.o eval.o
+	$(CC) test_assign.o plheap.o stack.o clist.o mstring.o eval.o \
+        -o test_assign
 
 test_calc: test_calc.o plheap.o stack.o clist.o mstring.o eval.o
 	$(CC) test_calc.o plheap.o stack.o clist.o mstring.o eval.o \
         -o test_calc
+
+test_assign.o: test/test_assign.c
+	$(CC) -c -I include test/test_assign.c -o test_assign.o $(CFLAGS)
 
 test_calc.o: test/test_calc.c
 	$(CC) -c -I include test/test_calc.c -o test_calc.o $(CFLAGS)
@@ -76,6 +83,6 @@ clean:
 	rm -rf y.output
 	rm -rf *.o
 	rm -rf pli plast
-	rm -rf test_stack test_gc test_calc
+	rm -rf test_stack test_gc test_calc test_assign
 	cd doc && make clean && cd ..
 	rm -rf doc/docs
