@@ -17,7 +17,6 @@ void test_stack_assign() {
   value.data.ivalue = 7777;
 
   VK_ASSERT_EQUALS(ROC_ONSTACK, create_onstack(stack_a).roc);
-  VK_ASSERT_EQUALS(ROC_TEMP, value.roc);
 
   assign(create_onstack(stack_a), value);
 
@@ -31,11 +30,30 @@ void test_stack_assign() {
   VK_TEST_SECTION_END("assign to stack variable")
 }
 
+void test_heap_assign() {
+  VK_TEST_SECTION_BEGIN("assign to heap object")
+
+  plheapobj_t *heapobj = plobj_create_int(99);
+  plvalue_t value = create_temp();
+  value.pvt = JT_INT;
+  value.data.ivalue = 7777;
+
+  VK_ASSERT_EQUALS(JT_INT, create_onheap(heapobj).pvt);
+  VK_ASSERT_EQUALS(99, heapobj->value.ivalue);
+
+  assign(create_onheap(heapobj), value);
+
+  VK_ASSERT_EQUALS(7777, heapobj->value.ivalue);
+
+  VK_TEST_SECTION_END("assign to heap object")
+}
+
 int main() {
   VK_TEST_BEGIN
   init_heap();
 
   test_stack_assign();
+  test_heap_assign();
 
   close_heap();
   VK_TEST_END
