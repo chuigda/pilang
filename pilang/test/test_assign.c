@@ -56,7 +56,6 @@ void test_assignto_stackref() {
   stack_enter_frame(&stack);
 
   plheapobj_t *heapobj = plobj_create_int(2900);
-  
   plstkobj_t *ref = stack_get(&stack, create_string("ref1"));
   ref->soid = SOID_REF;
   ref->value.pvalue = heapobj;
@@ -78,6 +77,35 @@ void test_assignto_stackref() {
   VK_TEST_SECTION_END("assign to stack reference")
 }
 
+void test_assign_ref_to_stackobj() {
+  VK_TEST_SECTION_BEGIN("assign ref to stack object")
+  
+  plstack_t stack;
+  init_stack(&stack);
+  stack_enter_frame(&stack);
+  
+  plheapobj_t *heapobj = plobj_create_int(2900);
+  plstkobj_t *ref = stack_get(&stack, create_string("ref1"));
+  ref->soid = SOID_REF;
+  ref->value.pvalue = heapobj;
+  
+  plstkobj_t *stack_a = stack_get(&stack, create_string("a"));
+  stack_a->soid = SOID_INT;
+  stack_a->value.ivalue = 4396;
+  
+  assign(create_onstack(stack_a), create_onstack(ref));
+  
+  VK_ASSERT_EQUALS(SOID_REF, stack_a->soid);
+  VK_ASSERT_EQUALS(heapobj, stack_a->value.pvalue);
+  VK_ASSERT_EQUALS(HOID_INT, heapobj->oid);
+  VK_ASSERT_EQUALS(2900, heapobj->value.ivalue);
+  
+  stack_exit_frame(&stack);
+  close_stack(&stack);
+  
+  VK_TEST_SECTION_END("assign ref to stack object")
+}
+
 int main() {
   VK_TEST_BEGIN
   init_heap();
@@ -85,6 +113,7 @@ int main() {
   test_stack_assign();
   test_heap_assign();
   test_assignto_stackref();
+  test_assign_ref_to_stackobj();
 
   close_heap();
   VK_TEST_END

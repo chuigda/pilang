@@ -214,7 +214,7 @@ static void asgn_list(plvalue_t *obj, list_t value) {
   storage->lsvalue = value;
 }
 
-static void asgn_ref(plvalue_t *obj, void *value) {
+static void asgn_ref(plvalue_t *obj, plheapobj_t *value) {
   jjvalue_t *storage = fetch_storage(obj);
   if (storage == NULL) {
     return;
@@ -313,12 +313,18 @@ plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
   }
 
   switch (rhs.pvt) {
-    case JT_INT:   asgn_int(&lhs, rhs.data.ivalue);    break;
-    case JT_FLOAT: asgn_float(&lhs, rhs.data.fvalue);  break;
-    case JT_STR:   asgn_str(&lhs, rhs.data.svalue);    break;
-    case JT_LIST:  asgn_list(&lhs, rhs.data.lsvalue);  break;
-    case JT_REF:   asgn_ref(&lhs, rhs.data.pvalue);    break;
-    default:       set_undefined(&lhs);                break;
+    case JT_INT:   asgn_int(&lhs, rhs.data.ivalue);   break;
+    case JT_FLOAT: asgn_float(&lhs, rhs.data.fvalue); break;
+    case JT_STR:   asgn_str(&lhs, rhs.data.svalue);   break;
+    case JT_LIST:  asgn_list(&lhs, rhs.data.lsvalue); break;
+    case JT_REF: {
+      plstkobj_t *stkobj = (plstkobj_t*)(rhs.data.pvalue);
+      plheapobj_t *referred_heapobj = 
+        (plheapobj_t*)(stkobj->value.pvalue);
+      asgn_ref(&lhs, referred_heapobj);
+      break;
+    }
+    default:       set_undefined(&lhs);               break;
   }
 
   return lhs;
