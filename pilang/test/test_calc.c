@@ -42,6 +42,29 @@ void test_int_calc() {
 
 void test_str_add() {
   VK_TEST_SECTION_BEGIN("string add test")
+
+  plstack_t test_stack;
+  init_stack(&test_stack);
+  stack_enter_frame(&test_stack);
+
+  plstkobj_t *stack_a = stack_get(&test_stack, create_string("a"));
+  plstkobj_t *stack_b = stack_get(&test_stack, create_string("b"));
+
+  stack_a->soid = SOID_STR;
+  stack_a->value.svalue = create_string("Hello, ");
+
+  stack_b->soid = SOID_STR;
+  stack_b->value.svalue = create_string("world!");
+
+  plvalue_t sum_ab = algebraic_calc(create_onstack(stack_a),
+                                    create_onstack(stack_b), ALF_ADD);
+
+  VK_ASSERT_EQUALS(ROC_TEMP, sum_ab.roc);
+  VK_ASSERT_EQUALS(JT_STR,   sum_ab.pvt);
+  VK_ASSERT_EQUALS(create_string("Hello, world!"), sum_ab.data.svalue);
+
+  close_stack(&test_stack);
+
   VK_TEST_SECTION_END("string add test")
 }
 
