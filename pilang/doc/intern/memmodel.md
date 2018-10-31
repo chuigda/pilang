@@ -22,7 +22,7 @@ objects.
 PiLang implementation allows multiple stacks to exist at a time. This is
 bogus but maybe useful when implementing coroutines.
 
-## Shallow copy mode
+## Shallow assign mode
 ### Assigning data to stack object
 * If the assignee object is a reference to a heap object, then assign 
 to heap object.
@@ -36,9 +36,10 @@ heap object.
 
 ### Assigning data to heap object
 When assigning data to heap object, the heap object drops its original
-value and takes the new value.
+value and takes the new value. If the assignee is a reference, deref it
+automatically.
 
-## Deep copy mode
+## Deep assign mode
 ### Assigning data to stack object
 * If the assigned value is a reference to heap object, first
 create a copy of the heap object, then let the stack object drop its 

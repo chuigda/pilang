@@ -318,9 +318,15 @@ plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
     case JT_STR:   asgn_str(&lhs, rhs.data.svalue);   break;
     case JT_LIST:  asgn_list(&lhs, rhs.data.lsvalue); break;
     case JT_REF: {
-      plstkobj_t *stkobj = (plstkobj_t*)(rhs.data.pvalue);
-      plheapobj_t *referred_heapobj = 
-        (plheapobj_t*)(stkobj->value.pvalue);
+    plheapobj_t *referred_heapobj = NULL;
+      if (rhs.roc == ROC_ONSTACK) {
+        plstkobj_t *stkobj = (plstkobj_t*)(rhs.data.pvalue);
+        referred_heapobj = (plheapobj_t*)(stkobj->value.pvalue);
+      }
+      else {
+        assert(rhs.roc == ROC_TEMP);
+        referred_heapobj = (plheapobj_t*)(rhs.data.pvalue);
+      }
       asgn_ref(&lhs, referred_heapobj);
       break;
     }
