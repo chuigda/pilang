@@ -10,7 +10,7 @@ GAST has the following kinds of nodes:
 <lo>
   <li>leaf node               (`ast_leaf_t`)</li>
   <li>leaf node with data     (`ast_leaf_wdata_t`)</li>
-  <li>single child node       (`ast_schild_t`) _deprecated_</li>
+  <li>single child node       (`ast_schild_t`)</li>
   <li>single child with data  (`ast_schild_wdata_t`)</li>
   <li>dual child node         (`ast_dchild_t`)</li>
   <li>dual child with data    (`ast_dchild_wdata_t`)</li>
@@ -103,11 +103,7 @@ Please note that GAST library itself never takes care of handling your
 attached semantics information. Rather, it is on your own to correctly
 pass them when creating nodes with utility functions.
 
-## Traversing GAST productions
-> FIXME: GAST traversing is not finished.
-
 ## Extending GAST structure
-> FIXME: GAST traversing is not finished.
 To add a new kind of AST node for GAST, for example, you want a kind of
 node which have 4 children and 2 pieces of extra data:
 
@@ -154,4 +150,3 @@ node:
 
 Add the function to `ast.c` and add the corresponding declaration to
 `ast.h`. Congratulations, that's done!
-

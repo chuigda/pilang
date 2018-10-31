@@ -13,13 +13,10 @@ needed. Garbage collection machanism will automatically cleanup not used
 objects.
 
 ### Garbage Collection
-PiLang uses simple Stop-The-World Mark-and-Sweep GC strategy. When heap
-memory usage exceeds 80%, Garbage collection starts and tries getting
-some free memory for stack.
+> This part is incomplete by this time.
 
 ### Memory Expansion
-PiLang expands its heap memory when memory usage gets 100% even after
-garbage collection.
+> This part is incomplete by this time.
 
 ### Multiple Stack
 PiLang implementation allows multiple stacks to exist at a time. This is
