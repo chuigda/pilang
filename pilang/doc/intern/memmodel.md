@@ -13,19 +13,16 @@ needed. Garbage collection machanism will automatically cleanup not used
 objects.
 
 ### Garbage Collection
-PiLang uses simple Stop-The-World Mark-and-Sweep GC strategy. When heap
-memory usage exceeds 80%, Garbage collection starts and tries getting
-some free memory for stack.
+> This part is incomplete by this time.
 
 ### Memory Expansion
-PiLang expands its heap memory when memory usage gets 100% even after
-garbage collection.
+> This part is incomplete by this time.
 
 ### Multiple Stack
 PiLang implementation allows multiple stacks to exist at a time. This is
 bogus but maybe useful when implementing coroutines.
 
-## Shallow copy mode
+## Shallow assign mode
 ### Assigning data to stack object
 * If the assignee object is a reference to a heap object, then assign 
 to heap object.
@@ -39,9 +36,10 @@ heap object.
 
 ### Assigning data to heap object
 When assigning data to heap object, the heap object drops its original
-value and takes the new value.
+value and takes the new value. If the assignee is a reference, deref it
+automatically.
 
-## Deep copy mode
+## Deep assign mode
 ### Assigning data to stack object
 * If the assigned value is a reference to heap object, first
 create a copy of the heap object, then let the stack object drop its 

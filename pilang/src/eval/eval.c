@@ -36,13 +36,12 @@ plvalue_t create_temp() {
 static jjvalue_t *fetch_storage(plvalue_t *obj) {
   switch (obj->roc) {
   case ROC_TEMP: return &(obj->data);
-  case ROC_ONHEAP: return &(((plheapobj_t*)obj->data.pvalue)->value);
+  case ROC_ONHEAP: {
+    plheapobj_t *heapobj = (plheapobj_t*)(obj->data.pvalue);
+    return &(heapobj->value);
+  }
   case ROC_ONSTACK: {
     plstkobj_t *stkobj = (plstkobj_t*)(obj->data.pvalue);
-    if (stkobj->soid == SOID_REF) {
-      plheapobj_t *heapobj = (plheapobj_t*)(stkobj->value.pvalue);
-      return &(heapobj->value);
-    }
     return &(stkobj->value);
   }
   }
@@ -211,7 +210,7 @@ static void asgn_list(plvalue_t *obj, list_t value) {
   storage->lsvalue = value;
 }
 
-static void asgn_ref(plvalue_t *obj, void *value) {
+static void asgn_ref(plvalue_t *obj, plheapobj_t *value) {
   jjvalue_t *storage = fetch_storage(obj);
   if (storage == NULL) {
     return;
@@ -303,13 +302,26 @@ plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
     return lhs;
   }
 
+  if (lhs.roc == ROC_ONSTACK && lhs.pvt == JT_REF) {
+    plstkobj_t *stkobj = (plstkobj_t*)lhs.data.pvalue;
+    plheapobj_t *referred_heapobj = (plheapobj_t*)(stkobj->value.pvalue);
+    return assign(create_onheap(referred_heapobj), rhs);
+  }
+
+  if (lhs.roc == ROC_ONHEAP && rhs.pvt == JT_REF) {
+    plheapobj_t *assignee_heapobj =
+      (plheapobj_t*)(fetch_storage(&rhs)->pvalue);
+    return assign(lhs, create_onheap(assignee_heapobj));
+  }
+
+  jjvalue_t *rhs_storage = fetch_storage(&rhs);
   switch (rhs.pvt) {
-    case JT_INT:   asgn_int(&lhs, rhs.data.ivalue);    break;
-    case JT_FLOAT: asgn_float(&lhs, rhs.data.fvalue);  break;
-    case JT_STR:   asgn_str(&lhs, rhs.data.svalue);    break;
-    case JT_LIST:  asgn_list(&lhs, rhs.data.lsvalue);  break;
-    case JT_REF:   asgn_ref(&lhs, rhs.data.pvalue);    break;
-    default:       set_undefined(&lhs);                break;
+    case JT_INT:   asgn_int(&lhs, rhs_storage->ivalue);   break;
+    case JT_FLOAT: asgn_float(&lhs, rhs_storage->fvalue); break;
+    case JT_STR:   asgn_str(&lhs, rhs_storage->svalue);   break;
+    case JT_LIST:  asgn_list(&lhs, rhs_storage->lsvalue); break;
+    case JT_REF:   asgn_ref(&lhs,  rhs_storage->pvalue);  break;
+    default:       set_undefined(&lhs);                   break;
   }
 
   return lhs;
