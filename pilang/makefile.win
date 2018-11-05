@@ -22,23 +22,23 @@ test_calc.exe: test_calc.o plheap.o stack.o clist.o mstring.o eval.o
 	$(CC) test_calc.o plheap.o stack.o clist.o mstring.o eval.o \
         -o test_calc
 
-test_assign.o: test/test_assign.c
-	$(CC) -c -I include test/test_assign.c -o test_assign.o $(CFLAGS)
-
-test_calc.o: test/test_calc.c
-	$(CC) -c -I include test/test_calc.c -o test_calc.o $(CFLAGS)
-
 test_gc.exe: test_gc.o plheap.o clist.o mstring.o
 	$(CC) test_gc.o plheap.o clist.o mstring.o -o test_gc.exe
-
-test_gc.o: test/test_gc.c
-	$(CC) -c -I include test/test_gc.c -o test_gc.o $(CFLAGS)
 
 test_stack.exe: stack.o test_stack.o clist.o mstring.o
 	$(CC) stack.o test_stack.o clist.o mstring.o -o test_stack.exe
 
 test_stack.o: test/test_stack.c
 	$(CC) -c -I include test/test_stack.c -o test_stack.o $(CFLAGS)
+
+test_gc.o: test/test_gc.c
+	$(CC) -c -I include test/test_gc.c -o test_gc.o $(CFLAGS)
+
+test_assign.o: test/test_assign.c
+	$(CC) -c -I include test/test_assign.c -o test_assign.o $(CFLAGS)
+
+test_calc.o: test/test_calc.c
+	$(CC) -c -I include test/test_calc.c -o test_calc.o $(CFLAGS)
 
 plast.o: src/driver/plast.c y.tab.h
 	$(CC) -c -I include -I . src/driver/plast.c -o plast.o $(CFLAGS) 
@@ -75,11 +75,14 @@ lexer.o : src/frontend/lexer.c y.tab.h
 
 y.tab.c y.tab.h : src/frontend/parser.y
 	bison -d -v src/frontend/parser.y
+	if exist y.tab.c del /F /S /Q y.tab.c
+	if exist y.tab.h del /F /S /Q y.tab.h
 	rename parser.tab.c y.tab.c
 	rename parser.tab.h y.tab.h
 
 clean:
 	del /F /S /Q y.tab.*
+	del /F /S /Q parser.tab.*
 	del /F /S /Q parser.output
 	del /F /S /Q *.o
 	del /F /S /Q plast.exe pli.exe
