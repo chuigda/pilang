@@ -44,7 +44,7 @@ annonations are also possible, and linting tools will come out soon.
 
 ## Building from source
 ### Building on linux
-To build PiLang on linux, you needs
+To build PiLang on linux, you need the following packages
 * `markdown`
 * `YACC`(`bison`) _note: `lex` is not required_
 * `tree`
@@ -58,4 +58,9 @@ Checkout the project with git, get into the pilang directory, and then
 `make`.
 
 ### Building on windows
-_Coming soon_
+To build PiLang on windows, it is recommended to use a MinGW32 GCC
+compiler, mingw32-make and a GnuWin32 Bison. These packages will soon be
+available for download from icey's site. After installing these
+packages, simply get into the pilang directory and then
+
+`mingw32-make --file="makefile.win"`
