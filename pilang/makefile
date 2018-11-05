@@ -48,7 +48,7 @@ plast.o: src/driver/plast.c y.tab.h
 pli.o: src/driver/pli.c y.tab.h
 	$(CC) -c -I include -I ./ src/driver/pli.c -o pli.o $(CFLAGS)
 
-eval.o: src/eval/eval.c
+eval.o: src/eval/eval.c y.tab.h
 	$(CC) -c -I include -I ./ src/eval/eval.c -o eval.o $(CFLAGS)
 
 stack.o: src/eval/stack.c
