@@ -328,8 +328,6 @@ plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
   return lhs;
 }
 
-plvalue_t eval_expr(ast_node_base_t *node, plstack_t *stack);
-
 plvalue_t eval_literal_expr(ast_leaf_wdata_t *node) {
   plvalue_t ret = create_temp();
   switch (node->node_sema_info) {

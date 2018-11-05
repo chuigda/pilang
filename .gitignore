@@ -47,6 +47,9 @@ pilang/test_assign
 y.tab.h
 y.tab.c
 y.output
+parser.tab.h
+parser.tab.c
+parser.output
 
 # Markdown output
 *.html

@@ -12,7 +12,13 @@ plast.exe: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o plast.o \
         -o plast.exe
 
-tests: test_stack.exe test_gc.exe test_calc.exe test_assign.exe
+tests: test_stack.exe test_gc.exe test_calc.exe test_assign.exe \
+       test_eval.exe
+
+test_eval.exe: test_eval_expr.o plheap.o stack.o clist.o mstring.o \
+               eval.o ast.o
+	$(CC) test_eval_expr.o plheap.o stack.o clist.o mstring.o eval.o \
+        ast.o -o test_eval.exe
 
 test_assign.exe: test_assign.o plheap.o stack.o clist.o mstring.o eval.o
 	$(CC) test_assign.o plheap.o stack.o clist.o mstring.o eval.o \
@@ -28,6 +34,10 @@ test_gc.exe: test_gc.o plheap.o clist.o mstring.o
 test_stack.exe: stack.o test_stack.o clist.o mstring.o
 	$(CC) stack.o test_stack.o clist.o mstring.o -o test_stack.exe
 
+test_eval_expr.o: test/test_eval_expr.c
+	$(CC) -c -I include -I . test/test_eval_expr.c -o test_eval_expr.o \
+        $(CFLAGS)
+
 test_stack.o: test/test_stack.c
 	$(CC) -c -I include test/test_stack.c -o test_stack.o $(CFLAGS)
 
@@ -41,7 +51,7 @@ test_calc.o: test/test_calc.c
 	$(CC) -c -I include test/test_calc.c -o test_calc.o $(CFLAGS)
 
 plast.o: src/driver/plast.c y.tab.h
-	$(CC) -c -I include -I . src/driver/plast.c -o plast.o $(CFLAGS) 
+	$(CC) -c -I include -I . src/driver/plast.c -o plast.o $(CFLAGS)
 
 pli.o: src/driver/pli.c y.tab.h
 	$(CC) -c -I include -I . src/driver/pli.c -o pli.o $(CFLAGS)
