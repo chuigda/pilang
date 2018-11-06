@@ -38,10 +38,7 @@ pli
 plast
 
 # Test output
-pilang/test_stack
-pilang/test_gc
-pilang/test_calc
-pilang/test_assign
+pilang/test_*
 
 # YACC output
 y.tab.h

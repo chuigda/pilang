@@ -14,7 +14,12 @@ plast: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o plast.o \
         -o plast
 
-tests: test_stack test_gc test_calc test_assign
+tests: test_stack test_gc test_calc test_assign test_eval_expr
+
+test_eval_expr: test_eval_expr.o plheap.o stack.o clist.o mstring.o \
+                eval.o ast.o
+	$(CC) test_eval_expr.o plheap.o stack.o clist.o mstring.o eval.o ast.o\
+        -o test_eval_expr
 
 test_assign: test_assign.o plheap.o stack.o clist.o mstring.o eval.o
 	$(CC) test_assign.o plheap.o stack.o clist.o mstring.o eval.o \
@@ -24,20 +29,24 @@ test_calc: test_calc.o plheap.o stack.o clist.o mstring.o eval.o
 	$(CC) test_calc.o plheap.o stack.o clist.o mstring.o eval.o \
         -o test_calc
 
+test_gc: test_gc.o plheap.o clist.o mstring.o
+	$(CC) test_gc.o plheap.o clist.o mstring.o -o test_gc
+
+test_stack: stack.o test_stack.o clist.o mstring.o
+	$(CC) stack.o test_stack.o clist.o mstring.o -o test_stack
+
+test_eval_expr.o: test/test_eval_expr.c y.tab.h
+	$(CC) -c -I include -I . test/test_eval_expr.c -o test_eval_expr.o \
+        $(CFLAGS)
+
 test_assign.o: test/test_assign.c
 	$(CC) -c -I include test/test_assign.c -o test_assign.o $(CFLAGS)
 
 test_calc.o: test/test_calc.c
 	$(CC) -c -I include test/test_calc.c -o test_calc.o $(CFLAGS)
 
-test_gc: test_gc.o plheap.o clist.o mstring.o
-	$(CC) test_gc.o plheap.o clist.o mstring.o -o test_gc
-
 test_gc.o: test/test_gc.c
 	$(CC) -c -I include test/test_gc.c -o test_gc.o $(CFLAGS)
-
-test_stack: stack.o test_stack.o clist.o mstring.o
-	$(CC) stack.o test_stack.o clist.o mstring.o -o test_stack
 
 test_stack.o: test/test_stack.c
 	$(CC) -c -I include test/test_stack.c -o test_stack.o $(CFLAGS)
