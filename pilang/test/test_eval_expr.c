@@ -242,7 +242,7 @@ void test_eval_intermix_storage() {
   plvalue_t r = eval_expr(expr, &stack);
   VK_ASSERT_EQUALS(ROC_TEMP, r.roc);
   VK_ASSERT_EQUALS(JT_INT, r.pvt);
-  VK_ASSERT_EQUALS(777, r.data.ivalue);
+  VK_ASSERT_EQUALS(777, r.data.ivalue); 
 
   stack_exit_frame(&stack);
   close_stack(&stack);
@@ -258,6 +258,7 @@ int main() {
   test_eval_literal();
   test_eval_binary_basic();
   test_eval_coercion();
+  test_eval_intermix_storage();
   
   close_heap();
   VK_TEST_END
