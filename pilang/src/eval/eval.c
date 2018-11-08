@@ -56,7 +56,7 @@ static result_t fetch_int(plvalue_t obj) {
   }
   
   switch (obj.pvt) {
-  case JT_INT: 
+  case JT_INT:  
     return success_result(*storage);
   case JT_FLOAT: {
     jjvalue_t shell;
@@ -242,8 +242,20 @@ static strhdl_t str_failsafe(result_t maybe) {
                        : create_string("undefined");
 }
 
+static plvalue_t auto_deref(plvalue_t maybe_ref) {
+  if (maybe_ref.pvt != JT_REF) {
+    return maybe_ref;
+  }
+  plheapobj_t *referred =
+    (plheapobj_t*)(fetch_storage(&maybe_ref)->pvalue);
+  return create_onheap(referred);
+}
+
 plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
                          algebraic_function_t alf) {
+  lhs = auto_deref(lhs);
+  rhs = auto_deref(rhs);
+
   if (alf == ALF_ADD) {
     if (EITHER_IS(JT_STR, lhs, rhs)) {
       const char* strl = get_string(str_failsafe(fetch_str(lhs)));
