@@ -86,17 +86,10 @@ void test_eval_binary_basic() {
   t5.svalue = create_string("NMSL, WSND");
   t6.svalue = create_string(", HJYZ!");
 
-  jjvalue_t add, sub, mul, div, mod;
+  jjvalue_t add, sub, mul;
   add.ivalue = TK_ESYM_PLUS;
   sub.ivalue = TK_ESYM_MINUS;
   mul.ivalue = TK_ESYM_ASTER;
-  div.ivalue = TK_ESYM_SLASH;
-  mod.ivalue = TK_ESYM_PERCENT;
-
-  (void)sub;
-  (void)mul;
-  (void)div;
-  (void)mod;
 
   ast_node_base_t *intexpr1 = leaf_wdata(ANS_INTVAL, t1);
   ast_node_base_t *intexpr2 = leaf_wdata(ANS_INTVAL, t2);
@@ -126,10 +119,93 @@ void test_eval_binary_basic() {
   VK_ASSERT_EQUALS_F(7777.777, r2.data.fvalue);
   VK_ASSERT_EQUALS(create_string("NMSL, WSND, HJYZ!"), r3.data.svalue);
 
+  ast_node_base_t *intsub = 
+    node2_wdata(ANS_BINEXPR, sub, intexpr1, intexpr2);
+  ast_node_base_t *floatsub =
+    node2_wdata(ANS_BINEXPR, sub, floatexpr1, floatexpr2);
+
+  plvalue_t r4 = eval_expr(intsub, &stack);
+  plvalue_t r5 = eval_expr(floatsub, &stack);
+  
+  VK_ASSERT_EQUALS(ROC_TEMP, r4.roc);
+  VK_ASSERT_EQUALS(ROC_TEMP, r5.roc);
+  VK_ASSERT_EQUALS(JT_INT, r4.pvt);
+  VK_ASSERT_EQUALS(JT_FLOAT, r5.pvt);
+  VK_ASSERT_EQUALS(4396 - 2900, r4.data.ivalue);
+  VK_ASSERT_EQUALS_F(7777.0 - 0.777, r5.data.fvalue);
+  
+  ast_node_base_t *intmul =
+    node2_wdata(ANS_BINEXPR, mul, intexpr1, intexpr2);
+  ast_node_base_t *floatmul =
+    node2_wdata(ANS_BINEXPR, mul, floatexpr1, floatexpr2);
+
+  plvalue_t r6 = eval_expr(intmul, &stack);
+  plvalue_t r7 = eval_expr(floatmul, &stack);
+
+  VK_ASSERT_EQUALS(ROC_TEMP, r6.roc);
+  VK_ASSERT_EQUALS(ROC_TEMP, r7.roc);
+  VK_ASSERT_EQUALS(JT_INT, r6.pvt);
+  VK_ASSERT_EQUALS(JT_FLOAT, r7.pvt);
+  VK_ASSERT_EQUALS(4396 * 2900, r6.data.ivalue);
+  VK_ASSERT_EQUALS_F(7777 * 0.777, r7.data.fvalue);
+
   stack_exit_frame(&stack);
   close_stack(&stack);
 
   VK_TEST_SECTION_END("evaluate binary expr")
+}
+
+void test_eval_coercion() {
+  VK_TEST_SECTION_BEGIN("evaluate with coercion")
+  
+  plstack_t stack;
+  init_stack(&stack);
+  stack_enter_frame(&stack);
+
+  jjvalue_t t1, t3, t4, t6;
+  t1.ivalue = 4396;
+  t3.fvalue = 7777.0;
+  t4.fvalue = 0.777;
+  t6.svalue = create_string(", HJYZ!");
+
+  jjvalue_t add, sub, mul;
+  add.ivalue = TK_ESYM_PLUS;
+  sub.ivalue = TK_ESYM_MINUS;
+  mul.ivalue = TK_ESYM_ASTER;
+  
+  (void)sub;
+  (void)mul;
+
+  ast_node_base_t *intexpr1 = leaf_wdata(ANS_INTVAL, t1);
+  ast_node_base_t *floatexpr1 = leaf_wdata(ANS_FLOATVAL, t3);
+  ast_node_base_t *floatexpr2 = leaf_wdata(ANS_FLOATVAL, t4);
+  ast_node_base_t *strexpr2 = leaf_wdata(ANS_STR, t6);
+  
+  ast_node_base_t *intfloatadd =
+    node2_wdata(ANS_BINEXPR, add, intexpr1, floatexpr2);
+  plvalue_t r1 = eval_expr(intfloatadd, &stack);
+  VK_ASSERT_EQUALS(ROC_TEMP, r1.roc);
+  VK_ASSERT_EQUALS(JT_FLOAT, r1.pvt);
+  VK_ASSERT_EQUALS_F(4396.777, r1.data.fvalue);
+  
+  ast_node_base_t *intstradd =
+    node2_wdata(ANS_BINEXPR, add, intexpr1, strexpr2);
+  plvalue_t r2 = eval_expr(intstradd, &stack);
+  VK_ASSERT_EQUALS(ROC_TEMP, r2.roc);
+  VK_ASSERT_EQUALS(JT_STR, r2.pvt);
+  VK_ASSERT_EQUALS(create_string("4396, HJYZ!"), r2.data.svalue);
+  
+  ast_node_base_t *floatstradd = 
+    node2_wdata(ANS_BINEXPR, add, floatexpr1, strexpr2);
+  plvalue_t r3 = eval_expr(floatstradd, &stack);
+  VK_ASSERT_EQUALS(ROC_TEMP, r3.roc);
+  VK_ASSERT_EQUALS(JT_STR, r3.pvt);
+  VK_ASSERT_EQUALS(create_string("7777, HJYZ!"), r3.data.svalue);
+  
+  stack_exit_frame(&stack);
+  close_stack(&stack);
+  
+  VK_TEST_SECTION_END("evaluate with coercion")
 }
 
 int main() {
@@ -139,6 +215,7 @@ int main() {
   test_eval_idref();
   test_eval_literal();
   test_eval_binary_basic();
+  test_eval_coercion();
   
   close_heap();
   VK_TEST_END

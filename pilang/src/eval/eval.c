@@ -106,15 +106,15 @@ static result_t fetch_str(plvalue_t obj) {
 
   switch (obj.pvt) {
   case JT_INT: {
-    char buffer[24]; 
+    char buffer[128]; 
     sprintf(buffer, "%" PRId64, storage->ivalue);
     jjvalue_t shell;
     shell.svalue = create_string(buffer);
     return success_result(shell);
   }
   case JT_FLOAT: {
-    char buffer[24]; 
-    sprintf(buffer, "%lf", storage->fvalue);
+    char buffer[128]; 
+    sprintf(buffer, "%g", storage->fvalue);
     jjvalue_t shell;
     shell.svalue = create_string(buffer);
     return success_result(shell);
