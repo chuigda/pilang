@@ -208,6 +208,48 @@ void test_eval_coercion() {
   VK_TEST_SECTION_END("evaluate with coercion")
 }
 
+void test_eval_intermix_storage() {
+  VK_TEST_SECTION_BEGIN("evaluate with intermixing storage")
+  
+  plstack_t stack;
+  init_stack(&stack);
+  stack_enter_frame(&stack);
+
+  plstkobj_t *stack_a = stack_get(&stack, create_string("a"));
+  stack_a->soid = SOID_INT;
+  stack_a->value.ivalue = 700;
+  
+  plheapobj_t *heapobj = plobj_create_int(70);
+  plstkobj_t *stack_b = stack_get(&stack, create_string("b"));
+  stack_b->soid = SOID_REF;
+  stack_b->value.pvalue = (void*)heapobj;
+  
+  jjvalue_t t1, t2, t3;
+  t1.svalue = create_string("a");
+  t2.svalue = create_string("b");
+  t3.ivalue = 7;
+
+  jjvalue_t add;
+  add.ivalue = TK_ESYM_PLUS;
+
+  ast_node_base_t *expr_a = leaf_wdata(ANS_IDREF, t1);
+  ast_node_base_t *expr_b = leaf_wdata(ANS_IDREF, t2);
+  ast_node_base_t *expr_7 = leaf_wdata(ANS_INTVAL, t3);
+  
+  ast_node_base_t *e1 = node2_wdata(ANS_BINEXPR, add, expr_a, expr_b);
+  ast_node_base_t *expr = node2_wdata(ANS_BINEXPR, add, e1, expr_7);
+
+  plvalue_t r = eval_expr(expr, &stack);
+  VK_ASSERT_EQUALS(ROC_TEMP, r.roc);
+  VK_ASSERT_EQUALS(JT_INT, r.pvt);
+  VK_ASSERT_EQUALS(777, r.data.ivalue);
+
+  stack_exit_frame(&stack);
+  close_stack(&stack);
+  
+  VK_TEST_SECTION_END("evaluate with intermixing storage")
+}
+
 int main() {
   VK_TEST_BEGIN
   init_heap();
