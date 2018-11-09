@@ -8,7 +8,7 @@ void eval_ast(ast_node_base_t *program);
 #if defined(TEST) || defined (EVAL_C)
 
 #include "stack.h"
-#include "plheap.h"
+#include "heap.h"
 
 typedef enum {
   ROC_TEMP,

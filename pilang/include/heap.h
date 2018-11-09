@@ -1,5 +1,5 @@
-#ifndef PLHEAP_H
-#define PLHEAP_H
+#ifndef HEAP_H
+#define HEAP_H
 
 #include "clist.h"
 #include "jjvalue.h"
