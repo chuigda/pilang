@@ -8,23 +8,23 @@
 #include <stdlib.h>
 #include <string.h>
 
-plstkobj_id_t jt2soid(jjtype_t jt) {
+stkobj_id_t jt2soid(jjtype_t jt) {
   assert(jt != JT_LIST);
-  return (plstkobj_id_t)jt;
+  return (stkobj_id_t)jt;
 }
 
-jjtype_t soid2jt(plstkobj_id_t soid) {
+jjtype_t soid2jt(stkobj_id_t soid) {
   return (jjtype_t)soid;
 }
 
-void init_stack(plstack_t *stack) {
-  stack->storage = NEWN(plstkobj_t, PLI_STACK_SIZE);
+void init_stack(stack_t *stack) {
+  stack->storage = NEWN(stkobj_t, PLI_STACK_SIZE);
   stack->stack_size = PLI_STACK_SIZE;
   stack->stack_usage = 0;
   create_list(&(stack->frames), malloc, free);
 }
 
-void close_stack(plstack_t *stack) {
+void close_stack(stack_t *stack) {
   for (iter_t it = list_begin(&(stack->frames));
        !iter_eq(it, list_end(&(stack->frames))); 
        it = iter_next(it)) {
@@ -34,43 +34,43 @@ void close_stack(plstack_t *stack) {
   free(stack->storage);
 }
 
-static plstkobj_t *stack_allocate(plstack_t *stack, strhdl_t name) {
+static stkobj_t *stack_allocate(stack_t *stack, strhdl_t name) {
   if (stack->stack_usage == stack->stack_size) {
     eprintf("pilang pivm: stack overflow, "
             "with DFL_STACK_SIZE = %d\n", PLI_STACK_SIZE);
     abort();
   }
 
-  plstkobj_t *obj = stack->storage + stack->stack_usage;
+  stkobj_t *obj = stack->storage + stack->stack_usage;
   obj->name = name;
 
-  plstkframe_t *cur_frame = 
-    (plstkframe_t*)iter_deref(iter_prev(list_end(&(stack->frames))));
+  stkframe_t *cur_frame = 
+    (stkframe_t*)iter_deref(iter_prev(list_end(&(stack->frames))));
   stack->stack_usage++;
   cur_frame->objs_end++;
   return obj;
 }
 
-void stack_enter_frame(plstack_t *stack) {
-  plstkframe_t *frame = NEW(plstkframe_t);
+void stack_enter_frame(stack_t *stack) {
+  stkframe_t *frame = NEW(stkframe_t);
   frame->objs_begin = stack->storage + stack->stack_usage;
   frame->objs_end = stack->storage + stack->stack_usage;
   list_push_back(&(stack->frames), frame);
 }
 
-void stack_exit_frame(plstack_t *stack) {
-  plstkframe_t *curframe =
-    (plstkframe_t*)iter_deref(iter_prev(list_end(&(stack->frames))));
+void stack_exit_frame(stack_t *stack) {
+  stkframe_t *curframe =
+    (stkframe_t*)iter_deref(iter_prev(list_end(&(stack->frames))));
   stack->stack_usage -= (curframe->objs_end - curframe->objs_begin);
   list_remove(&(stack->frames), iter_prev(list_end(&(stack->frames))));
   free(curframe);
 }
 
-plstkobj_t *stack_get(plstack_t *stack, strhdl_t name) {
-  plstkframe_t *frame = 
-    (plstkframe_t*)iter_deref(iter_prev(list_end(&(stack->frames))));
+stkobj_t *stack_get(stack_t *stack, strhdl_t name) {
+  stkframe_t *frame = 
+    (stkframe_t*)iter_deref(iter_prev(list_end(&(stack->frames))));
 
-  for (plstkobj_t *obj = frame->objs_begin;
+  for (stkobj_t *obj = frame->objs_begin;
        obj != frame->objs_end;
        ++obj) {
     if (name == obj->name) {
@@ -78,7 +78,7 @@ plstkobj_t *stack_get(plstack_t *stack, strhdl_t name) {
     }
   }
   
-  plstkobj_t *obj = stack_allocate(stack, name);
+  stkobj_t *obj = stack_allocate(stack, name);
   obj->soid = SOID_UNDEFINED;
   return obj;
 }

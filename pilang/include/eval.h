@@ -23,8 +23,8 @@ typedef struct {
   int16_t pvt;
 } plvalue_t;
 
-plvalue_t create_onstack(plstkobj_t *storage);
-plvalue_t create_onheap(plheapobj_t *storage);
+plvalue_t create_onstack(stkobj_t *storage);
+plvalue_t create_onheap(heapobj_t *storage);
 plvalue_t create_temp();
 
 typedef enum {
@@ -35,7 +35,7 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
                          algebraic_function_t alf);
 plvalue_t assign(plvalue_t lhs, plvalue_t rhs);
 
-plvalue_t eval_expr(ast_node_base_t *node, plstack_t *stack);
+plvalue_t eval_expr(ast_node_base_t *node, stack_t *stack);
 
 #endif
 

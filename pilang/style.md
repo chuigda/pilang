@@ -29,5 +29,5 @@ for example
 ```
   jjvalue_t
   plvalue_t
-  plstkobj_t
+  stkobj_t
 ```

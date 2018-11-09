@@ -8,17 +8,17 @@ int main() {
 
   init_heap();
   
-  plheapobj_t *o1 = heap_alloc_int(39);
-  plheapobj_t *o2 = heap_alloc_float(39.0);
-  plheapobj_t *o3 = heap_alloc_str(create_string("fuck"));
-  plheapobj_t *o4 = heap_alloc_str(create_string("shit"));
+  heapobj_t *o1 = heap_alloc_int(39);
+  heapobj_t *o2 = heap_alloc_float(39.0);
+  heapobj_t *o3 = heap_alloc_str(create_string("fuck"));
+  heapobj_t *o4 = heap_alloc_str(create_string("shit"));
   
   list_t list;
   create_list(&list, malloc, free);
   list_push_back(&list, o1);
   list_push_back(&list, o2);
   
-  plheapobj_t *lsobj = heap_alloc_list(list);
+  heapobj_t *lsobj = heap_alloc_list(list);
   
   gc_start();
   gc_mark_white(o4);

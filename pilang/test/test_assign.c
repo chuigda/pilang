@@ -7,11 +7,11 @@
 void test_stack_assign() {
   VK_TEST_SECTION_BEGIN("assign to stack variable")
 
-  plstack_t stack;
+  stack_t stack;
   init_stack(&stack);
   stack_enter_frame(&stack);
 
-  plstkobj_t *stack_a = stack_get(&stack, create_string("a"));
+  stkobj_t *stack_a = stack_get(&stack, create_string("a"));
   plvalue_t value = create_temp();
   value.pvt = JT_INT;
   value.data.ivalue = 7777;
@@ -33,7 +33,7 @@ void test_stack_assign() {
 void test_heap_assign() {
   VK_TEST_SECTION_BEGIN("assign to heap object")
 
-  plheapobj_t *heapobj = heap_alloc_int(99);
+  heapobj_t *heapobj = heap_alloc_int(99);
   plvalue_t value = create_temp();
   value.pvt = JT_INT;
   value.data.ivalue = 7777;
@@ -51,12 +51,12 @@ void test_heap_assign() {
 void test_assignto_stackref() {
   VK_TEST_SECTION_BEGIN("assign to stack reference")
   
-  plstack_t stack;
+  stack_t stack;
   init_stack(&stack);
   stack_enter_frame(&stack);
 
-  plheapobj_t *heapobj = heap_alloc_int(2900);
-  plstkobj_t *ref = stack_get(&stack, create_string("ref1"));
+  heapobj_t *heapobj = heap_alloc_int(2900);
+  stkobj_t *ref = stack_get(&stack, create_string("ref1"));
   ref->soid = SOID_REF;
   ref->value.pvalue = heapobj;
   
@@ -80,16 +80,16 @@ void test_assignto_stackref() {
 void test_assign_ref_to_stackobj() {
   VK_TEST_SECTION_BEGIN("assign ref to stack object")
   
-  plstack_t stack;
+  stack_t stack;
   init_stack(&stack);
   stack_enter_frame(&stack);
   
-  plheapobj_t *heapobj = heap_alloc_int(2900);
-  plstkobj_t *ref = stack_get(&stack, create_string("ref1"));
+  heapobj_t *heapobj = heap_alloc_int(2900);
+  stkobj_t *ref = stack_get(&stack, create_string("ref1"));
   ref->soid = SOID_REF;
   ref->value.pvalue = heapobj;
   
-  plstkobj_t *stack_a = stack_get(&stack, create_string("a"));
+  stkobj_t *stack_a = stack_get(&stack, create_string("a"));
   stack_a->soid = SOID_INT;
   stack_a->value.ivalue = 4396;
   
@@ -109,14 +109,14 @@ void test_assign_ref_to_stackobj() {
 void test_assign_ref_to_heapobj() {
   VK_TEST_SECTION_BEGIN("assign ref to heap object")
   
-  plstack_t stack;
+  stack_t stack;
   init_stack(&stack);
   stack_enter_frame(&stack);
   
-  plheapobj_t *heapobj1 = heap_alloc_int(2900);
-  plheapobj_t *heapobj2 = heap_alloc_str(create_string("4396"));
+  heapobj_t *heapobj1 = heap_alloc_int(2900);
+  heapobj_t *heapobj2 = heap_alloc_str(create_string("4396"));
   
-  plstkobj_t *ref = stack_get(&stack, create_string("ref"));
+  stkobj_t *ref = stack_get(&stack, create_string("ref"));
   ref->soid = SOID_REF;
   ref->value.pvalue = heapobj1;
   

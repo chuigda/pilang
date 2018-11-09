@@ -12,7 +12,7 @@
 #include <string.h>
 #include <stdint.h>
 
-plvalue_t create_onstack(plstkobj_t *storage) {
+plvalue_t create_onstack(stkobj_t *storage) {
   plvalue_t ret;
   ret.roc = ROC_ONSTACK;
   ret.pvt = soid2jt(storage->soid);
@@ -20,7 +20,7 @@ plvalue_t create_onstack(plstkobj_t *storage) {
   return ret;
 }
 
-plvalue_t create_onheap(plheapobj_t *storage) {
+plvalue_t create_onheap(heapobj_t *storage) {
   plvalue_t ret;
   ret.roc = ROC_ONHEAP;
   ret.pvt = hoid2jt(storage->oid);
@@ -38,11 +38,11 @@ static jjvalue_t *fetch_storage(plvalue_t *obj) {
   switch (obj->roc) {
   case ROC_TEMP: return &(obj->data);
   case ROC_ONHEAP: {
-    plheapobj_t *heapobj = (plheapobj_t*)(obj->data.pvalue);
+    heapobj_t *heapobj = (heapobj_t*)(obj->data.pvalue);
     return &(heapobj->value);
   }
   case ROC_ONSTACK: {
-    plstkobj_t *stkobj = (plstkobj_t*)(obj->data.pvalue);
+    stkobj_t *stkobj = (stkobj_t*)(obj->data.pvalue);
     return &(stkobj->value);
   }
   }
@@ -151,12 +151,12 @@ static void asgn_attach_typeinfo(plvalue_t *obj, int16_t pvt) {
   obj->pvt = pvt;
   switch (obj->roc) {
     case ROC_ONSTACK: {
-      plstkobj_t *stkobj = (plstkobj_t*)obj->data.pvalue;
+      stkobj_t *stkobj = (stkobj_t*)obj->data.pvalue;
       stkobj->soid = jt2soid(pvt);
       break;
     }
     case ROC_ONHEAP: {
-      plheapobj_t *heapobj = (plheapobj_t*)obj->data.pvalue;
+      heapobj_t *heapobj = (heapobj_t*)obj->data.pvalue;
       heapobj->oid = jt2hoid(pvt);
       break;
     }
@@ -167,7 +167,7 @@ static void asgn_attach_typeinfo(plvalue_t *obj, int16_t pvt) {
 
 static void storage_precleanup(plvalue_t *obj) {
   if (obj->roc == ROC_ONHEAP) {
-    destroy_object((plheapobj_t*)(obj->data.pvalue));
+    destroy_object((heapobj_t*)(obj->data.pvalue));
   }
 }
 
@@ -211,7 +211,7 @@ static void asgn_list(plvalue_t *obj, list_t value) {
   storage->lsvalue = value;
 }
 
-static void asgn_ref(plvalue_t *obj, plheapobj_t *value) {
+static void asgn_ref(plvalue_t *obj, heapobj_t *value) {
   jjvalue_t *storage = fetch_storage(obj);
   if (storage == NULL) {
     return;
@@ -246,8 +246,8 @@ static plvalue_t auto_deref(plvalue_t maybe_ref) {
   if (maybe_ref.pvt != JT_REF) {
     return maybe_ref;
   }
-  plheapobj_t *referred =
-    (plheapobj_t*)(fetch_storage(&maybe_ref)->pvalue);
+  heapobj_t *referred =
+    (heapobj_t*)(fetch_storage(&maybe_ref)->pvalue);
   return create_onheap(referred);
 }
 
@@ -316,14 +316,14 @@ plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
   }
 
   if (lhs.roc == ROC_ONSTACK && lhs.pvt == JT_REF) {
-    plstkobj_t *stkobj = (plstkobj_t*)lhs.data.pvalue;
-    plheapobj_t *referred_heapobj = (plheapobj_t*)(stkobj->value.pvalue);
+    stkobj_t *stkobj = (stkobj_t*)lhs.data.pvalue;
+    heapobj_t *referred_heapobj = (heapobj_t*)(stkobj->value.pvalue);
     return assign(create_onheap(referred_heapobj), rhs);
   }
 
   if (lhs.roc == ROC_ONHEAP && rhs.pvt == JT_REF) {
-    plheapobj_t *assignee_heapobj =
-      (plheapobj_t*)(fetch_storage(&rhs)->pvalue);
+    heapobj_t *assignee_heapobj =
+      (heapobj_t*)(fetch_storage(&rhs)->pvalue);
     return assign(lhs, create_onheap(assignee_heapobj));
   }
 
@@ -351,11 +351,11 @@ plvalue_t eval_literal_expr(ast_leaf_wdata_t *node) {
   return ret;
 }
 
-plvalue_t eval_idref_expr(ast_leaf_wdata_t *node, plstack_t *stack) {
+plvalue_t eval_idref_expr(ast_leaf_wdata_t *node, stack_t *stack) {
   return create_onstack(stack_get(stack, node->data.svalue));
 }
 
-plvalue_t eval_binexpr(ast_dchild_wdata_t *node, plstack_t *stack) {
+plvalue_t eval_binexpr(ast_dchild_wdata_t *node, stack_t *stack) {
   plvalue_t lhs = eval_expr(node->children[0], stack);
   plvalue_t rhs = eval_expr(node->children[1], stack);
   if (node->data.ivalue == TK_ESYM_EQ) {
@@ -379,7 +379,7 @@ plvalue_t eval_binexpr(ast_dchild_wdata_t *node, plstack_t *stack) {
   return algebraic_calc(lhs, rhs, alf);
 }
 
-plvalue_t eval_expr(ast_node_base_t *node, plstack_t *stack) {
+plvalue_t eval_expr(ast_node_base_t *node, stack_t *stack) {
   switch (node->node_sema_info) {
   case ANS_BINEXPR: 
     return eval_binexpr((ast_dchild_wdata_t*)node, stack);
@@ -394,13 +394,13 @@ plvalue_t eval_expr(ast_node_base_t *node, plstack_t *stack) {
   return failure;
 }
 
-void eval_stmt(ast_node_base_t *stmt, plstack_t *stack) {
+void eval_stmt(ast_node_base_t *stmt, stack_t *stack) {
   // TODO
   (void)stmt;
   (void)stack;
 }
 
-void eval_func_body(ast_list_t *body, plstack_t *stack) {
+void eval_func_body(ast_list_t *body, stack_t *stack) {
   list_t stmts = body->list;
   for (iter_t it = list_begin(&stmts); 
        !iter_eq(it, list_end(&stmts));
@@ -410,7 +410,7 @@ void eval_func_body(ast_list_t *body, plstack_t *stack) {
 }
 
 static void callfunc(ast_tchild_wdata_t *func, list_t args, 
-                     list_t rets, plstack_t *stack) {
+                     list_t rets, stack_t *stack) {
   stack_enter_frame(stack);
   ast_list_t *param_list_node = (ast_list_t*)func->children[0];
   list_t param_list = param_list_node->list;

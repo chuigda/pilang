@@ -10,11 +10,11 @@
 void test_eval_idref() {
   VK_TEST_SECTION_BEGIN("evaluate idref expr")
   
-  plstack_t stack;
+  stack_t stack;
   init_stack(&stack);
   stack_enter_frame(&stack);
 
-  plstkobj_t *stack_a = stack_get(&stack, create_string("a"));
+  stkobj_t *stack_a = stack_get(&stack, create_string("a"));
   stack_a->soid = SOID_INT;
   stack_a->value.ivalue = 4277;
   
@@ -27,7 +27,7 @@ void test_eval_idref() {
   VK_ASSERT_EQUALS(ROC_ONSTACK, result.roc);
   VK_ASSERT_EQUALS(JT_INT, result.pvt);
   VK_ASSERT_EQUALS(4277, 
-                   ((plstkobj_t*)result.data.pvalue)->value.ivalue);
+                   ((stkobj_t*)result.data.pvalue)->value.ivalue);
 
   stack_exit_frame(&stack);
   close_stack(&stack);
@@ -38,7 +38,7 @@ void test_eval_idref() {
 void test_eval_literal() {
   VK_TEST_SECTION_BEGIN("evaluate literal expr")
   
-  plstack_t stack;
+  stack_t stack;
   init_stack(&stack);
   stack_enter_frame(&stack);
   
@@ -74,7 +74,7 @@ void test_eval_literal() {
 void test_eval_binary_basic() {
   VK_TEST_SECTION_BEGIN("evaluate binary expr")
 
-  plstack_t stack;
+  stack_t stack;
   init_stack(&stack);
   stack_enter_frame(&stack);
 
@@ -158,7 +158,7 @@ void test_eval_binary_basic() {
 void test_eval_coercion() {
   VK_TEST_SECTION_BEGIN("evaluate with coercion")
   
-  plstack_t stack;
+  stack_t stack;
   init_stack(&stack);
   stack_enter_frame(&stack);
 
@@ -211,16 +211,16 @@ void test_eval_coercion() {
 void test_eval_intermix_storage() {
   VK_TEST_SECTION_BEGIN("evaluate with intermixing storage")
   
-  plstack_t stack;
+  stack_t stack;
   init_stack(&stack);
   stack_enter_frame(&stack);
 
-  plstkobj_t *stack_a = stack_get(&stack, create_string("a"));
+  stkobj_t *stack_a = stack_get(&stack, create_string("a"));
   stack_a->soid = SOID_INT;
   stack_a->value.ivalue = 700;
   
-  plheapobj_t *heapobj = heap_alloc_int(70);
-  plstkobj_t *stack_b = stack_get(&stack, create_string("b"));
+  heapobj_t *heapobj = heap_alloc_int(70);
+  stkobj_t *stack_b = stack_get(&stack, create_string("b"));
   stack_b->soid = SOID_REF;
   stack_b->value.pvalue = (void*)heapobj;
   

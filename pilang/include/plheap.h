@@ -10,12 +10,12 @@ typedef enum {
   HOID_STR       = JT_STR,
   HOID_LIST      = JT_LIST,
   HOID_UNDEFINED = JT_UNDEFINED
-} plheapobj_id_t;
+} heapobj_id_t;
 
 typedef enum {
   GCM_WHITE,
   GCM_BLACK
-} plheap_gcmark_t;
+} heap_gcmark_t;
 
 typedef struct {
   jjvalue_t value;
@@ -23,24 +23,24 @@ typedef struct {
   uint8_t gcmark : 1;
   uint8_t oid : 4;
   uint32_t index : 26;
-} plheapobj_t;
+} heapobj_t;
 
-plheapobj_id_t jt2hoid(jjtype_t jt);
-jjtype_t hoid2jt(plheapobj_id_t hoid);
+heapobj_id_t jt2hoid(jjtype_t jt);
+jjtype_t hoid2jt(heapobj_id_t hoid);
 
-plheapobj_t *heap_alloc_ref(plheapobj_t *source);
-plheapobj_t *heap_alloc_int(int64_t value);
-plheapobj_t *heap_alloc_float(double value);
-plheapobj_t *heap_alloc_str(strhdl_t h_str);
-plheapobj_t *heap_alloc_list(list_t list);
+heapobj_t *heap_alloc_ref(heapobj_t *source);
+heapobj_t *heap_alloc_int(int64_t value);
+heapobj_t *heap_alloc_float(double value);
+heapobj_t *heap_alloc_str(strhdl_t h_str);
+heapobj_t *heap_alloc_list(list_t list);
 
-void destroy_object(plheapobj_t *obj);
+void destroy_object(heapobj_t *obj);
 
 void init_heap(void);
 void close_heap(void);
 
 void gc_start(void);
-void gc_mark_white(plheapobj_t *obj);
+void gc_mark_white(heapobj_t *obj);
 void gc_cleanup(void);
 
 #endif
