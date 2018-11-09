@@ -30,11 +30,11 @@ can be stored in a `plvalue_t` directly.
 * Reference to stack value
 
 In such circumstance, `roc` should be `ROC_ONSTACK`, and `data.pvalue`
-holds the pointer to that stack object. `pvt` simply "forwards" type
+holds the pointer to that stack object. `type` simply "forwards" type
 info (`soid`) held by the stack object.
 
 * Reference to heap value
 
 In such circumstance, `roc` should be `ROC_ONHEAP`, and `data.pvalue`
-holds the pointer to that heap object. `pvt` simply "forwards" type info
+holds the pointer to that heap object. `type` simply "forwards" type info
 (`oid`) held by the heap object.

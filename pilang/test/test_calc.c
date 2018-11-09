@@ -25,14 +25,14 @@ void test_int_calc() {
                                      create_onstack(stack_b), ALF_ADD);
 
   VK_ASSERT_EQUALS(ROC_TEMP, sum_ab.roc);
-  VK_ASSERT_EQUALS(JT_INT,    sum_ab.pvt);
+  VK_ASSERT_EQUALS(JT_INT,    sum_ab.type);
   VK_ASSERT_EQUALS(3,         sum_ab.data.ivalue);
 
   plvalue_t sum_abc = algebraic_calc(sum_ab, create_onheap(heapobj), 
                                       ALF_ADD);
 
   VK_ASSERT_EQUALS(ROC_TEMP, sum_abc.roc);
-  VK_ASSERT_EQUALS(JT_INT,    sum_abc.pvt);
+  VK_ASSERT_EQUALS(JT_INT,    sum_abc.type);
   VK_ASSERT_EQUALS(36,        sum_abc.data.ivalue);
 
   close_stack(&test_stack);
@@ -60,7 +60,7 @@ void test_str_add() {
                                     create_onstack(stack_b), ALF_ADD);
 
   VK_ASSERT_EQUALS(ROC_TEMP, sum_ab.roc);
-  VK_ASSERT_EQUALS(JT_STR,   sum_ab.pvt);
+  VK_ASSERT_EQUALS(JT_STR,   sum_ab.type);
   VK_ASSERT_EQUALS(create_string("Hello, world!"), sum_ab.data.svalue);
 
   close_stack(&test_stack);

@@ -25,7 +25,7 @@ void test_eval_idref() {
   
   plvalue_t result = eval_expr((ast_node_base_t*)idref_expr, &stack);
   VK_ASSERT_EQUALS(ROC_ONSTACK, result.roc);
-  VK_ASSERT_EQUALS(JT_INT, result.pvt);
+  VK_ASSERT_EQUALS(JT_INT, result.type);
   VK_ASSERT_EQUALS(4277, 
                    ((stkobj_t*)result.data.pvalue)->value.ivalue);
 
@@ -58,9 +58,9 @@ void test_eval_literal() {
   VK_ASSERT_EQUALS(ROC_TEMP, r1.roc);
   VK_ASSERT_EQUALS(ROC_TEMP, r2.roc);
   VK_ASSERT_EQUALS(ROC_TEMP, r3.roc);
-  VK_ASSERT_EQUALS(JT_INT, r1.pvt);
-  VK_ASSERT_EQUALS(JT_FLOAT, r2.pvt);
-  VK_ASSERT_EQUALS(JT_STR, r3.pvt);
+  VK_ASSERT_EQUALS(JT_INT, r1.type);
+  VK_ASSERT_EQUALS(JT_FLOAT, r2.type);
+  VK_ASSERT_EQUALS(JT_STR, r3.type);
   VK_ASSERT_EQUALS(4396, r1.data.ivalue);
   VK_ASSERT_EQUALS(7777.77, r2.data.fvalue);
   VK_ASSERT_EQUALS(create_string("HJYZ"), r3.data.svalue);
@@ -112,9 +112,9 @@ void test_eval_binary_basic() {
   VK_ASSERT_EQUALS(ROC_TEMP, r1.roc);
   VK_ASSERT_EQUALS(ROC_TEMP, r2.roc);
   VK_ASSERT_EQUALS(ROC_TEMP, r3.roc);
-  VK_ASSERT_EQUALS(JT_INT, r1.pvt);
-  VK_ASSERT_EQUALS(JT_FLOAT, r2.pvt);
-  VK_ASSERT_EQUALS(JT_STR, r3.pvt);
+  VK_ASSERT_EQUALS(JT_INT, r1.type);
+  VK_ASSERT_EQUALS(JT_FLOAT, r2.type);
+  VK_ASSERT_EQUALS(JT_STR, r3.type);
   VK_ASSERT_EQUALS(7296, r1.data.ivalue);
   VK_ASSERT_EQUALS_F(7777.777, r2.data.fvalue);
   VK_ASSERT_EQUALS(create_string("NMSL, WSND, HJYZ!"), r3.data.svalue);
@@ -129,8 +129,8 @@ void test_eval_binary_basic() {
   
   VK_ASSERT_EQUALS(ROC_TEMP, r4.roc);
   VK_ASSERT_EQUALS(ROC_TEMP, r5.roc);
-  VK_ASSERT_EQUALS(JT_INT, r4.pvt);
-  VK_ASSERT_EQUALS(JT_FLOAT, r5.pvt);
+  VK_ASSERT_EQUALS(JT_INT, r4.type);
+  VK_ASSERT_EQUALS(JT_FLOAT, r5.type);
   VK_ASSERT_EQUALS(4396 - 2900, r4.data.ivalue);
   VK_ASSERT_EQUALS_F(7777.0 - 0.777, r5.data.fvalue);
   
@@ -144,8 +144,8 @@ void test_eval_binary_basic() {
 
   VK_ASSERT_EQUALS(ROC_TEMP, r6.roc);
   VK_ASSERT_EQUALS(ROC_TEMP, r7.roc);
-  VK_ASSERT_EQUALS(JT_INT, r6.pvt);
-  VK_ASSERT_EQUALS(JT_FLOAT, r7.pvt);
+  VK_ASSERT_EQUALS(JT_INT, r6.type);
+  VK_ASSERT_EQUALS(JT_FLOAT, r7.type);
   VK_ASSERT_EQUALS(4396 * 2900, r6.data.ivalue);
   VK_ASSERT_EQUALS_F(7777 * 0.777, r7.data.fvalue);
 
@@ -185,21 +185,21 @@ void test_eval_coercion() {
     node2_wdata(ANS_BINEXPR, add, intexpr1, floatexpr2);
   plvalue_t r1 = eval_expr(intfloatadd, &stack);
   VK_ASSERT_EQUALS(ROC_TEMP, r1.roc);
-  VK_ASSERT_EQUALS(JT_FLOAT, r1.pvt);
+  VK_ASSERT_EQUALS(JT_FLOAT, r1.type);
   VK_ASSERT_EQUALS_F(4396.777, r1.data.fvalue);
   
   ast_node_base_t *intstradd =
     node2_wdata(ANS_BINEXPR, add, intexpr1, strexpr2);
   plvalue_t r2 = eval_expr(intstradd, &stack);
   VK_ASSERT_EQUALS(ROC_TEMP, r2.roc);
-  VK_ASSERT_EQUALS(JT_STR, r2.pvt);
+  VK_ASSERT_EQUALS(JT_STR, r2.type);
   VK_ASSERT_EQUALS(create_string("4396, HJYZ!"), r2.data.svalue);
   
   ast_node_base_t *floatstradd = 
     node2_wdata(ANS_BINEXPR, add, floatexpr1, strexpr2);
   plvalue_t r3 = eval_expr(floatstradd, &stack);
   VK_ASSERT_EQUALS(ROC_TEMP, r3.roc);
-  VK_ASSERT_EQUALS(JT_STR, r3.pvt);
+  VK_ASSERT_EQUALS(JT_STR, r3.type);
   VK_ASSERT_EQUALS(create_string("7777, HJYZ!"), r3.data.svalue);
   
   stack_exit_frame(&stack);
@@ -241,7 +241,7 @@ void test_eval_intermix_storage() {
 
   plvalue_t r = eval_expr(expr, &stack);
   VK_ASSERT_EQUALS(ROC_TEMP, r.roc);
-  VK_ASSERT_EQUALS(JT_INT, r.pvt);
+  VK_ASSERT_EQUALS(JT_INT, r.type);
   VK_ASSERT_EQUALS(777, r.data.ivalue); 
 
   stack_exit_frame(&stack);

@@ -15,7 +15,7 @@
 plvalue_t create_onstack(stkobj_t *storage) {
   plvalue_t ret;
   ret.roc = ROC_ONSTACK;
-  ret.pvt = soid2jt(storage->soid);
+  ret.type = soid2jt(storage->soid);
   ret.data.pvalue = storage;
   return ret;
 }
@@ -23,7 +23,7 @@ plvalue_t create_onstack(stkobj_t *storage) {
 plvalue_t create_onheap(heapobj_t *storage) {
   plvalue_t ret;
   ret.roc = ROC_ONHEAP;
-  ret.pvt = hoid2jt(storage->oid);
+  ret.type = hoid2jt(storage->oid);
   ret.data.pvalue = storage;
   return ret;
 }
@@ -55,7 +55,7 @@ static result_t fetch_int(plvalue_t obj) {
     return failed_result("object does not have storage");
   }
   
-  switch (obj.pvt) {
+  switch (obj.type) {
   case JT_INT:  
     return success_result(*storage);
   case JT_FLOAT: {
@@ -80,7 +80,7 @@ static result_t fetch_float(plvalue_t obj) {
     return failed_result("object does not have storage");
   }
   
-  switch (obj.pvt) {
+  switch (obj.type) {
   case JT_INT: {
     jjvalue_t shell;
     shell.fvalue = (double)(storage->ivalue);
@@ -104,7 +104,7 @@ static result_t fetch_str(plvalue_t obj) {
     return failed_result("object does not have storage");
   }
 
-  switch (obj.pvt) {
+  switch (obj.type) {
   case JT_INT: {
     char buffer[128]; 
     sprintf(buffer, "%" PRId64, storage->ivalue);
@@ -133,7 +133,7 @@ static result_t fetch_list(plvalue_t obj) {
     return failed_result("object does not have storage");
   }
   
-  switch (obj.pvt) {
+  switch (obj.type) {
   case JT_INT:
     return failed_result("cannot autocast from Int to List");
   case JT_FLOAT: 
@@ -147,17 +147,17 @@ static result_t fetch_list(plvalue_t obj) {
   UNREAECHABLE
 }
 
-static void asgn_attach_typeinfo(plvalue_t *obj, int16_t pvt) {
-  obj->pvt = pvt;
+static void asgn_attach_typeinfo(plvalue_t *obj, int16_t type) {
+  obj->type = type;
   switch (obj->roc) {
     case ROC_ONSTACK: {
       stkobj_t *stkobj = (stkobj_t*)obj->data.pvalue;
-      stkobj->soid = jt2soid(pvt);
+      stkobj->soid = jt2soid(type);
       break;
     }
     case ROC_ONHEAP: {
       heapobj_t *heapobj = (heapobj_t*)obj->data.pvalue;
-      heapobj->oid = jt2hoid(pvt);
+      heapobj->oid = jt2hoid(type);
       break;
     }
     default:
@@ -223,11 +223,11 @@ static void asgn_ref(plvalue_t *obj, heapobj_t *value) {
 
 static void set_undefined(plvalue_t *obj) {
   storage_precleanup(obj);
-  obj->pvt = JT_UNDEFINED;
+  obj->type = JT_UNDEFINED;
 }
 
 #define EITHER_IS(VALUETYPE, LHS, RHS) \
-  ((LHS).pvt == VALUETYPE || (RHS).pvt == VALUETYPE)
+  ((LHS).type == VALUETYPE || (RHS).type == VALUETYPE)
 
 static int64_t int_failsafe(result_t maybe) {
   return maybe.success ? maybe.value.ivalue : 0;
@@ -243,7 +243,7 @@ static strhdl_t str_failsafe(result_t maybe) {
 }
 
 static plvalue_t auto_deref(plvalue_t maybe_ref) {
-  if (maybe_ref.pvt != JT_REF) {
+  if (maybe_ref.type != JT_REF) {
     return maybe_ref;
   }
   heapobj_t *referred =
@@ -267,7 +267,7 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
       free(temp);
     
       plvalue_t ret = create_temp();
-      ret.pvt = JT_STR;
+      ret.type = JT_STR;
       ret.data.svalue = newstr;
       return ret;
     }
@@ -278,7 +278,7 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
     double f2 = float_failsafe(fetch_float(rhs));
     
     plvalue_t ret = create_temp();
-    ret.pvt = JT_FLOAT;
+    ret.type = JT_FLOAT;
     switch (alf) {
     case ALF_ADD: ret.data.fvalue = f1 + f2; break;
     case ALF_SUB: ret.data.fvalue = f1 - f2; break;
@@ -293,7 +293,7 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
     int64_t i2 = int_failsafe(fetch_int(rhs));
     
     plvalue_t ret = create_temp();
-    ret.pvt = JT_INT;
+    ret.type = JT_INT;
     switch (alf) {
     case ALF_ADD: ret.data.ivalue = i1 + i2; break;
     case ALF_SUB: ret.data.ivalue = i1 - i2; break;
@@ -305,7 +305,7 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
   }
   else {
     plvalue_t ret = create_temp();
-    ret.pvt = JT_UNDEFINED;
+    ret.type = JT_UNDEFINED;
     return ret;
   }
 }
@@ -315,20 +315,20 @@ plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
     return lhs;
   }
 
-  if (lhs.roc == ROC_ONSTACK && lhs.pvt == JT_REF) {
+  if (lhs.roc == ROC_ONSTACK && lhs.type == JT_REF) {
     stkobj_t *stkobj = (stkobj_t*)lhs.data.pvalue;
     heapobj_t *referred_heapobj = (heapobj_t*)(stkobj->value.pvalue);
     return assign(create_onheap(referred_heapobj), rhs);
   }
 
-  if (lhs.roc == ROC_ONHEAP && rhs.pvt == JT_REF) {
+  if (lhs.roc == ROC_ONHEAP && rhs.type == JT_REF) {
     heapobj_t *assignee_heapobj =
       (heapobj_t*)(fetch_storage(&rhs)->pvalue);
     return assign(lhs, create_onheap(assignee_heapobj));
   }
 
   jjvalue_t *rhs_storage = fetch_storage(&rhs);
-  switch (rhs.pvt) {
+  switch (rhs.type) {
     case JT_INT:   asgn_int(&lhs, rhs_storage->ivalue);   break;
     case JT_FLOAT: asgn_float(&lhs, rhs_storage->fvalue); break;
     case JT_STR:   asgn_str(&lhs, rhs_storage->svalue);   break;
@@ -343,9 +343,9 @@ plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
 plvalue_t eval_literal_expr(ast_leaf_wdata_t *node) {
   plvalue_t ret = create_temp();
   switch (node->node_sema_info) {
-    case ANS_INTVAL:   ret.pvt = JT_INT;   break;
-    case ANS_FLOATVAL: ret.pvt = JT_FLOAT; break;
-    case ANS_STR:      ret.pvt = JT_STR;   break;
+    case ANS_INTVAL:   ret.type = JT_INT;   break;
+    case ANS_FLOATVAL: ret.type = JT_FLOAT; break;
+    case ANS_STR:      ret.type = JT_STR;   break;
   }
   ret.data = node->data;
   return ret;
@@ -372,7 +372,7 @@ plvalue_t eval_binexpr(ast_dchild_wdata_t *node, stack_t *stack) {
   default: {
       UNREAECHABLE
       plvalue_t failure = create_temp();
-      failure.pvt = JT_UNDEFINED;
+      failure.type = JT_UNDEFINED;
       return failure;
     }
   }
@@ -390,7 +390,7 @@ plvalue_t eval_expr(ast_node_base_t *node, stack_t *stack) {
   }
   UNREAECHABLE;
   plvalue_t failure = create_temp();
-  failure.pvt = JT_UNDEFINED;
+  failure.type = JT_UNDEFINED;
   return failure;
 }
 

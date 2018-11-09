@@ -20,7 +20,7 @@ typedef enum {
 typedef struct {
   jjvalue_t data;
   int16_t roc;
-  int16_t pvt;
+  int16_t type;
 } plvalue_t;
 
 plvalue_t create_onstack(stkobj_t *storage);

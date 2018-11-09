@@ -13,14 +13,14 @@ void test_stack_assign() {
 
   stkobj_t *stack_a = stack_get(&stack, create_string("a"));
   plvalue_t value = create_temp();
-  value.pvt = JT_INT;
+  value.type = JT_INT;
   value.data.ivalue = 7777;
 
   VK_ASSERT_EQUALS(ROC_ONSTACK, create_onstack(stack_a).roc);
 
   assign(create_onstack(stack_a), value);
 
-  VK_ASSERT_EQUALS(JT_INT,   create_onstack(stack_a).pvt);
+  VK_ASSERT_EQUALS(JT_INT,   create_onstack(stack_a).type);
   VK_ASSERT_EQUALS(SOID_INT, stack_a->soid);
   VK_ASSERT_EQUALS(7777,     stack_a->value.ivalue);
 
@@ -35,10 +35,10 @@ void test_heap_assign() {
 
   heapobj_t *heapobj = heap_alloc_int(99);
   plvalue_t value = create_temp();
-  value.pvt = JT_INT;
+  value.type = JT_INT;
   value.data.ivalue = 7777;
 
-  VK_ASSERT_EQUALS(JT_INT, create_onheap(heapobj).pvt);
+  VK_ASSERT_EQUALS(JT_INT, create_onheap(heapobj).type);
   VK_ASSERT_EQUALS(99, heapobj->value.ivalue);
 
   assign(create_onheap(heapobj), value);
@@ -61,7 +61,7 @@ void test_assignto_stackref() {
   ref->value.pvalue = heapobj;
   
   plvalue_t value = create_temp();
-  value.pvt = JT_INT;
+  value.type = JT_INT;
   value.data.ivalue = 4396;
   
   assign(create_onstack(ref), value);
