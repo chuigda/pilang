@@ -18,7 +18,7 @@ typedef enum {
 } plvalue_storage_t;
 
 typedef struct {
-  jjvalue_t data;
+  jjvalue_t value;
   int16_t roc;
   int16_t type;
 } plvalue_t;

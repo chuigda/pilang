@@ -14,7 +14,7 @@ void test_stack_assign() {
   stkobj_t *stack_a = stack_get(&stack, create_string("a"));
   plvalue_t value = create_temp();
   value.type = JT_INT;
-  value.data.ivalue = 7777;
+  value.value.ivalue = 7777;
 
   VK_ASSERT_EQUALS(ROC_ONSTACK, create_onstack(stack_a).roc);
 
@@ -36,7 +36,7 @@ void test_heap_assign() {
   heapobj_t *heapobj = heap_alloc_int(99);
   plvalue_t value = create_temp();
   value.type = JT_INT;
-  value.data.ivalue = 7777;
+  value.value.ivalue = 7777;
 
   VK_ASSERT_EQUALS(JT_INT, create_onheap(heapobj).type);
   VK_ASSERT_EQUALS(99, heapobj->value.ivalue);
@@ -62,7 +62,7 @@ void test_assignto_stackref() {
   
   plvalue_t value = create_temp();
   value.type = JT_INT;
-  value.data.ivalue = 4396;
+  value.value.ivalue = 4396;
   
   assign(create_onstack(ref), value);
   

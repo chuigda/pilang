@@ -40,11 +40,11 @@ tree_dump_impl(ast_node_base_t *root, uint16_t parent, int nth_child) {
         || root->node_sema_info == ANS_FUNCTION
         || root->node_sema_info == ANS_STR) {
       printf(", SDATA = %s",
-             get_string(((ast_node_wdata_base_t*)root)->data.svalue));
+             get_string(((ast_node_wdata_base_t*)root)->value.svalue));
     }
     else {
       printf(", IDATA = %" PRId64, 
-             ((ast_node_wdata_base_t*)root)->data.ivalue);
+             ((ast_node_wdata_base_t*)root)->value.ivalue);
     }
   }
   putchar('\n');

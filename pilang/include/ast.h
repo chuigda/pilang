@@ -36,7 +36,7 @@ typedef struct {
 
 typedef struct {
   AST_NODE_COMMON
-  jjvalue_t data;
+  jjvalue_t value;
 } ast_node_wdata_base_t;
 
 #if __STDC_VERSION__ >= 201112L
@@ -52,7 +52,7 @@ typedef struct {
 
 typedef struct {
   AST_NODE_COMMON
-  jjvalue_t data;
+  jjvalue_t value;
 } ast_leaf_wdata_t;
 
 typedef struct {
@@ -62,7 +62,7 @@ typedef struct {
 
 typedef struct {
   AST_NODE_COMMON
-  jjvalue_t data;
+  jjvalue_t value;
   ast_node_base_t *child;
 } ast_schild_wdata_t;
 
@@ -73,7 +73,7 @@ typedef struct {
 
 typedef struct {
   AST_NODE_COMMON
-  jjvalue_t data;
+  jjvalue_t value;
   ast_node_base_t *children[2];
 } ast_dchild_wdata_t;
 
@@ -84,7 +84,7 @@ typedef struct {
 
 typedef struct {
   AST_NODE_COMMON
-  jjvalue_t data;
+  jjvalue_t value;
   ast_node_base_t *children[3];
 } ast_tchild_wdata_t;
 

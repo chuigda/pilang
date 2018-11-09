@@ -16,7 +16,7 @@ plvalue_t create_onstack(stkobj_t *storage) {
   plvalue_t ret;
   ret.roc = ROC_ONSTACK;
   ret.type = soid2jt(storage->soid);
-  ret.data.pvalue = storage;
+  ret.value.pvalue = storage;
   return ret;
 }
 
@@ -24,7 +24,7 @@ plvalue_t create_onheap(heapobj_t *storage) {
   plvalue_t ret;
   ret.roc = ROC_ONHEAP;
   ret.type = hoid2jt(storage->oid);
-  ret.data.pvalue = storage;
+  ret.value.pvalue = storage;
   return ret;
 }
 
@@ -36,13 +36,13 @@ plvalue_t create_temp() {
 
 static jjvalue_t *fetch_storage(plvalue_t *obj) {
   switch (obj->roc) {
-  case ROC_TEMP: return &(obj->data);
+  case ROC_TEMP: return &(obj->value);
   case ROC_ONHEAP: {
-    heapobj_t *heapobj = (heapobj_t*)(obj->data.pvalue);
+    heapobj_t *heapobj = (heapobj_t*)(obj->value.pvalue);
     return &(heapobj->value);
   }
   case ROC_ONSTACK: {
-    stkobj_t *stkobj = (stkobj_t*)(obj->data.pvalue);
+    stkobj_t *stkobj = (stkobj_t*)(obj->value.pvalue);
     return &(stkobj->value);
   }
   }
@@ -151,12 +151,12 @@ static void asgn_attach_typeinfo(plvalue_t *obj, int16_t type) {
   obj->type = type;
   switch (obj->roc) {
     case ROC_ONSTACK: {
-      stkobj_t *stkobj = (stkobj_t*)obj->data.pvalue;
+      stkobj_t *stkobj = (stkobj_t*)obj->value.pvalue;
       stkobj->soid = jt2soid(type);
       break;
     }
     case ROC_ONHEAP: {
-      heapobj_t *heapobj = (heapobj_t*)obj->data.pvalue;
+      heapobj_t *heapobj = (heapobj_t*)obj->value.pvalue;
       heapobj->oid = jt2hoid(type);
       break;
     }
@@ -167,7 +167,7 @@ static void asgn_attach_typeinfo(plvalue_t *obj, int16_t type) {
 
 static void storage_precleanup(plvalue_t *obj) {
   if (obj->roc == ROC_ONHEAP) {
-    destroy_object((heapobj_t*)(obj->data.pvalue));
+    destroy_object((heapobj_t*)(obj->value.pvalue));
   }
 }
 
@@ -268,7 +268,7 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
     
       plvalue_t ret = create_temp();
       ret.type = JT_STR;
-      ret.data.svalue = newstr;
+      ret.value.svalue = newstr;
       return ret;
     }
   }
@@ -280,10 +280,10 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
     plvalue_t ret = create_temp();
     ret.type = JT_FLOAT;
     switch (alf) {
-    case ALF_ADD: ret.data.fvalue = f1 + f2; break;
-    case ALF_SUB: ret.data.fvalue = f1 - f2; break;
-    case ALF_MUL: ret.data.fvalue = f1 * f2; break;
-    case ALF_DIV: ret.data.fvalue = f1 / f2; break;
+    case ALF_ADD: ret.value.fvalue = f1 + f2; break;
+    case ALF_SUB: ret.value.fvalue = f1 - f2; break;
+    case ALF_MUL: ret.value.fvalue = f1 * f2; break;
+    case ALF_DIV: ret.value.fvalue = f1 / f2; break;
     default: UNREAECHABLE
     }
     return ret;
@@ -295,11 +295,11 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
     plvalue_t ret = create_temp();
     ret.type = JT_INT;
     switch (alf) {
-    case ALF_ADD: ret.data.ivalue = i1 + i2; break;
-    case ALF_SUB: ret.data.ivalue = i1 - i2; break;
-    case ALF_MUL: ret.data.ivalue = i1 * i2; break;
-    case ALF_DIV: ret.data.ivalue = i1 / i2; break;
-    case ALF_MOD: ret.data.ivalue = i1 % i2; break;
+    case ALF_ADD: ret.value.ivalue = i1 + i2; break;
+    case ALF_SUB: ret.value.ivalue = i1 - i2; break;
+    case ALF_MUL: ret.value.ivalue = i1 * i2; break;
+    case ALF_DIV: ret.value.ivalue = i1 / i2; break;
+    case ALF_MOD: ret.value.ivalue = i1 % i2; break;
     }
     return ret;
   }
@@ -316,7 +316,7 @@ plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
   }
 
   if (lhs.roc == ROC_ONSTACK && lhs.type == JT_REF) {
-    stkobj_t *stkobj = (stkobj_t*)lhs.data.pvalue;
+    stkobj_t *stkobj = (stkobj_t*)lhs.value.pvalue;
     heapobj_t *referred_heapobj = (heapobj_t*)(stkobj->value.pvalue);
     return assign(create_onheap(referred_heapobj), rhs);
   }
@@ -347,23 +347,23 @@ plvalue_t eval_literal_expr(ast_leaf_wdata_t *node) {
     case ANS_FLOATVAL: ret.type = JT_FLOAT; break;
     case ANS_STR:      ret.type = JT_STR;   break;
   }
-  ret.data = node->data;
+  ret.value = node->value;
   return ret;
 }
 
 plvalue_t eval_idref_expr(ast_leaf_wdata_t *node, stack_t *stack) {
-  return create_onstack(stack_get(stack, node->data.svalue));
+  return create_onstack(stack_get(stack, node->value.svalue));
 }
 
 plvalue_t eval_binexpr(ast_dchild_wdata_t *node, stack_t *stack) {
   plvalue_t lhs = eval_expr(node->children[0], stack);
   plvalue_t rhs = eval_expr(node->children[1], stack);
-  if (node->data.ivalue == TK_ESYM_EQ) {
+  if (node->value.ivalue == TK_ESYM_EQ) {
     return assign(lhs, rhs);
   }
 
   algebraic_function_t alf;
-  switch (node->data.ivalue) {
+  switch (node->value.ivalue) {
   case TK_ESYM_PLUS:    alf = ALF_ADD; break;
   case TK_ESYM_MINUS:   alf = ALF_SUB; break;
   case TK_ESYM_ASTER:   alf = ALF_MUL; break;
