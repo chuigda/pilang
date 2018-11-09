@@ -19,7 +19,7 @@ void test_int_calc() {
   stack_b->soid = SOID_INT;
   stack_b->value.ivalue = 2;
 
-  plheapobj_t *heapobj = plobj_create_int(33);
+  plheapobj_t *heapobj = heap_alloc_int(33);
 
   plvalue_t sum_ab = algebraic_calc(create_onstack(stack_a),
                                      create_onstack(stack_b), ALF_ADD);

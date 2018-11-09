@@ -33,7 +33,7 @@ void test_stack_assign() {
 void test_heap_assign() {
   VK_TEST_SECTION_BEGIN("assign to heap object")
 
-  plheapobj_t *heapobj = plobj_create_int(99);
+  plheapobj_t *heapobj = heap_alloc_int(99);
   plvalue_t value = create_temp();
   value.pvt = JT_INT;
   value.data.ivalue = 7777;
@@ -55,7 +55,7 @@ void test_assignto_stackref() {
   init_stack(&stack);
   stack_enter_frame(&stack);
 
-  plheapobj_t *heapobj = plobj_create_int(2900);
+  plheapobj_t *heapobj = heap_alloc_int(2900);
   plstkobj_t *ref = stack_get(&stack, create_string("ref1"));
   ref->soid = SOID_REF;
   ref->value.pvalue = heapobj;
@@ -84,7 +84,7 @@ void test_assign_ref_to_stackobj() {
   init_stack(&stack);
   stack_enter_frame(&stack);
   
-  plheapobj_t *heapobj = plobj_create_int(2900);
+  plheapobj_t *heapobj = heap_alloc_int(2900);
   plstkobj_t *ref = stack_get(&stack, create_string("ref1"));
   ref->soid = SOID_REF;
   ref->value.pvalue = heapobj;
@@ -113,8 +113,8 @@ void test_assign_ref_to_heapobj() {
   init_stack(&stack);
   stack_enter_frame(&stack);
   
-  plheapobj_t *heapobj1 = plobj_create_int(2900);
-  plheapobj_t *heapobj2 = plobj_create_str(create_string("4396"));
+  plheapobj_t *heapobj1 = heap_alloc_int(2900);
+  plheapobj_t *heapobj2 = heap_alloc_str(create_string("4396"));
   
   plstkobj_t *ref = stack_get(&stack, create_string("ref"));
   ref->soid = SOID_REF;

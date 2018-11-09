@@ -102,28 +102,28 @@ static plheapobj_t *plalloc(void) {
   assert(0);
 }
 
-plheapobj_t *plobj_create_int(int64_t value) {
+plheapobj_t *heap_alloc_int(int64_t value) {
   plheapobj_t *ret = plalloc();
   ret->oid = HOID_INT;
   ret->value.ivalue = value;
   return ret;
 }
 
-plheapobj_t *plobj_create_float(double value) {
+plheapobj_t *heap_alloc_float(double value) {
   plheapobj_t *ret = plalloc();  
   ret->oid = HOID_FLOAT;
   ret->value.fvalue = value;
   return ret;
 }
 
-plheapobj_t *plobj_create_list(list_t list) {
+plheapobj_t *heap_alloc_list(list_t list) {
   plheapobj_t *ret = plalloc();
   ret->oid = HOID_LIST;
   ret->value.lsvalue = list;
   return ret;
 }
 
-plheapobj_t *plobj_create_str(int64_t str) {
+plheapobj_t *heap_alloc_str(int64_t str) {
   plheapobj_t *ret = plalloc();
   ret->oid = HOID_STR;
   ret->value.svalue = str;

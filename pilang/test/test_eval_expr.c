@@ -219,7 +219,7 @@ void test_eval_intermix_storage() {
   stack_a->soid = SOID_INT;
   stack_a->value.ivalue = 700;
   
-  plheapobj_t *heapobj = plobj_create_int(70);
+  plheapobj_t *heapobj = heap_alloc_int(70);
   plstkobj_t *stack_b = stack_get(&stack, create_string("b"));
   stack_b->soid = SOID_REF;
   stack_b->value.pvalue = (void*)heapobj;
