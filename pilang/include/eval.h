@@ -35,6 +35,8 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
                          algebraic_function_t alf);
 plvalue_t assign(plvalue_t lhs, plvalue_t rhs);
 
+plvalue_t eval_expr(ast_node_base_t *node, plstack_t *stack);
+
 #endif
 
 #endif

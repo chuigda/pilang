@@ -3,6 +3,7 @@
 
 #include "ast.h"
 #include "util.h"
+#include "y.tab.h"
 
 #include <assert.h>
 #include <inttypes.h>
@@ -55,7 +56,7 @@ static result_t fetch_int(plvalue_t obj) {
   }
   
   switch (obj.pvt) {
-  case JT_INT: 
+  case JT_INT:  
     return success_result(*storage);
   case JT_FLOAT: {
     jjvalue_t shell;
@@ -105,15 +106,15 @@ static result_t fetch_str(plvalue_t obj) {
 
   switch (obj.pvt) {
   case JT_INT: {
-    char buffer[24]; 
+    char buffer[128]; 
     sprintf(buffer, "%" PRId64, storage->ivalue);
     jjvalue_t shell;
     shell.svalue = create_string(buffer);
     return success_result(shell);
   }
   case JT_FLOAT: {
-    char buffer[24]; 
-    sprintf(buffer, "%lf", storage->fvalue);
+    char buffer[128]; 
+    sprintf(buffer, "%g", storage->fvalue);
     jjvalue_t shell;
     shell.svalue = create_string(buffer);
     return success_result(shell);
@@ -241,8 +242,20 @@ static strhdl_t str_failsafe(result_t maybe) {
                        : create_string("undefined");
 }
 
+static plvalue_t auto_deref(plvalue_t maybe_ref) {
+  if (maybe_ref.pvt != JT_REF) {
+    return maybe_ref;
+  }
+  plheapobj_t *referred =
+    (plheapobj_t*)(fetch_storage(&maybe_ref)->pvalue);
+  return create_onheap(referred);
+}
+
 plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
                          algebraic_function_t alf) {
+  lhs = auto_deref(lhs);
+  rhs = auto_deref(rhs);
+
   if (alf == ALF_ADD) {
     if (EITHER_IS(JT_STR, lhs, rhs)) {
       const char* strl = get_string(str_failsafe(fetch_str(lhs)));
@@ -261,8 +274,8 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
   }
   
   if (EITHER_IS(JT_FLOAT, lhs, rhs) && alf != ALF_MOD) {
-    float f1 = float_failsafe(fetch_float(lhs));
-    float f2 = float_failsafe(fetch_float(rhs));
+    double f1 = float_failsafe(fetch_float(lhs));
+    double f2 = float_failsafe(fetch_float(rhs));
     
     plvalue_t ret = create_temp();
     ret.pvt = JT_FLOAT;
@@ -340,6 +353,45 @@ plvalue_t eval_literal_expr(ast_leaf_wdata_t *node) {
 
 plvalue_t eval_idref_expr(ast_leaf_wdata_t *node, plstack_t *stack) {
   return create_onstack(stack_get(stack, node->data.svalue));
+}
+
+plvalue_t eval_binexpr(ast_dchild_wdata_t *node, plstack_t *stack) {
+  plvalue_t lhs = eval_expr(node->children[0], stack);
+  plvalue_t rhs = eval_expr(node->children[1], stack);
+  if (node->data.ivalue == TK_ESYM_EQ) {
+    return assign(lhs, rhs);
+  }
+
+  algebraic_function_t alf;
+  switch (node->data.ivalue) {
+  case TK_ESYM_PLUS:    alf = ALF_ADD; break;
+  case TK_ESYM_MINUS:   alf = ALF_SUB; break;
+  case TK_ESYM_ASTER:   alf = ALF_MUL; break;
+  case TK_ESYM_SLASH:   alf = ALF_DIV; break;
+  case TK_ESYM_PERCENT: alf = ALF_MOD; break;
+  default: {
+      UNREAECHABLE
+      plvalue_t failure = create_temp();
+      failure.pvt = JT_UNDEFINED;
+      return failure;
+    }
+  }
+  return algebraic_calc(lhs, rhs, alf);
+}
+
+plvalue_t eval_expr(ast_node_base_t *node, plstack_t *stack) {
+  switch (node->node_sema_info) {
+  case ANS_BINEXPR: 
+    return eval_binexpr((ast_dchild_wdata_t*)node, stack);
+  case ANS_IDREF:
+    return eval_idref_expr((ast_leaf_wdata_t*)node, stack);
+  case ANS_INTVAL: case ANS_FLOATVAL: case ANS_STR:
+    return eval_literal_expr((ast_leaf_wdata_t*)node);
+  }
+  UNREAECHABLE;
+  plvalue_t failure = create_temp();
+  failure.pvt = JT_UNDEFINED;
+  return failure;
 }
 
 void eval_stmt(ast_node_base_t *stmt, plstack_t *stack) {

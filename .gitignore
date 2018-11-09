@@ -38,15 +38,15 @@ pli
 plast
 
 # Test output
-pilang/test_stack
-pilang/test_gc
-pilang/test_calc
-pilang/test_assign
+pilang/test_*
 
 # YACC output
 y.tab.h
 y.tab.c
 y.output
+parser.tab.h
+parser.tab.c
+parser.output
 
 # Markdown output
 *.html

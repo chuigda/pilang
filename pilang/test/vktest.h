@@ -7,6 +7,7 @@
 #ifndef VKTEST_H
 #define VKTEST_H
 
+#include <math.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -71,6 +72,24 @@ static unsigned __g_passing_tests_section, __g_all_tests_section;
     fprintf(stderr, "Testing AssertEquals(%s, %s)... ", \
             #standard, #expr); \
     if ((standard) == (expr)) { \
+      fprintf(stderr, "Passing\n"); \
+      __g_passing_tests++; \
+      __g_passing_tests_section++; \
+    } \
+    else { \
+      fprintf(stderr, "Failing\n"); \
+    } \
+  }
+
+#define VK_EPSILON 1e-5
+
+#define VK_ASSERT_EQUALS_F(standard, expr) \
+  { \
+    __g_all_tests++; \
+    __g_all_tests_section++; \
+    fprintf(stderr, "Testing AssertEquals(%s, %s)... ", \
+            #standard, #expr); \
+    if (fabs((standard) - (expr)) <= VK_EPSILON) { \
       fprintf(stderr, "Passing\n"); \
       __g_passing_tests++; \
       __g_passing_tests_section++; \
