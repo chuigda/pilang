@@ -262,8 +262,8 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
   }
   
   if (EITHER_IS(JT_FLOAT, lhs, rhs) && alf != ALF_MOD) {
-    float f1 = float_failsafe(fetch_float(lhs));
-    float f2 = float_failsafe(fetch_float(rhs));
+    double f1 = float_failsafe(fetch_float(lhs));
+    double f2 = float_failsafe(fetch_float(rhs));
     
     plvalue_t ret = create_temp();
     ret.pvt = JT_FLOAT;
