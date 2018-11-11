@@ -8,7 +8,7 @@ docs: doc/makefile
 pli: mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o plheap.o \
      pli.o
 	$(CC) mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
-          plheap.o pli.o -o pli
+        plheap.o pli.o -o pli
 
 plast: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o plast.o \
@@ -92,6 +92,6 @@ clean:
 	rm -rf y.output
 	rm -rf *.o
 	rm -rf pli plast
-	rm -rf test_stack test_gc test_calc test_assign
+	rm -rf test_*
 	cd doc && make clean && cd ..
 	rm -rf doc/docs
