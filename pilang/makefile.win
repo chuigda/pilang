@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Wno-unused-function -g
 
-all: pli.exe plast.exe tests
+all: pli.exe plast.exe plrepl.exe tests
 
 pli.exe: mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
          plheap.o pli.o
@@ -11,6 +11,11 @@ pli.exe: mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
 plast.exe: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o plast.o \
         -o plast.exe
+
+plrepl.exe: mstring.o lexer.o parser.o clist.o ast.o stack.o plheap.o \
+            tree_dump.o eval.o plrepl.o
+	$(CC) mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plrepl.o \
+        plheap.o stack.o eval.o -o plrepl.exe
 
 tests: test_stack.exe test_gc.exe test_calc.exe test_assign.exe \
        test_eval_expr.exe
@@ -55,6 +60,9 @@ plast.o: src/driver/plast.c y.tab.h
 
 pli.o: src/driver/pli.c y.tab.h
 	$(CC) -c -I include -I . src/driver/pli.c -o pli.o $(CFLAGS)
+
+plrepl.o: src/driver/plrepl.c y.tab.h
+	$(CC) -c -I include -I . src/driver/plrepl.c -o plrepl.o $(CFLAGS)
 
 eval.o: src/eval/eval.c y.tab.h
 	$(CC) -c -I include -I . src/eval/eval.c -o eval.o $(CFLAGS)

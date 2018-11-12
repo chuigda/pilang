@@ -35,7 +35,7 @@ To create these nodes, here's utility functions:
     // yields ast_schild_wdata_t
     ast_node_base_t *node1(ast_sema_info_t, jjvalue_t,
                            ast_node_base_t*);
-    
+
     // yields ast_dchild_t
     ast_node_base_t *node2(ast_sema_info_t,
                            ast_node_base_t*, ast_node_base_t*);
