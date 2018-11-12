@@ -42,18 +42,21 @@ void test_eval_literal() {
   init_stack(&stack);
   stack_enter_frame(&stack);
 
-  jjvalue_t t1, t2, t3;
+  jjvalue_t t1, t2, t3, t4;
   t1.ivalue = 4396;
   t2.fvalue = 7777.77;
   t3.svalue = create_string("HJYZ");
+  t4.bvalue = true;
 
   ast_node_base_t *intexpr = leaf_wdata(ANS_INTVAL, t1);
   ast_node_base_t *floatexpr = leaf_wdata(ANS_FLOATVAL, t2);
   ast_node_base_t *strexpr = leaf_wdata(ANS_STR, t3);
+  ast_node_base_t *boolexpr = leaf_wdata(ANS_BOOLVAL, t4);
 
   plvalue_t r1 = eval_expr(intexpr, &stack);
   plvalue_t r2 = eval_expr(floatexpr, &stack);
   plvalue_t r3 = eval_expr(strexpr, &stack);
+  plvalue_t r4 = eval_expr(boolexpr, &stack);
 
   VK_ASSERT_EQUALS(ROC_TEMP, r1.roc);
   VK_ASSERT_EQUALS(ROC_TEMP, r2.roc);
@@ -61,9 +64,11 @@ void test_eval_literal() {
   VK_ASSERT_EQUALS(JT_INT, r1.type);
   VK_ASSERT_EQUALS(JT_FLOAT, r2.type);
   VK_ASSERT_EQUALS(JT_STR, r3.type);
+  VK_ASSERT_EQUALS(JT_BOOL, r4.type);
   VK_ASSERT_EQUALS(4396, r1.value.ivalue);
-  VK_ASSERT_EQUALS(7777.77, r2.value.fvalue);
+  VK_ASSERT_EQUALS_F(7777.77, r2.value.fvalue);
   VK_ASSERT_EQUALS(create_string("HJYZ"), r3.value.svalue);
+  VK_ASSERT_EQUALS(true, r4.value.bvalue);
 
   stack_exit_frame(&stack);
   close_stack(&stack);
@@ -162,11 +167,12 @@ void test_eval_coercion() {
   init_stack(&stack);
   stack_enter_frame(&stack);
 
-  jjvalue_t t1, t3, t4, t6;
+  jjvalue_t t1, t3, t4, t6, t7;
   t1.ivalue = 4396;
   t3.fvalue = 7777.0;
   t4.fvalue = 0.777;
   t6.svalue = create_string(", HJYZ!");
+  t7.bvalue = true;
 
   jjvalue_t add, sub, mul;
   add.ivalue = TK_ESYM_PLUS;
@@ -180,6 +186,7 @@ void test_eval_coercion() {
   ast_node_base_t *floatexpr1 = leaf_wdata(ANS_FLOATVAL, t3);
   ast_node_base_t *floatexpr2 = leaf_wdata(ANS_FLOATVAL, t4);
   ast_node_base_t *strexpr2 = leaf_wdata(ANS_STR, t6);
+  ast_node_base_t *boolexpr = leaf_wdata(ANS_BOOLVAL, t7);
 
   ast_node_base_t *intfloatadd =
     node2_wdata(ANS_BINEXPR, add, intexpr1, floatexpr2);
@@ -201,6 +208,22 @@ void test_eval_coercion() {
   VK_ASSERT_EQUALS(ROC_TEMP, r3.roc);
   VK_ASSERT_EQUALS(JT_STR, r3.type);
   VK_ASSERT_EQUALS(create_string("7777, HJYZ!"), r3.value.svalue);
+
+  ast_node_base_t *intbooladd =
+    node2_wdata(ANS_BINEXPR, add, intexpr1, boolexpr);
+  plvalue_t r4 = eval_expr(intbooladd, &stack);
+  VK_ASSERT_EQUALS(ROC_TEMP, r4.roc);
+  VK_ASSERT_EQUALS(JT_INT, r4.type);
+  VK_ASSERT_EQUALS(4397, r4.value.ivalue);
+
+
+  ast_node_base_t *boolstradd =
+    node2_wdata(ANS_BINEXPR, add, boolexpr, strexpr2);
+  plvalue_t r5 = eval_expr(boolstradd, &stack);
+  VK_ASSERT_EQUALS(ROC_TEMP, r5.roc);
+  VK_ASSERT_EQUALS(JT_STR, r5.type);
+  VK_ASSERT_EQUALS(create_string("True, HJYZ!"), r5.value.svalue);
+  eprintf("r5.value.svalue = %s\n", get_string(r5.value.svalue));
 
   stack_exit_frame(&stack);
   close_stack(&stack);

@@ -165,7 +165,7 @@ static result_t fetch_str(plvalue_t obj) {
   case JT_BOOL: {
     jjvalue_t shell;
     shell.svalue = storage->bvalue ? create_string("True") :
-                                     create_string("false");
+                                     create_string("False");
     return success_result(shell);
   }
   case JT_STR: return success_result(*storage);
