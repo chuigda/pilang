@@ -98,6 +98,8 @@ static int maybe_id_to_kwd(const char *str) {
   STRING_CASE("for", TK_FOR)
   STRING_CASE("to", TK_TO)
   STRING_CASE("return", TK_RETURN)
+  STRING_CASE("true", TK_TRUE)
+  STRING_CASE("false", TK_FALSE)
 
   #undef STRING_CASE
 

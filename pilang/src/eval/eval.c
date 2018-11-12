@@ -335,9 +335,10 @@ plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
 plvalue_t eval_literal_expr(ast_leaf_wdata_t *node) {
   plvalue_t ret = create_temp();
   switch (node->node_sema_info) {
-    case ANS_INTVAL:   ret.type = JT_INT;   break;
-    case ANS_FLOATVAL: ret.type = JT_FLOAT; break;
-    case ANS_STR:      ret.type = JT_STR;   break;
+  case ANS_INTVAL:   ret.type = JT_INT;   break;
+  case ANS_FLOATVAL: ret.type = JT_FLOAT; break;
+  case ANS_STR:      ret.type = JT_STR;   break;
+  case ANS_BOOLVAL:  ret.type = JT_BOOL;  break;
   }
   ret.value = node->value;
   return ret;
@@ -377,7 +378,7 @@ plvalue_t eval_expr(ast_node_base_t *node, stack_t *stack) {
     return eval_binexpr((ast_dchild_wdata_t*)node, stack);
   case ANS_IDREF:
     return eval_idref_expr((ast_leaf_wdata_t*)node, stack);
-  case ANS_INTVAL: case ANS_FLOATVAL: case ANS_STR:
+  case ANS_INTVAL: case ANS_FLOATVAL: case ANS_BOOLVAL: case ANS_STR:
     return eval_literal_expr((ast_leaf_wdata_t*)node);
   }
   UNREAECHABLE;

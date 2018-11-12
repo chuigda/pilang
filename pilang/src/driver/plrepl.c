@@ -65,6 +65,9 @@ int main() {
     case JT_FLOAT:
       eprintf("%f :: Float", storage->fvalue);
       break;
+    case JT_BOOL:
+      eprintf("%s :: Bool", storage->bvalue ? "True" : "False");
+      break;
     case JT_STR:
       eprintf("\'%s\' :: Str", get_string(storage->svalue));
       break;

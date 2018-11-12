@@ -18,7 +18,7 @@ ast_node_base_t *glob_ast = NULL;
 %}
 
 %token TK_FUNCTION TK_TAKES TK_RETURNS TK_BEGIN TK_END TK_IF TK_THEN
-%token TK_ELSE TK_WHILE TK_FOR TK_TO TK_RETURN
+%token TK_ELSE TK_WHILE TK_FOR TK_TO TK_RETURN TK_TRUE TK_FALSE
 %token TK_ID
 %token TK_NUM_INT TK_NUM_FLOAT TK_STR
 %token TK_SYM_COMMA TK_SYM_SEMI TK_SYM_DOT
@@ -209,6 +209,7 @@ unary_op: TK_ESYM_PLUS { $$ = $1; }
 
 atom_expr: int_expr { $$ = $1; }
            | float_expr { $$ = $1; }
+           | bool_expr { $$ = $1; }
            | idref_expr { $$ = $1; }
            | str_expr { $$ = $1; }
            | TK_SYM_LBRACKET expr TK_SYM_RBRACKET { $$ = $2; }
@@ -220,6 +221,21 @@ int_expr:
 
 float_expr:
   TK_NUM_FLOAT { $$.ast = leaf_wdata(ANS_FLOATVAL, $1.token.val); } ;
+
+bool_expr:
+  TK_TRUE
+  {
+    jjvalue_t value;
+    value.bvalue = true;
+    $$.ast = leaf_wdata(ANS_BOOLVAL, value);
+  }
+  | TK_FALSE
+  {
+    jjvalue_t value;
+    value.bvalue = false;
+    $$.ast = leaf_wdata(ANS_BOOLVAL, value);
+  }
+  ;
 
 idref_expr:
   TK_ID { $$.ast = leaf_wdata(ANS_IDREF, $1.token.val); } ;
