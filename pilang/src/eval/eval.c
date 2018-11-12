@@ -63,6 +63,11 @@ static result_t fetch_int(plvalue_t obj) {
     shell.fvalue = (int)(storage->ivalue);
     return success_result(shell);
   }
+  case JT_BOOL: {
+    jjvalue_t shell;
+    shell.ivalue = (int)(storage->bvalue);
+    return success_result(shell);
+  }
   case JT_STR:
     return failed_result("cannot autocast from Str to Int");
   case JT_LIST:
@@ -87,12 +92,50 @@ static result_t fetch_float(plvalue_t obj) {
     return success_result(shell);
   }
   case JT_FLOAT: return success_result(*storage);
+  case JT_BOOL: {
+    jjvalue_t shell;
+    shell.fvalue = (float)(storage->fvalue);
+    return success_result(shell);
+  }
   case JT_STR:
     return failed_result("cannot autocast from Str to Float");
   case JT_LIST:
     return failed_result("cannot autocast from List to Float");
   case JT_UNDEFINED:
     return failed_result("cannot autocast from Nothing to Float");
+  }
+
+  UNREAECHABLE
+}
+
+static result_t fetch_bool(plvalue_t obj) {
+  jjvalue_t *storage = fetch_storage(&obj);
+  if (storage == NULL) {
+    return failed_result("object does not have storage");
+  }
+
+  switch (obj.type) {
+  case JT_INT: {
+    jjvalue_t shell;
+    shell.bvalue = (bool)(storage->ivalue);
+    return success_result(shell);
+  }
+  case JT_FLOAT: {
+    jjvalue_t shell;
+    shell.bvalue = (int)(storage->fvalue);
+    return success_result(shell);
+  }
+  case JT_STR:
+  case JT_LIST: {
+    jjvalue_t shell;
+    shell.bvalue = true;
+    return success_result(shell);
+  }
+  case JT_UNDEFINED: {
+    jjvalue_t shell;
+    shell.bvalue = false;
+    return success_result(shell);
+  }
   }
 
   UNREAECHABLE
@@ -119,6 +162,12 @@ static result_t fetch_str(plvalue_t obj) {
     shell.svalue = create_string(buffer);
     return success_result(shell);
   }
+  case JT_BOOL: {
+    jjvalue_t shell;
+    shell.svalue = storage->bvalue ? create_string("True") :
+                                     create_string("false");
+    return success_result(shell);
+  }
   case JT_STR: return success_result(*storage);
   case JT_LIST:
     return failed_result("cannot autocast fron List to Str");
@@ -138,6 +187,8 @@ static result_t fetch_list(plvalue_t obj) {
     return failed_result("cannot autocast from Int to List");
   case JT_FLOAT:
     return failed_result("cannot autocast from Float to List");
+  case JT_BOOL:
+    return failed_result("cannot autocast from Bool to List");
   case JT_STR:
     return failed_result("cannot autocast from Str to List");
   case JT_LIST:
