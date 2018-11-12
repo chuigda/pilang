@@ -43,7 +43,7 @@ tree_dump_impl(ast_node_base_t *root, uint16_t parent, int nth_child) {
              get_string(((ast_node_wdata_base_t*)root)->value.svalue));
     }
     else {
-      printf(", IDATA = %" PRId64, 
+      printf(", IDATA = %" PRId64,
              ((ast_node_wdata_base_t*)root)->value.ivalue);
     }
   }
@@ -52,7 +52,7 @@ tree_dump_impl(ast_node_base_t *root, uint16_t parent, int nth_child) {
   switch (root->node_kind) {
   default:
   case ANK_LEAF:
-  case ANK_LEAF_WDATA: 
+  case ANK_LEAF_WDATA:
     break;
 
   case ANK_SINGLE_CHILD:
@@ -60,7 +60,7 @@ tree_dump_impl(ast_node_base_t *root, uint16_t parent, int nth_child) {
     break;
 
   case ANK_SINGLE_CHILD_WDATA:
-    tree_dump_impl(((ast_schild_wdata_t*)root)->child, 
+    tree_dump_impl(((ast_schild_wdata_t*)root)->child,
                    root->node_uid, 0);
     break;
 
@@ -79,7 +79,7 @@ tree_dump_impl(ast_node_base_t *root, uint16_t parent, int nth_child) {
     break;
 
   case ANK_TRIPLE_CHILD:
-  	for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++) {
       tree_dump_impl(((ast_tchild_t*)root)->children[i],
                      root->node_uid, i);
     }
@@ -87,7 +87,7 @@ tree_dump_impl(ast_node_base_t *root, uint16_t parent, int nth_child) {
 
   case ANK_TRIPLE_CHILD_WDATA:
     for (int i = 0; i < 3; i++) {
-      tree_dump_impl(((ast_tchild_wdata_t*)root)->children[i], 
+      tree_dump_impl(((ast_tchild_wdata_t*)root)->children[i],
                      root->node_uid, i);
     }
     break;
@@ -95,8 +95,8 @@ tree_dump_impl(ast_node_base_t *root, uint16_t parent, int nth_child) {
   case ANK_LIST: {
     ast_list_t *list = (ast_list_t*)root;
     int i = 0;
-    for (iter_t it = list_begin(&(list->list)); 
-         !iter_eq(it, list_end(&(list->list))); 
+    for (iter_t it = list_begin(&(list->list));
+         !iter_eq(it, list_end(&(list->list)));
          it = iter_next(it)) {
       tree_dump_impl((ast_node_base_t*)iter_deref(it),
                      root->node_uid, i);

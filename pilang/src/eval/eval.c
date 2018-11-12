@@ -54,9 +54,9 @@ static result_t fetch_int(plvalue_t obj) {
   if (storage == NULL) {
     return failed_result("object does not have storage");
   }
-  
+
   switch (obj.type) {
-  case JT_INT:  
+  case JT_INT:
     return success_result(*storage);
   case JT_FLOAT: {
     jjvalue_t shell;
@@ -67,7 +67,7 @@ static result_t fetch_int(plvalue_t obj) {
     return failed_result("cannot autocast from Str to Int");
   case JT_LIST:
     return failed_result("cannot autocast from List to Int");
-  case JT_UNDEFINED: 
+  case JT_UNDEFINED:
     return failed_result("cannot autocast from Nothing to Int");
   }
 
@@ -79,7 +79,7 @@ static result_t fetch_float(plvalue_t obj) {
   if (storage == NULL) {
     return failed_result("object does not have storage");
   }
-  
+
   switch (obj.type) {
   case JT_INT: {
     jjvalue_t shell;
@@ -87,11 +87,11 @@ static result_t fetch_float(plvalue_t obj) {
     return success_result(shell);
   }
   case JT_FLOAT: return success_result(*storage);
-  case JT_STR: 
+  case JT_STR:
     return failed_result("cannot autocast from Str to Float");
   case JT_LIST:
     return failed_result("cannot autocast from List to Float");
-  case JT_UNDEFINED: 
+  case JT_UNDEFINED:
     return failed_result("cannot autocast from Nothing to Float");
   }
 
@@ -106,24 +106,24 @@ static result_t fetch_str(plvalue_t obj) {
 
   switch (obj.type) {
   case JT_INT: {
-    char buffer[128]; 
+    char buffer[128];
     sprintf(buffer, "%" PRId64, storage->ivalue);
     jjvalue_t shell;
     shell.svalue = create_string(buffer);
     return success_result(shell);
   }
   case JT_FLOAT: {
-    char buffer[128]; 
+    char buffer[128];
     sprintf(buffer, "%g", storage->fvalue);
     jjvalue_t shell;
     shell.svalue = create_string(buffer);
     return success_result(shell);
   }
   case JT_STR: return success_result(*storage);
-  case JT_LIST: 
+  case JT_LIST:
     return failed_result("cannot autocast fron List to Str");
   }
-  
+
   UNREAECHABLE
 }
 
@@ -132,15 +132,15 @@ static result_t fetch_list(plvalue_t obj) {
   if (storage == NULL) {
     return failed_result("object does not have storage");
   }
-  
+
   switch (obj.type) {
   case JT_INT:
     return failed_result("cannot autocast from Int to List");
-  case JT_FLOAT: 
+  case JT_FLOAT:
     return failed_result("cannot autocast from Float to List");
-  case JT_STR: 
+  case JT_STR:
     return failed_result("cannot autocast from Str to List");
-  case JT_LIST: 
+  case JT_LIST:
     return success_result(*storage);
   }
 
@@ -171,61 +171,6 @@ static void storage_precleanup(plvalue_t *obj) {
   }
 }
 
-static void asgn_int(plvalue_t *obj, int64_t value) {
-  jjvalue_t *storage = fetch_storage(obj);
-  if (storage == NULL) {
-    return;
-  }
-  storage_precleanup(obj);
-  asgn_attach_typeinfo(obj, JT_INT);
-  storage->ivalue = value;
-}
-
-static void asgn_float(plvalue_t *obj, double value) {
-  jjvalue_t *storage = fetch_storage(obj);
-  if (storage == NULL) {
-    return;
-  }
-  storage_precleanup(obj);
-  asgn_attach_typeinfo(obj, JT_FLOAT);
-  storage->fvalue = value;
-}
-
-static void asgn_str(plvalue_t *obj, int64_t value) {
-  jjvalue_t *storage = fetch_storage(obj);
-  if (storage == NULL) {
-    return;
-  }
-  storage_precleanup(obj);
-  asgn_attach_typeinfo(obj, JT_STR);
-  storage->svalue = value;
-}
-
-static void asgn_list(plvalue_t *obj, list_t value) {
-  jjvalue_t *storage = fetch_storage(obj);
-  if (storage == NULL) {
-    return;
-  }
-  storage_precleanup(obj);
-  asgn_attach_typeinfo(obj, JT_LIST);
-  storage->lsvalue = value;
-}
-
-static void asgn_ref(plvalue_t *obj, heapobj_t *value) {
-  jjvalue_t *storage = fetch_storage(obj);
-  if (storage == NULL) {
-    return;
-  }
-  storage_precleanup(obj);
-  asgn_attach_typeinfo(obj, JT_REF);
-  storage->pvalue = value;
-}
-
-static void set_undefined(plvalue_t *obj) {
-  storage_precleanup(obj);
-  obj->type = JT_UNDEFINED;
-}
-
 #define EITHER_IS(VALUETYPE, LHS, RHS) \
   ((LHS).type == VALUETYPE || (RHS).type == VALUETYPE)
 
@@ -238,7 +183,7 @@ static double float_failsafe(result_t maybe) {
 }
 
 static strhdl_t str_failsafe(result_t maybe) {
-  return maybe.success ? maybe.value.svalue 
+  return maybe.success ? maybe.value.svalue
                        : create_string("undefined");
 }
 
@@ -265,18 +210,18 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
       strcat(temp, strr);
       int newstr = create_string(temp);
       free(temp);
-    
+
       plvalue_t ret = create_temp();
       ret.type = JT_STR;
       ret.value.svalue = newstr;
       return ret;
     }
   }
-  
+
   if (EITHER_IS(JT_FLOAT, lhs, rhs) && alf != ALF_MOD) {
     double f1 = float_failsafe(fetch_float(lhs));
     double f2 = float_failsafe(fetch_float(rhs));
-    
+
     plvalue_t ret = create_temp();
     ret.type = JT_FLOAT;
     switch (alf) {
@@ -291,7 +236,7 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
   else if (EITHER_IS(JT_INT, lhs, rhs)) {
     int64_t i1 = int_failsafe(fetch_int(lhs));
     int64_t i2 = int_failsafe(fetch_int(rhs));
-    
+
     plvalue_t ret = create_temp();
     ret.type = JT_INT;
     switch (alf) {
@@ -315,28 +260,24 @@ plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
     return lhs;
   }
 
-  if (lhs.roc == ROC_ONSTACK && lhs.type == JT_REF) {
-    stkobj_t *stkobj = (stkobj_t*)lhs.value.pvalue;
-    heapobj_t *referred_heapobj = (heapobj_t*)(stkobj->value.pvalue);
-    return assign(create_onheap(referred_heapobj), rhs);
+  if (lhs.roc == ROC_ONSTACK) {
+    lhs = auto_deref(lhs);
   }
 
-  if (lhs.roc == ROC_ONHEAP && rhs.type == JT_REF) {
-    heapobj_t *assignee_heapobj =
-      (heapobj_t*)(fetch_storage(&rhs)->pvalue);
-    return assign(lhs, create_onheap(assignee_heapobj));
+  if (lhs.roc == ROC_ONHEAP) {
+    rhs = auto_deref(rhs);
   }
 
-  jjvalue_t *rhs_storage = fetch_storage(&rhs);
-  switch (rhs.type) {
-    case JT_INT:   asgn_int(&lhs, rhs_storage->ivalue);   break;
-    case JT_FLOAT: asgn_float(&lhs, rhs_storage->fvalue); break;
-    case JT_STR:   asgn_str(&lhs, rhs_storage->svalue);   break;
-    case JT_LIST:  asgn_list(&lhs, rhs_storage->lsvalue); break;
-    case JT_REF:   asgn_ref(&lhs,  rhs_storage->pvalue);  break;
-    default:       set_undefined(&lhs);                   break;
+  jjvalue_t *rhs_storage = fetch_storage(&rhs),
+            *lhs_storage = fetch_storage(&lhs);
+
+  if (lhs_storage == NULL) {
+    return lhs;
   }
 
+  storage_precleanup(&lhs);
+  asgn_attach_typeinfo(&lhs, rhs.type);
+  *lhs_storage = *rhs_storage;
   return lhs;
 }
 
@@ -381,7 +322,7 @@ plvalue_t eval_binexpr(ast_dchild_wdata_t *node, stack_t *stack) {
 
 plvalue_t eval_expr(ast_node_base_t *node, stack_t *stack) {
   switch (node->node_sema_info) {
-  case ANS_BINEXPR: 
+  case ANS_BINEXPR:
     return eval_binexpr((ast_dchild_wdata_t*)node, stack);
   case ANS_IDREF:
     return eval_idref_expr((ast_leaf_wdata_t*)node, stack);
@@ -402,14 +343,14 @@ void eval_stmt(ast_node_base_t *stmt, stack_t *stack) {
 
 void eval_func_body(ast_list_t *body, stack_t *stack) {
   list_t stmts = body->list;
-  for (iter_t it = list_begin(&stmts); 
+  for (iter_t it = list_begin(&stmts);
        !iter_eq(it, list_end(&stmts));
        it = iter_next(it)) {
     eval_stmt((ast_node_base_t*)iter_deref(it), stack);
   }
 }
 
-static void callfunc(ast_tchild_wdata_t *func, list_t args, 
+static void callfunc(ast_tchild_wdata_t *func, list_t args,
                      list_t rets, stack_t *stack) {
   stack_enter_frame(stack);
   ast_list_t *param_list_node = (ast_list_t*)func->children[0];
@@ -419,7 +360,7 @@ static void callfunc(ast_tchild_wdata_t *func, list_t args,
        !iter_eq(it1, list_end(&param_list))
        && !iter_eq(it2, list_end(&args));
        it1 = iter_next(it1), it2 = iter_next(it2)) {
-    ast_leaf_wdata_t *param_idref_node = 
+    ast_leaf_wdata_t *param_idref_node =
       (ast_leaf_wdata_t*)iter_deref(it1);
     assign(eval_idref_expr(param_idref_node, stack),
            *(plvalue_t*)iter_deref(it2));
