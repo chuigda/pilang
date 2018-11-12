@@ -85,7 +85,7 @@ static int maybe_id_to_kwd(const char *str) {
       yylval.token.token_kind = TOKEN_KIND; \
       return TOKEN_KIND; \
     }
-  
+
   STRING_CASE("function", TK_FUNCTION)
   STRING_CASE("takes", TK_TAKES)
   STRING_CASE("returns", TK_RETURNS)
@@ -186,7 +186,7 @@ static int lex_dot_or_conv(void) {
     }
     buffer[idx] = '\0';
     if (idx == 15) {
-      lex_warn("Conv-sequence length exceeds 15 characters", 
+      lex_warn("Conv-sequence length exceeds 15 characters",
                currow(), curcol());
       while (curchar() != '\0' && curchar() != ']') {
         get_next_char();
@@ -258,7 +258,7 @@ static int lex_common_sym(void) {
   case '^': yylval.token.token_kind = TK_ESYM_CARET;   break;
 
   case '=': {
-    peek_one_char(); 
+    peek_one_char();
     if (peeked_char() == '=') {
       get_next_char();
       yylval.token.token_kind = TK_ESYM_EQEQ;
@@ -326,7 +326,7 @@ static int lex_string(void) {
   yylval.token.row = currow();
   yylval.token.col = curcol();
   yylval.token.replaced = 0;
-  
+
   // TODO: Shall we make out a mutable string?
   size_t cap = 64;
   size_t size = 0;
@@ -340,7 +340,7 @@ static int lex_string(void) {
       free(buffer);
       buffer = new_buffer;
     }
-    
+
     if (curchar() == '\\') {
       peek_one_char();
       switch (peeked_char()) {
@@ -361,14 +361,14 @@ static int lex_string(void) {
     ++size;
     get_next_char();
   }
-  
+
   if (curchar() == '\0') {
     lex_warn("Unclosed string, ignoring", currow(), curcol());
   }
   else {
     get_next_char();
   }
-  
+
   yylval.token.val.svalue = create_string(buffer);
   free(buffer);
   return yylval.token.token_kind;
@@ -380,13 +380,17 @@ int yylex(void) {
     case '\0':
       return -1;
 
-    case 'a': case 'b': case 'c': case 'd': case 'e': case 'f': 
-    case 'g': case 'h': case 'i': case 'j': case 'k': case 'l': 
+    case '#':
+      get_next_char();
+      return -1;
+
+    case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+    case 'g': case 'h': case 'i': case 'j': case 'k': case 'l':
     case 'm': case 'n': case 'o': case 'p': case 'q': case 'r':
-    case 's': case 't': case 'u': case 'v': case 'w': case 'x': 
-    case 'y': case 'z': case 'A': case 'B': case 'C': case 'D': 
-    case 'E': case 'F': case 'G': case 'H': case 'I': case 'J': 
-    case 'K': case 'L': case 'M': case 'N': case 'O': case 'P': 
+    case 's': case 't': case 'u': case 'v': case 'w': case 'x':
+    case 'y': case 'z': case 'A': case 'B': case 'C': case 'D':
+    case 'E': case 'F': case 'G': case 'H': case 'I': case 'J':
+    case 'K': case 'L': case 'M': case 'N': case 'O': case 'P':
     case 'Q': case 'R': case 'S': case 'T': case 'U': case 'V':
     case 'W': case 'X': case 'Y': case 'Z':
       return lex_id_or_kwd();

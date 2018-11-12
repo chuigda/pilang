@@ -1,9 +1,14 @@
 CFLAGS = -Wall -Wextra -Wno-unused-function -g
 
-all: docs pli plast tests
+all: docs pli plrepl plast tests
 
 docs: doc/makefile
 	cd doc && make && tree -P "*.html" > docs && cd ..
+
+plrepl: mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
+        plheap.o plrepl.o
+	$(CC) mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
+        plheap.o plrepl.o -o plrepl
 
 pli: mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o plheap.o \
      pli.o
@@ -56,6 +61,9 @@ plast.o: src/driver/plast.c y.tab.h
 
 pli.o: src/driver/pli.c y.tab.h
 	$(CC) -c -I include -I ./ src/driver/pli.c -o pli.o $(CFLAGS)
+
+plrepl.o: src/driver/plrepl.c y.tab.h
+	$(CC) -c -I include -I ./ src/driver/plrepl.c -o plrepl.o $(CFLAGS)
 
 eval.o: src/eval/eval.c y.tab.h
 	$(CC) -c -I include -I ./ src/eval/eval.c -o eval.o $(CFLAGS)

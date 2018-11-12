@@ -9,6 +9,6 @@
 #define TP(...)
 #define TEMPLATE(...)
 
-#define UNREAECHABLE { fprintf(stderr, "unreachable!\n"); abort(); }
+#define UNREAECHABLE { assert(0 && "unreachable!\n"); }
 
 #endif

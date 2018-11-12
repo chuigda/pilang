@@ -34,7 +34,7 @@ plvalue_t create_temp() {
   return ret;
 }
 
-static jjvalue_t *fetch_storage(plvalue_t *obj) {
+jjvalue_t *fetch_storage(plvalue_t *obj) {
   switch (obj->roc) {
   case ROC_TEMP: return &(obj->value);
   case ROC_ONHEAP: {

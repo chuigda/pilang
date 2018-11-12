@@ -25,31 +25,34 @@ ast_node_base_t *glob_ast = NULL;
 %token TK_SYM_LBRACKET TK_SYM_RBRACKET
 %token TK_ESYM_EQ TK_ESYM_EQEQ TK_ESYM_PLUS TK_ESYM_MINUS TK_ESYM_ASTER
 %token TK_ESYM_AMP TK_ESYM_PIPE TK_ESYM_AMPAMP TK_ESYM_PIPEPIPE
-%token TK_ESYM_CARET TK_ESYM_SLASH TK_ESYM_PERCENT TK_ESYM_LPAREN 
+%token TK_ESYM_CARET TK_ESYM_SLASH TK_ESYM_PERCENT TK_ESYM_LPAREN
 %token TK_ESYM_RPAREN TK_ESYM_LBRACE TK_ESYM_RBRACE TK_ESYM_LT
 %token TK_ESYM_GT TK_ESYM_NOT TK_ESYM_NEQ TK_ESYM_LEQ TK_ESYM_GEQ
 
 %%
 
-program: functions { glob_ast = $1.ast; $$ = $1; } ;
+program: functions { glob_ast = $1.ast; $$ = $1; }
+         | repl_eval_expr { glob_ast = $1.ast; $$ = $1; };
 
-functions: 
-  functions function 
+repl_eval_expr: expr { $$ = $1; };
+
+functions:
+  functions function
   {
     $$.ast = $1.ast;
     ast_list_append($$.ast, $2.ast);
   }
   | { $$.ast = node_list(ANS_FUNCTIONS); } ;
 
-function: 
+function:
   TK_FUNCTION TK_ID TK_TAKES id_list TK_RETURNS id_list function_body
   {
     $$.ast = node3_wdata(ANS_FUNCTION, $2.token.val, $4.ast, $6.ast,
                          $7.ast);
-  } 
+  }
   ;
 
-function_body: 
+function_body:
   TK_BEGIN statements TK_END TK_FUNCTION
   {
     $$.ast = node1(ANS_FUNCTION_BODY, $2.ast);
@@ -74,7 +77,7 @@ statement: expr_statement { $$ = $1; }
 
 expr_statement: expr TK_SYM_SEMI { $$ = $1; } ;
 
-if_statement: 
+if_statement:
   TK_IF expr TK_THEN statements TK_END TK_IF
   {
     $$.ast = node2(ANS_IF, $2.ast, $4.ast);
@@ -91,12 +94,12 @@ while_statement: TK_WHILE expr TK_THEN statements TK_END TK_WHILE
   }
   ;
 
-for_statement: 
-  TK_FOR idref_expr TK_ESYM_EQ int_expr TK_TO int_expr TK_THEN 
+for_statement:
+  TK_FOR idref_expr TK_ESYM_EQ int_expr TK_TO int_expr TK_THEN
   statements
   TK_END TK_FOR
   {
-    ast_node_base_t *for_head = 
+    ast_node_base_t *for_head =
       node3(ANS_FOR_HEAD, $2.ast, $4.ast, $6.ast);
     $$.ast = node2(ANS_FOR, for_head, $8.ast);
   }
@@ -115,7 +118,7 @@ assign_expr:
     t.ivalue = TK_ESYM_EQ;
     $$.ast = node2_wdata(ANS_BINEXPR, t, $1.ast, $3.ast);
   }
-  | logic_expr { $$ = $1; } 
+  | logic_expr { $$ = $1; }
   ;
 
 logic_expr:
@@ -127,7 +130,7 @@ logic_expr:
   }
   | rel_expr { $$ = $1; }
   ;
-  
+
 
 rel_expr:
   rel_expr bin_relop add_expr
@@ -139,14 +142,14 @@ rel_expr:
   | add_expr { $$ = $1; }
   ;
 
-add_expr: 
+add_expr:
   add_expr bin_addop mul_expr
   {
     jjvalue_t t;
     t.ivalue = $2.token.token_kind;
-    $$.ast = node2_wdata(ANS_BINEXPR, t, $1.ast, $3.ast); 
+    $$.ast = node2_wdata(ANS_BINEXPR, t, $1.ast, $3.ast);
   }
-  | mul_expr { $$ = $1; } 
+  | mul_expr { $$ = $1; }
   ;
 
 mul_expr:
@@ -177,7 +180,7 @@ unary_op_chain:
 */
 
 bin_logicop: TK_ESYM_AMPAMP { $$ = $1; }
-             | TK_ESYM_PIPEPIPE { $$ = $1; } 
+             | TK_ESYM_PIPEPIPE { $$ = $1; }
              ;
 
 bin_relop: TK_ESYM_LT { $$ = $1; }
@@ -185,27 +188,27 @@ bin_relop: TK_ESYM_LT { $$ = $1; }
            | TK_ESYM_EQEQ { $$ = $1; }
            | TK_ESYM_GEQ { $$ = $1; }
            | TK_ESYM_LEQ { $$ = $1; }
-           | TK_ESYM_NEQ { $$ = $1; } 
+           | TK_ESYM_NEQ { $$ = $1; }
            ;
 
 bin_mulop: TK_ESYM_ASTER { $$ = $1; }
            | TK_ESYM_SLASH { $$ = $1; }
-           | TK_ESYM_PERCENT { $$ = $1; } 
+           | TK_ESYM_PERCENT { $$ = $1; }
            ;
 
-bin_addop: TK_ESYM_PLUS { $$ = $1; } 
-           | TK_ESYM_MINUS { $$ = $1; } 
+bin_addop: TK_ESYM_PLUS { $$ = $1; }
+           | TK_ESYM_MINUS { $$ = $1; }
            ;
 /*
 unary_op: TK_ESYM_PLUS { $$ = $1; }
           | TK_ESYM_MINUS { $$ = $1; }
           | TK_ESYM_NOT { $$ = $1; }
-          | TK_ESYM_CARET { $$ = $1; } 
+          | TK_ESYM_CARET { $$ = $1; }
           ;
 */
 
-atom_expr: int_expr { $$ = $1; } 
-           | float_expr { $$ = $1; } 
+atom_expr: int_expr { $$ = $1; }
+           | float_expr { $$ = $1; }
            | idref_expr { $$ = $1; }
            | str_expr { $$ = $1; }
            | TK_SYM_LBRACKET expr TK_SYM_RBRACKET { $$ = $2; }
@@ -230,25 +233,25 @@ func_call_expr:
 
 empty_statement: TK_SYM_SEMI { $$.ast = leaf(ANS_NULL); } ;
 
-id_list: 
+id_list:
   id_list idref_expr
   {
     $$.ast = $1.ast;
     ast_list_append($$.ast, $2.ast);
   }
-  | 
+  |
   {
-    $$.ast = node_list(ANS_IDS); 
+    $$.ast = node_list(ANS_IDS);
   }
   ;
 
-semi_sep_list: 
+semi_sep_list:
   semi_sep_list TK_SYM_SEMI expr
   {
     $$.ast = $1.ast;
     ast_list_append($$.ast, $3.ast);
   }
-  | expr 
+  | expr
   {
     $$.ast = node_list(ANS_SEMI_SEP_LIST);
     ast_list_append($$.ast, $1.ast);
