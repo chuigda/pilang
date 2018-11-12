@@ -5,11 +5,13 @@
 #include "mstring.h"
 #include "util.h"
 
+#include <stdbool.h>
 #include <stdint.h>
 
 typedef union {
   int64_t ivalue;
   double fvalue;
+  bool bvalue;
   strhdl_t svalue;
   list_t lsvalue;
   void *pvalue;
@@ -18,6 +20,7 @@ typedef union {
 typedef enum {
   JT_INT,
   JT_FLOAT,
+  JT_BOOL,
   JT_STR,
   JT_LIST,
   JT_REF,

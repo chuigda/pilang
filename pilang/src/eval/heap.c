@@ -36,16 +36,6 @@ void destroy_object(heapobj_t *obj) {
   case HOID_LIST:
     destroy_list(&(obj->value.lsvalue));
     break;
-
-// TODO: do this after we have a set implementation
-//  case HOID_SET:
-//    destroy_set_object(obj);
-//    break;
-
-// TODO: do this after we have a struct implementation
-//  case HOID_STRUCT:
-//    destroy_struct_object(obj);
-//    break;
   }
 }
 
@@ -110,9 +100,16 @@ heapobj_t *heap_alloc_int(int64_t value) {
 }
 
 heapobj_t *heap_alloc_float(double value) {
-  heapobj_t *ret = plalloc();  
+  heapobj_t *ret = plalloc();
   ret->oid = HOID_FLOAT;
   ret->value.fvalue = value;
+  return ret;
+}
+
+heapobj_t *heap_alloc_bool(bool value) {
+  heapobj_t *ret = plalloc();
+  ret->oid = HOID_BOOL;
+  ret->value.bvalue = value;
   return ret;
 }
 
@@ -157,7 +154,6 @@ void gc_mark_white(heapobj_t *obj) {
   case HOID_LIST:
     gc_mark_list(obj);
     break;
-  
   default:
     ;
   }

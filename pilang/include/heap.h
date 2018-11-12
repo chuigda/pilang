@@ -7,6 +7,7 @@
 typedef enum {
   HOID_INT       = JT_INT,
   HOID_FLOAT     = JT_FLOAT,
+  HOID_BOOL      = JT_BOOL,
   HOID_STR       = JT_STR,
   HOID_LIST      = JT_LIST,
   HOID_UNDEFINED = JT_UNDEFINED
@@ -28,8 +29,10 @@ typedef struct {
 heapobj_id_t jt2hoid(jjtype_t jt);
 jjtype_t hoid2jt(heapobj_id_t hoid);
 
+/// @todo FIXME do we really need these assistant functions?
 heapobj_t *heap_alloc_ref(heapobj_t *source);
 heapobj_t *heap_alloc_int(int64_t value);
+heapobj_t *heap_alloc_bool(bool value);
 heapobj_t *heap_alloc_float(double value);
 heapobj_t *heap_alloc_str(strhdl_t h_str);
 heapobj_t *heap_alloc_list(list_t list);

@@ -11,6 +11,7 @@
 typedef enum {
   SOID_INT       = JT_INT,
   SOID_FLOAT     = JT_FLOAT,
+  SOID_BOOL      = JT_BOOL,
   SOID_STR       = JT_STR,
   SOID_REF       = JT_REF,
   SOID_UNDEFINED = JT_UNDEFINED
