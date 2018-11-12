@@ -103,5 +103,5 @@ clean:
 	del /F /S /Q parser.tab.*
 	del /F /S /Q parser.output
 	del /F /S /Q *.o
-	del /F /S /Q plast.exe pli.exe
+	del /F /S /Q plast.exe pli.exe plrepl.exe
 	del /F /S /Q test_*.exe

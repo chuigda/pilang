@@ -99,7 +99,7 @@ clean:
 	rm -rf y.tab.*
 	rm -rf y.output
 	rm -rf *.o
-	rm -rf pli plast
+	rm -rf pli plast plrepl
 	rm -rf test_*
 	cd doc && make clean && cd ..
 	rm -rf doc/docs
