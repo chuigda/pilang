@@ -227,6 +227,7 @@ static int lex_number(void) {
     while (isdigit(curchar())) {
       temp += curchar() - '0';
       temp /= 10;
+      get_next_char();
     }
     float_value += temp;
     yylval.token.token_kind = TK_NUM_FLOAT;
