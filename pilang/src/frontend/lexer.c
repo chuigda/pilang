@@ -101,6 +101,27 @@ static int maybe_id_to_kwd(const char *str) {
   STRING_CASE("true", TK_TRUE)
   STRING_CASE("false", TK_FALSE)
 
+  STRING_CASE("plus", TK_ESYM_PLUS)
+  STRING_CASE("add", TK_ESYM_PLUS)
+  STRING_CASE("minus", TK_ESYM_MINUS)
+  STRING_CASE("mult", TK_ESYM_ASTER)
+  STRING_CASE("multi", TK_ESYM_ASTER)
+  STRING_CASE("multiply", TK_ESYM_ASTER)
+  STRING_CASE("times", TK_ESYM_ASTER)
+  STRING_CASE("aster", TK_ESYM_ASTER)
+  STRING_CASE("asterisk", TK_ESYM_ASTER)
+  STRING_CASE("div", TK_ESYM_SLASH)
+  STRING_CASE("divide", TK_ESYM_SLASH)
+  STRING_CASE("slash", TK_ESYM_SLASH)
+  STRING_CASE("eqeq", TK_ESYM_EQEQ)
+  STRING_CASE("equals", TK_ESYM_EQEQ)
+  STRING_CASE("eq", TK_ESYM_EQEQ)
+  STRING_CASE("assign", TK_ESYM_EQ)
+  STRING_CASE("perc", TK_ESYM_PERCENT)
+  STRING_CASE("percent", TK_ESYM_PERCENT)
+  STRING_CASE("lbrace", TK_ESYM_LBRACE)
+  STRING_CASE("rbrace", TK_ESYM_RBRACE)
+
   #undef STRING_CASE
 
   return TK_ID;
