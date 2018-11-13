@@ -128,6 +128,11 @@ static result_t fetch_bool(plvalue_t obj) {
     shell.bvalue = (int)(storage->fvalue);
     return success_result(shell);
   }
+  case JT_BOOL: {
+    jjvalue_t shell;
+    shell.bvalue = storage->bvalue;
+    return success_result(shell);
+  }
   case JT_STR:
   case JT_LIST: {
     jjvalue_t shell;
@@ -365,6 +370,40 @@ plvalue_t relative_calc(plvalue_t lhs, plvalue_t rhs,
   return ret;
 }
 
+plvalue_t logical_calc(ast_node_base_t *lhs, ast_node_base_t *rhs,
+                       stack_t *stack, logical_function_t lgf) {
+  plvalue_t ret = create_temp();
+  ret.type = JT_BOOL;
+
+  bool b1 =
+    fetch_bool(auto_deref(eval_expr(lhs, stack))).value.bvalue;
+  switch (lgf) {
+  case LGF_AND:
+    if (b1) {
+      bool b2 =
+        fetch_bool(auto_deref(eval_expr(rhs, stack))).value.bvalue;
+      ret.value.bvalue = b1 && b2;
+    }
+    else {
+      ret.value.bvalue = false;
+    }
+    break;
+  case LGF_OR:
+    if (b1) {
+      ret.value.bvalue = true;
+    }
+    else {
+      bool b2 =
+        fetch_bool(auto_deref(eval_expr(rhs, stack))).value.bvalue;
+      ret.value.bvalue = b1 || b2;
+    }
+    break;
+  default: UNREAECHABLE
+  }
+
+  return ret;
+}
+
 plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
   if (lhs.roc != ROC_ONSTACK && lhs.roc != ROC_ONHEAP) {
     return lhs;
@@ -408,8 +447,18 @@ plvalue_t eval_idref_expr(ast_leaf_wdata_t *node, stack_t *stack) {
 }
 
 plvalue_t eval_binexpr(ast_dchild_wdata_t *node, stack_t *stack) {
-  plvalue_t lhs = eval_expr(node->children[0], stack);
-  plvalue_t rhs = eval_expr(node->children[1], stack);
+  ast_node_base_t *lhs_node = node->children[0];
+  ast_node_base_t *rhs_node = node->children[1];
+
+  switch (node->value.ivalue) {
+  case TK_ESYM_AMPAMP:
+    return logical_calc(lhs_node, rhs_node, stack, LGF_AND);
+  case TK_ESYM_PIPEPIPE:
+    return logical_calc(lhs_node, rhs_node, stack, LGF_OR);
+  }
+
+  plvalue_t lhs = eval_expr(lhs_node, stack);
+  plvalue_t rhs = eval_expr(rhs_node, stack);
   if (node->value.ivalue == TK_ESYM_EQ) {
     return assign(lhs, rhs);
   }

@@ -36,10 +36,16 @@ typedef enum {
   RLF_INVL, RLF_LT, RLF_GT, RLF_EQ, RLF_NEQ, RLF_NLT, RLF_NGT
 } relative_function_t;
 
+typedef enum {
+  LGF_INVL, LGF_AND, LGF_OR
+} logical_function_t;
+
 plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
                          algebraic_function_t alf);
 plvalue_t relative_calc(plvalue_t lhs, plvalue_t rhs,
                         relative_function_t rlf);
+plvalue_t logical_calc(ast_node_base_t *lhs, ast_node_base_t *rhs,
+                       stack_t *stack, logical_function_t lgf);
 plvalue_t assign(plvalue_t lhs, plvalue_t rhs);
 plvalue_t eval_expr(ast_node_base_t *node, stack_t *stack);
 
