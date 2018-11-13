@@ -499,16 +499,24 @@ static plvalue_t builtin_print(list_t args) {
        !iter_eq(it, list_end(&args));
        it = iter_next(it)) {
     plvalue_t *value = (plvalue_t*)iter_deref(it);
-    plvalue_t t = auto_deref(*value);
+    jjvalue_t *storage = fetch_storage(value);
 
-    switch (t.type) {
-    case JT_INT: printf("%" PRId64, t.value.ivalue); break;
-    case JT_FLOAT: printf("%f", t.value.fvalue); break;
-    case JT_BOOL: printf("%s", t.value.bvalue ? "T" : "F"); break;
-    case JT_STR: printf("%s", get_string(t.value.svalue)); break;
-    case JT_LIST: printf("(list)"); break;
-    case JT_UNDEFINED: printf("Undefined"); break;
-    default: printf("error");
+    switch (value->type) {
+    case JT_INT:
+      printf("%" PRId64, storage->ivalue); break;
+    case JT_FLOAT:
+      printf("%f", storage->fvalue); break;
+    case JT_BOOL:
+      printf("%s", storage->bvalue ? "true" : "false");
+      break;
+    case JT_STR:
+      printf("%s", get_string(storage->svalue)); break;
+    case JT_LIST:
+      printf("(list)"); break;
+    case JT_UNDEFINED:
+      printf("Undefined"); break;
+    default:
+      printf("error");
     }
   }
   plvalue_t ret = create_temp();
