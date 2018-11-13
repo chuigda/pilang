@@ -29,11 +29,17 @@ plvalue_t create_temp();
 jjvalue_t *fetch_storage(plvalue_t *obj);
 
 typedef enum {
-  ALF_ADD, ALF_SUB, ALF_MUL, ALF_DIV, ALF_MOD
+  ALF_INVL, ALF_ADD, ALF_SUB, ALF_MUL, ALF_DIV, ALF_MOD
 } algebraic_function_t;
+
+typedef enum {
+  RLF_INVL, RLF_LT, RLF_GT, RLF_EQ, RLF_NEQ, RLF_NLT, RLF_NGT
+} relative_function_t;
 
 plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
                          algebraic_function_t alf);
+plvalue_t relative_calc(plvalue_t lhs, plvalue_t rhs,
+                        relative_function_t rlf);
 plvalue_t assign(plvalue_t lhs, plvalue_t rhs);
 plvalue_t eval_expr(ast_node_base_t *node, stack_t *stack);
 

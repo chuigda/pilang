@@ -6,7 +6,10 @@
 #include "y.tab.h"
 
 #include <assert.h>
+#include <float.h>
 #include <inttypes.h>
+#include <limits.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -284,7 +287,7 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
     }
     return ret;
   }
-  else if (EITHER_IS(JT_INT, lhs, rhs)) {
+  else if (EITHER_IS(JT_INT, lhs, rhs) || EITHER_IS(JT_BOOL, lhs, rhs)) {
     int64_t i1 = int_failsafe(fetch_int(lhs));
     int64_t i2 = int_failsafe(fetch_int(rhs));
 
@@ -296,6 +299,7 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
     case ALF_MUL: ret.value.ivalue = i1 * i2; break;
     case ALF_DIV: ret.value.ivalue = i1 / i2; break;
     case ALF_MOD: ret.value.ivalue = i1 % i2; break;
+    default: UNREAECHABLE
     }
     return ret;
   }
@@ -304,6 +308,61 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
     ret.type = JT_UNDEFINED;
     return ret;
   }
+}
+
+plvalue_t relative_calc(plvalue_t lhs, plvalue_t rhs,
+                        relative_function_t rlf) {
+  lhs = auto_deref(lhs);
+  rhs = auto_deref(rhs);
+  plvalue_t ret = create_temp();
+  ret.type = JT_BOOL;
+
+  if (EITHER_IS(JT_STR, lhs, rhs)) {
+    const char* strl = get_string(str_failsafe(fetch_str(lhs)));
+    const char* strr = get_string(str_failsafe(fetch_str(rhs)));
+    int comp_result = strcmp(strl, strr);
+    switch (rlf) {
+    case RLF_EQ:  ret.value.bvalue = (comp_result == 0); break;
+    case RLF_NEQ: ret.value.bvalue = (comp_result != 0); break;
+    case RLF_LT:  ret.value.bvalue = (comp_result < 0); break;
+    case RLF_GT:  ret.value.bvalue = (comp_result > 0); break;
+    case RLF_NLT: ret.value.bvalue = (comp_result >= 0); break;
+    case RLF_NGT: ret.value.bvalue = (comp_result <= 0); break;
+    default: UNREAECHABLE
+    }
+  }
+  else if (EITHER_IS(JT_FLOAT, lhs, rhs)) {
+    double f1 = float_failsafe(fetch_float(lhs));
+    double f2 = float_failsafe(fetch_float(rhs));
+    switch (rlf) {
+    case RLF_EQ:
+      ret.value.bvalue = (fabs(f1 - f2) < DBL_EPSILON); break;
+    case RLF_NEQ:
+      ret.value.bvalue = (fabs(f1 - f2) >= DBL_EPSILON); break;
+    case RLF_LT:  ret.value.bvalue = f1 < f2;  break;
+    case RLF_GT:  ret.value.bvalue = f1 > f2;  break;
+    case RLF_NLT: ret.value.bvalue = f1 >= f2; break;
+    case RLF_NGT: ret.value.bvalue = f1 <= f2; break;
+    default: UNREAECHABLE
+    }
+  }
+  else if (EITHER_IS(JT_INT, lhs, rhs) || EITHER_IS(JT_BOOL, lhs, rhs)) {
+    int i1 = int_failsafe(fetch_int(lhs));
+    int i2 = int_failsafe(fetch_int(rhs));
+    switch (rlf) {
+    case RLF_EQ:  ret.value.ivalue = i1 == i2; break;
+    case RLF_NEQ: ret.value.ivalue = i1 != i2; break;
+    case RLF_LT:  ret.value.bvalue = i1 < i2;  break;
+    case RLF_GT:  ret.value.bvalue = i1 > i2;  break;
+    case RLF_NLT: ret.value.bvalue = i1 >= i2; break;
+    case RLF_NGT: ret.value.bvalue = i1 <= i2; break;
+    default: UNREAECHABLE
+    }
+  }
+  else {
+    ret.value.bvalue = false;
+  }
+  return ret;
 }
 
 plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
@@ -355,13 +414,20 @@ plvalue_t eval_binexpr(ast_dchild_wdata_t *node, stack_t *stack) {
     return assign(lhs, rhs);
   }
 
-  algebraic_function_t alf;
+  algebraic_function_t alf = ALF_INVL;
+  relative_function_t rlf = RLF_INVL;
   switch (node->value.ivalue) {
   case TK_ESYM_PLUS:    alf = ALF_ADD; break;
   case TK_ESYM_MINUS:   alf = ALF_SUB; break;
   case TK_ESYM_ASTER:   alf = ALF_MUL; break;
   case TK_ESYM_SLASH:   alf = ALF_DIV; break;
   case TK_ESYM_PERCENT: alf = ALF_MOD; break;
+  case TK_ESYM_LT:      rlf = RLF_LT;  break;
+  case TK_ESYM_GT:      rlf = RLF_LT;  break;
+  case TK_ESYM_LEQ:     rlf = RLF_NGT; break;
+  case TK_ESYM_GEQ:     rlf = RLF_NLT; break;
+  case TK_ESYM_NEQ:     rlf = RLF_NEQ; break;
+  case TK_ESYM_EQEQ:    rlf = RLF_EQ; break;
   default: {
       UNREAECHABLE
       plvalue_t failure = create_temp();
@@ -369,7 +435,12 @@ plvalue_t eval_binexpr(ast_dchild_wdata_t *node, stack_t *stack) {
       return failure;
     }
   }
-  return algebraic_calc(lhs, rhs, alf);
+  if (alf != ALF_INVL) {
+    return algebraic_calc(lhs, rhs, alf);
+  }
+  else {
+    return relative_calc(lhs, rhs, rlf);
+  }
 }
 
 plvalue_t eval_expr(ast_node_base_t *node, stack_t *stack) {
