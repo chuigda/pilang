@@ -283,6 +283,18 @@ static int lex_common_sym(void) {
     break;
   }
 
+  case '>': {
+    peek_one_char();
+    if (peeked_char() == '=') {
+      get_next_char();
+      yylval.token.token_kind = TK_ESYM_GEQ;
+    }
+    else {
+      yylval.token.token_kind = TK_ESYM_GT;
+    }
+    break;
+  }
+
   case '!': {
     peek_one_char();
     if (peeked_char() == '=') {
