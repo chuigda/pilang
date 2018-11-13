@@ -472,7 +472,7 @@ plvalue_t eval_binexpr(ast_dchild_wdata_t *node, stack_t *stack) {
   case TK_ESYM_SLASH:   alf = ALF_DIV; break;
   case TK_ESYM_PERCENT: alf = ALF_MOD; break;
   case TK_ESYM_LT:      rlf = RLF_LT;  break;
-  case TK_ESYM_GT:      rlf = RLF_LT;  break;
+  case TK_ESYM_GT:      rlf = RLF_GT;  break;
   case TK_ESYM_LEQ:     rlf = RLF_NGT; break;
   case TK_ESYM_GEQ:     rlf = RLF_NLT; break;
   case TK_ESYM_NEQ:     rlf = RLF_NEQ; break;

@@ -284,6 +284,33 @@ void test_eval_relop() {
   VK_ASSERT_EQUALS(false, r3.value.bvalue);
   VK_ASSERT_EQUALS(false, r4.value.bvalue);
 
+  jjvalue_t gt;
+  gt.ivalue = TK_ESYM_GT;
+
+  ast_node_base_t *gtexpr1 =
+    node2_wdata(ANS_BINEXPR, gt, intexpr1, intexpr2);
+  ast_node_base_t *gtexpr2 =
+    node2_wdata(ANS_BINEXPR, gt, floatexpr1, floatexpr2);
+  ast_node_base_t *gtexpr3 =
+    node2_wdata(ANS_BINEXPR, gt, strexpr1, strexpr2);
+  ast_node_base_t *gtexpr4 =
+    node2_wdata(ANS_BINEXPR, gt, boolexpr1, boolexpr2);
+
+  plvalue_t r5 = eval_expr(gtexpr1, &stack);
+  plvalue_t r6 = eval_expr(gtexpr2, &stack);
+  plvalue_t r7 = eval_expr(gtexpr3, &stack);
+  plvalue_t r8 = eval_expr(gtexpr4, &stack);
+
+  VK_ASSERT_EQUALS(JT_BOOL, r5.type);
+  VK_ASSERT_EQUALS(JT_BOOL, r6.type);
+  VK_ASSERT_EQUALS(JT_BOOL, r7.type);
+  VK_ASSERT_EQUALS(JT_BOOL, r8.type);
+
+  VK_ASSERT_EQUALS(true, r5.value.bvalue);
+  VK_ASSERT_EQUALS(true, r6.value.bvalue);
+  VK_ASSERT_EQUALS(true, r7.value.bvalue);
+  VK_ASSERT_EQUALS(true, r8.value.bvalue);
+
   stack_exit_frame(&stack);
   close_stack(&stack);
 
