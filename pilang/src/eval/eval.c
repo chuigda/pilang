@@ -492,8 +492,131 @@ plvalue_t eval_binexpr(ast_dchild_wdata_t *node, stack_t *stack) {
   }
 }
 
+typedef plvalue_t (*builtin_func_t)(list_t);
+
+static plvalue_t builtin_print(list_t args) {
+  for (iter_t it = list_begin(&args);
+       !iter_eq(it, list_end(&args));
+       it = iter_next(it)) {
+    plvalue_t *value = (plvalue_t*)iter_deref(it);
+    plvalue_t t = auto_deref(*value);
+
+    switch (t.type) {
+    case JT_INT: printf("%" PRId64, t.value.ivalue); break;
+    case JT_FLOAT: printf("%f", t.value.fvalue); break;
+    case JT_BOOL: printf("%s", t.value.bvalue ? "T" : "F"); break;
+    case JT_STR: printf("%s", get_string(t.value.svalue)); break;
+    case JT_LIST: printf("(list)"); break;
+    case JT_UNDEFINED: printf("Undefined"); break;
+    default: printf("error");
+    }
+  }
+  plvalue_t ret = create_temp();
+  ret.type = JT_INT;
+  ret.value.ivalue = list_size(&args);
+  return ret;
+}
+
+static plvalue_t builtin_readint(list_t args) {
+  (void)args;
+  plvalue_t ret = create_temp();
+  ret.type = JT_INT;
+  scanf("%" PRId64, &(ret.value.ivalue));
+  return ret;
+}
+
+static plvalue_t builtin_readfloat(list_t args) {
+  (void)args;
+  plvalue_t ret = create_temp();
+  ret.type = JT_FLOAT;
+  scanf("%lf", &(ret.value.fvalue));
+  return ret;
+}
+
+static plvalue_t builtin_readstr(list_t args) {
+  (void)args;
+  static char buffer[4096];
+  plvalue_t ret = create_temp();
+  ret.type = JT_STR;
+  scanf("%s", buffer);
+  ret.value.svalue = create_string(buffer);
+  return ret;
+}
+
+plvalue_t builtin_call(strhdl_t name, list_t args) {
+  /// @todo replace this with TableGen
+  static bool initialized = false;
+  static strhdl_t builtin_func_names[11];
+  if (!initialized) {
+    builtin_func_names[0] = create_string("print");
+    builtin_func_names[1] = create_string("readint");
+    builtin_func_names[2] = create_string("readfloat");
+    builtin_func_names[3] = create_string("readstr");
+    builtin_func_names[4] = create_string("toheap");
+    builtin_func_names[5] = create_string("fromheap");
+    builtin_func_names[6] = create_string("createlist");
+    builtin_func_names[7] = create_string("pushback");
+    builtin_func_names[8] = create_string("popback");
+    builtin_func_names[9] = create_string("atput");
+    builtin_func_names[10] = create_string("at");
+    initialized = true;
+  }
+
+  static builtin_func_t builtin_funcs[11] = {
+    builtin_print, builtin_readint, builtin_readfloat, builtin_readstr,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL
+  };
+
+  plvalue_t ret = create_temp();
+  ret.type = JT_UNDEFINED;
+
+  for (size_t i = 0; i < COUNTOF(builtin_func_names); i++) {
+    if (name == builtin_func_names[i]) {
+      if (builtin_funcs[i] == NULL) {
+        eprintf("sorry, %s not implemented yet.\n", get_string(name));
+        break;
+      }
+      ret = (builtin_funcs[i])(args);
+    }
+  }
+
+  return ret;
+}
+
+plvalue_t eval_func_call(ast_dchild_t *func, stack_t *stack) {
+  /// @todo now builtin functions only. Add user-defined functions afte
+  /// releasing version Perseus
+  ast_leaf_wdata_t *idref = (ast_leaf_wdata_t*)(func->children[0]);
+  ast_list_t *args = (ast_list_t*)(func->children[1]);
+
+  list_t evaluated_args;
+  create_list(&evaluated_args, malloc, free);
+
+  for (iter_t it = list_begin(&(args->list));
+       !iter_eq(it, list_end(&(args->list)));
+       it = iter_next(it)) {
+    plvalue_t *evaluated_arg = NEW(plvalue_t);
+    *evaluated_arg =
+      eval_expr((ast_node_base_t*)(iter_deref(it)), stack);
+    list_push_back(&evaluated_args, evaluated_arg);
+  }
+
+  plvalue_t ret = builtin_call(idref->value.svalue, evaluated_args);
+
+  for (iter_t it = list_begin(&evaluated_args);
+       !iter_eq(it, list_end(&evaluated_args));
+       it = iter_next(it)) {
+    free(iter_deref(it));
+  }
+  destroy_list(&evaluated_args);
+
+  return ret;
+}
+
 plvalue_t eval_expr(ast_node_base_t *node, stack_t *stack) {
   switch (node->node_sema_info) {
+  case ANS_FUNC_CALL:
+    return eval_func_call((ast_dchild_t*)node, stack);
   case ANS_BINEXPR:
     return eval_binexpr((ast_dchild_wdata_t*)node, stack);
   case ANS_IDREF:

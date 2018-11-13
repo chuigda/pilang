@@ -9,6 +9,8 @@
 #define TP(...)
 #define TEMPLATE(...)
 
+#define COUNTOF(arr) (sizeof(arr) / sizeof((arr)[0]))
+
 #define UNREAECHABLE { assert(0 && "unreachable!\n"); }
 
 #endif

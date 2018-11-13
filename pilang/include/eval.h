@@ -47,6 +47,7 @@ plvalue_t relative_calc(plvalue_t lhs, plvalue_t rhs,
 plvalue_t logical_calc(ast_node_base_t *lhs, ast_node_base_t *rhs,
                        stack_t *stack, logical_function_t lgf);
 plvalue_t assign(plvalue_t lhs, plvalue_t rhs);
+plvalue_t builtin_call(strhdl_t name, list_t args);
 plvalue_t eval_expr(ast_node_base_t *node, stack_t *stack);
 
 #endif
