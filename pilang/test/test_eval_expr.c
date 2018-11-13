@@ -231,6 +231,133 @@ void test_eval_coercion() {
   VK_TEST_SECTION_END("evaluate with coercion")
 }
 
+void test_eval_relop() {
+  VK_TEST_SECTION_BEGIN("evaluate relative operations");
+
+  stack_t stack;
+  init_stack(&stack);
+  stack_enter_frame(&stack);
+
+  jjvalue_t t1, t2, t3, t4, t5, t6, t7, t8;
+  t1.ivalue = 4396;
+  t2.ivalue = 2900;
+  t3.fvalue = 7777.0;
+  t4.fvalue = 0.777;
+  t5.svalue = create_string("NMSL, WSND");
+  t6.svalue = create_string(", HJYZ!");
+  t7.bvalue = true;
+  t8.bvalue = false;
+
+  ast_node_base_t *intexpr1 = leaf_wdata(ANS_INTVAL, t1);
+  ast_node_base_t *intexpr2 = leaf_wdata(ANS_INTVAL, t2);
+  ast_node_base_t *floatexpr1 = leaf_wdata(ANS_FLOATVAL, t3);
+  ast_node_base_t *floatexpr2 = leaf_wdata(ANS_FLOATVAL, t4);
+  ast_node_base_t *strexpr1 = leaf_wdata(ANS_STR, t5);
+  ast_node_base_t *strexpr2 = leaf_wdata(ANS_STR, t6);
+  ast_node_base_t *boolexpr1 = leaf_wdata(ANS_BOOLVAL, t7);
+  ast_node_base_t *boolexpr2 = leaf_wdata(ANS_BOOLVAL, t8);
+
+  jjvalue_t lt;
+  lt.ivalue = TK_ESYM_LT;
+
+  ast_node_base_t *ltexpr1 =
+    node2_wdata(ANS_BINEXPR, lt, intexpr1, intexpr2);
+  ast_node_base_t *ltexpr2 =
+    node2_wdata(ANS_BINEXPR, lt, floatexpr1, floatexpr2);
+  ast_node_base_t *ltexpr3 =
+    node2_wdata(ANS_BINEXPR, lt, strexpr1, strexpr2);
+  ast_node_base_t *ltexpr4 =
+    node2_wdata(ANS_BINEXPR, lt, boolexpr1, boolexpr2);
+
+  plvalue_t r1 = eval_expr(ltexpr1, &stack);
+  plvalue_t r2 = eval_expr(ltexpr2, &stack);
+  plvalue_t r3 = eval_expr(ltexpr3, &stack);
+  plvalue_t r4 = eval_expr(ltexpr4, &stack);
+
+  VK_ASSERT_EQUALS(JT_BOOL, r1.type);
+  VK_ASSERT_EQUALS(JT_BOOL, r2.type);
+  VK_ASSERT_EQUALS(JT_BOOL, r3.type);
+  VK_ASSERT_EQUALS(JT_BOOL, r4.type);
+
+  VK_ASSERT_EQUALS(false, r1.value.bvalue);
+  VK_ASSERT_EQUALS(false, r2.value.bvalue);
+  VK_ASSERT_EQUALS(false, r3.value.bvalue);
+  VK_ASSERT_EQUALS(false, r4.value.bvalue);
+
+  stack_exit_frame(&stack);
+  close_stack(&stack);
+
+  VK_TEST_SECTION_END("evaluate relative operations");
+}
+
+void test_eval_logop() {
+  VK_TEST_SECTION_BEGIN("evaluate logical operations");
+
+  stack_t stack;
+  init_stack(&stack);
+  stack_enter_frame(&stack);
+
+  jjvalue_t jjtrue, jjfalse;
+  jjtrue.bvalue = true;
+  jjfalse.bvalue = false;
+
+  jjvalue_t ampamp, pipepipe;
+  ampamp.ivalue = TK_ESYM_AMPAMP;
+  pipepipe.ivalue = TK_ESYM_PIPEPIPE;
+
+  ast_node_base_t *true_node = leaf_wdata(ANS_BOOLVAL, jjtrue);
+  ast_node_base_t *false_node = leaf_wdata(ANS_BOOLVAL, jjfalse);
+
+  ast_node_base_t *true_n_true =
+    node2_wdata(ANS_BINEXPR, ampamp, true_node, true_node);
+  ast_node_base_t *true_n_false =
+    node2_wdata(ANS_BINEXPR, ampamp, true_node, false_node);
+  ast_node_base_t *false_n_true =
+    node2_wdata(ANS_BINEXPR, ampamp, false_node, true_node);
+  ast_node_base_t *false_n_false =
+    node2_wdata(ANS_BINEXPR, ampamp, false_node, false_node);
+  ast_node_base_t *true_or_true =
+    node2_wdata(ANS_BINEXPR, pipepipe, true_node, true_node);
+  ast_node_base_t *true_or_false =
+    node2_wdata(ANS_BINEXPR, pipepipe, true_node, false_node);
+  ast_node_base_t *false_or_true =
+    node2_wdata(ANS_BINEXPR, pipepipe, false_node, true_node);
+  ast_node_base_t *false_or_false =
+    node2_wdata(ANS_BINEXPR, pipepipe, false_node, false_node);
+
+  plvalue_t r1 = eval_expr(true_n_true, &stack);
+  plvalue_t r2 = eval_expr(true_n_false, &stack);
+  plvalue_t r3 = eval_expr(false_n_true, &stack);
+  plvalue_t r4 = eval_expr(false_n_false, &stack);
+  plvalue_t r5 = eval_expr(true_or_true, &stack);
+  plvalue_t r6 = eval_expr(true_or_false, &stack);
+  plvalue_t r7 = eval_expr(false_or_true, &stack);
+  plvalue_t r8 = eval_expr(false_or_false, &stack);
+
+  VK_ASSERT_EQUALS(JT_BOOL, r1.type);
+  VK_ASSERT_EQUALS(JT_BOOL, r2.type);
+  VK_ASSERT_EQUALS(JT_BOOL, r3.type);
+  VK_ASSERT_EQUALS(JT_BOOL, r4.type);
+  VK_ASSERT_EQUALS(JT_BOOL, r5.type);
+  VK_ASSERT_EQUALS(JT_BOOL, r6.type);
+  VK_ASSERT_EQUALS(JT_BOOL, r7.type);
+  VK_ASSERT_EQUALS(JT_BOOL, r8.type);
+
+  VK_ASSERT_EQUALS(true, r1.value.bvalue);
+  VK_ASSERT_EQUALS(false, r2.value.bvalue);
+  VK_ASSERT_EQUALS(false, r3.value.bvalue);
+  VK_ASSERT_EQUALS(false, r4.value.bvalue);
+  VK_ASSERT_EQUALS(true, r5.value.bvalue);
+  VK_ASSERT_EQUALS(true, r6.value.bvalue);
+  VK_ASSERT_EQUALS(true, r7.value.bvalue);
+  VK_ASSERT_EQUALS(false, r8.value.bvalue);
+
+  stack_exit_frame(&stack);
+  close_stack(&stack);
+
+  VK_TEST_SECTION_END("evaluate logical operatios");
+}
+
 void test_eval_intermix_storage() {
   VK_TEST_SECTION_BEGIN("evaluate with intermixing storage")
 
@@ -311,6 +438,8 @@ int main() {
   test_eval_idref();
   test_eval_literal();
   test_eval_binary_basic();
+  test_eval_relop();
+  test_eval_logop();
   test_eval_coercion();
   test_eval_intermix_storage();
   test_eval_assign_expr();
