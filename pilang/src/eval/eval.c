@@ -409,8 +409,12 @@ plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
     return lhs;
   }
 
-  if (lhs.roc == ROC_ONSTACK) {
+  plvalue_t lhs_org = create_temp();
+  lhs_org.type = JT_UNDEFINED;
+  if (lhs.roc == ROC_ONSTACK && lhs.type == JT_REF) {
     lhs = auto_deref(lhs);
+    lhs_org.type = JT_REF;
+    lhs_org.value.pvalue = fetch_storage(&lhs)->pvalue;
   }
 
   if (lhs.roc == ROC_ONHEAP) {
@@ -427,7 +431,8 @@ plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
   storage_precleanup(&lhs);
   asgn_attach_typeinfo(&lhs, rhs.type);
   *lhs_storage = *rhs_storage;
-  return lhs;
+
+  return lhs_org.type == JT_REF ? lhs_org : lhs;
 }
 
 plvalue_t eval_literal_expr(ast_leaf_wdata_t *node) {
