@@ -411,6 +411,7 @@ static int lex_string(void) {
   else {
     get_next_char();
   }
+  buffer[size] = '\0';
 
   yylval.token.val.svalue = create_string(buffer);
   free(buffer);
