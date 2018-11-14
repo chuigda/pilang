@@ -121,6 +121,13 @@ static int maybe_id_to_kwd(const char *str) {
   STRING_CASE("percent", TK_ESYM_PERCENT)
   STRING_CASE("lbrace", TK_ESYM_LBRACE)
   STRING_CASE("rbrace", TK_ESYM_RBRACE)
+  STRING_CASE("and", TK_ESYM_AMPAMP)
+  STRING_CASE("or", TK_ESYM_PIPE)
+  STRING_CASE("lt", TK_ESYM_LT)
+  STRING_CASE("gt", TK_ESYM_GT)
+  STRING_CASE("leq", TK_ESYM_LEQ)
+  STRING_CASE("geq", TK_ESYM_GEQ)
+  STRING_CASE("neq", TK_ESYM_NEQ)
 
   #undef STRING_CASE
 
