@@ -36,6 +36,7 @@ heapobj_t *heap_alloc_bool(bool value);
 heapobj_t *heap_alloc_float(double value);
 heapobj_t *heap_alloc_str(strhdl_t h_str);
 heapobj_t *heap_alloc_list(list_t list);
+heapobj_t *heap_alloc_empty();
 
 void destroy_object(heapobj_t *obj);
 

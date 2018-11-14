@@ -127,6 +127,12 @@ heapobj_t *heap_alloc_str(int64_t str) {
   return ret;
 }
 
+heapobj_t *heap_alloc_empty() {
+  heapobj_t *ret = plalloc();
+  ret->oid = HOID_UNDEFINED;
+  return ret;
+}
+
 void gc_start() {
   for (size_t i = 0; i < heap_cap; i++) {
     if (heap[i]->used) {

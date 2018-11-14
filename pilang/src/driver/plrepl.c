@@ -41,7 +41,7 @@ int main() {
   eprintf0("empty input with # to exit\n");
   int count = 0;
   while (1) {
-    eprintf0("PiLang> ");
+    eprintf0("(prelude) ");
 
     glob_ast = NULL;
     yyparse();
@@ -57,7 +57,7 @@ int main() {
     plvalue_t result = eval_expr(glob_ast, &stack);
     jjvalue_t *storage = fetch_storage(&result);
 
-    eprintf(" %d ] => ", count);
+    eprintf("%d ] => ", count);
     switch (result.type) {
     case JT_INT:
       eprintf("%" PRId64 " :: Int", storage->ivalue);
@@ -73,6 +73,9 @@ int main() {
       break;
     case JT_LIST:
       eprintf0("(Not printable) :: List");
+      break;
+    case JT_REF:
+      eprintf0("(Not printable) :: Ref");
       break;
     case JT_UNDEFINED:
       eprintf0("Undefined :: Undefined");

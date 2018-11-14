@@ -499,6 +499,7 @@ static plvalue_t builtin_print(list_t args) {
        !iter_eq(it, list_end(&args));
        it = iter_next(it)) {
     plvalue_t *value = (plvalue_t*)iter_deref(it);
+    *value = auto_deref(*value);
     jjvalue_t *storage = fetch_storage(value);
 
     switch (value->type) {
@@ -551,6 +552,47 @@ static plvalue_t builtin_readstr(list_t args) {
   return ret;
 }
 
+static plvalue_t builtin_copy_to_heap(list_t args) {
+  if (list_size(&args) < 1) {
+    eprintf0("e: toheap requires one argument\n");
+    plvalue_t ret = create_temp();
+    ret.type = JT_UNDEFINED;
+    return ret;
+  }
+
+  if (list_size(&args) > 2) {
+    eprintf0("w: toheap require only one argument\n");
+  }
+
+  plvalue_t *value = (plvalue_t*)iter_deref(list_begin(&args));
+  *value = auto_deref(*value);
+  jjvalue_t *storage = fetch_storage(value);
+
+  if (value->roc == ROC_ONHEAP) {
+    eprintf0("e: already on heap\n");
+    plvalue_t ret = create_temp();
+    ret.type = JT_UNDEFINED;
+    return ret;
+  }
+
+  plvalue_t ref = create_temp();
+  ref.type = JT_REF;
+  switch (value->type) {
+  case JT_INT:
+    ref.value.pvalue = heap_alloc_int(storage->ivalue); break;
+  case JT_FLOAT:
+    ref.value.pvalue = heap_alloc_float(storage->fvalue); break;
+  case JT_STR:
+    ref.value.pvalue = heap_alloc_str(storage->svalue); break;
+  case JT_BOOL:
+    ref.value.pvalue = heap_alloc_bool(storage->bvalue); break;
+  case JT_UNDEFINED:
+    ref.value.pvalue = heap_alloc_empty(); break;
+  default: UNREAECHABLE
+  }
+  return ref;
+}
+
 plvalue_t builtin_call(strhdl_t name, list_t args) {
   /// @todo replace this with TableGen
   static bool initialized = false;
@@ -572,7 +614,7 @@ plvalue_t builtin_call(strhdl_t name, list_t args) {
 
   static builtin_func_t builtin_funcs[11] = {
     builtin_print, builtin_readint, builtin_readfloat, builtin_readstr,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL
+    builtin_copy_to_heap, NULL, NULL, NULL, NULL, NULL, NULL
   };
 
   plvalue_t ret = create_temp();
