@@ -410,8 +410,9 @@ plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
   }
 
   plvalue_t lhs_org = create_temp();
+
   lhs_org.type = JT_UNDEFINED;
-  if (lhs.roc == ROC_ONSTACK && lhs.type == JT_REF) {
+  if (lhs.roc == ROC_ONSTACK && lhs.type == JT_REF && rhs.type != JT_REF) {
     lhs = auto_deref(lhs);
     lhs_org.type = JT_REF;
     lhs_org.value.pvalue = fetch_storage(&lhs)->pvalue;
@@ -607,8 +608,8 @@ plvalue_t builtin_call(strhdl_t name, list_t args) {
     builtin_func_names[1] = create_string("readint");
     builtin_func_names[2] = create_string("readfloat");
     builtin_func_names[3] = create_string("readstr");
-    builtin_func_names[4] = create_string("toheap");
-    builtin_func_names[5] = create_string("fromheap");
+    builtin_func_names[4] = create_string("new");
+    builtin_func_names[5] = create_string("deref");
     builtin_func_names[6] = create_string("createlist");
     builtin_func_names[7] = create_string("pushback");
     builtin_func_names[8] = create_string("popback");
