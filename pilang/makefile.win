@@ -10,12 +10,12 @@ pli.exe: mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
 
 plast.exe: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o plast.o \
-        -o plast.exe
+          -o plast.exe
 
 plrepl.exe: mstring.o lexer.o parser.o clist.o ast.o stack.o plheap.o \
             tree_dump.o eval.o plrepl.o
 	$(CC) mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plrepl.o \
-        plheap.o stack.o eval.o -o plrepl.exe
+          plheap.o stack.o eval.o -o plrepl.exe
 
 tests: test_stack.exe test_gc.exe test_calc.exe test_assign.exe \
        test_eval_expr.exe
@@ -23,15 +23,15 @@ tests: test_stack.exe test_gc.exe test_calc.exe test_assign.exe \
 test_eval_expr.exe: test_eval_expr.o plheap.o stack.o clist.o mstring.o \
                eval.o ast.o
 	$(CC) test_eval_expr.o plheap.o stack.o clist.o mstring.o eval.o \
-        ast.o -o test_eval_expr.exe
+          ast.o -o test_eval_expr.exe
 
 test_assign.exe: test_assign.o plheap.o stack.o clist.o mstring.o eval.o
 	$(CC) test_assign.o plheap.o stack.o clist.o mstring.o eval.o \
-        -o test_assign.exe
+          -o test_assign.exe
 
 test_calc.exe: test_calc.o plheap.o stack.o clist.o mstring.o eval.o
 	$(CC) test_calc.o plheap.o stack.o clist.o mstring.o eval.o \
-        -o test_calc
+          -o test_calc.exe
 
 test_gc.exe: test_gc.o plheap.o clist.o mstring.o
 	$(CC) test_gc.o plheap.o clist.o mstring.o -o test_gc.exe
@@ -41,7 +41,7 @@ test_stack.exe: stack.o test_stack.o clist.o mstring.o
 
 test_eval_expr.o: test/test_eval_expr.c
 	$(CC) -c -I include -I . test/test_eval_expr.c -o test_eval_expr.o \
-        $(CFLAGS)
+          $(CFLAGS)
 
 test_stack.o: test/test_stack.c
 	$(CC) -c -I include test/test_stack.c -o test_stack.o $(CFLAGS)
@@ -73,8 +73,8 @@ stack.o: src/eval/stack.c
 plheap.o: src/eval/heap.c
 	$(CC) -c -I include src/eval/heap.c -o plheap.o $(CFLAGS)
 
-tree_dump.o: src/ast/tree_dump.c
-	$(CC) -c -I include src/ast/tree_dump.c -o tree_dump.o $(CFLAGS)
+tree_dump.o: src/ast/tree_dump.c y.tab.h
+	$(CC) -c -I include -I . src/ast/tree_dump.c -o tree_dump.o $(CFLAGS)
 
 ast.o : src/ast/ast.c
 	$(CC) -c -I include src/ast/ast.c -o ast.o $(CFLAGS)
