@@ -16,8 +16,12 @@ int yylex(void);
 
 extern ast_node_base_t *glob_ast;
 extern FILE *fp_lex_in;
+extern bool repl_mode;
+extern bool lexer_error;
 
 int main() {
+  repl_mode = true;
+
   eprintf("Interactive REPL for %s -- %s\n",
           BAS_LANGUAGE_NAME, BAS_DISCRIPTION);
   eprintf("Created by %s, licensed under %s\n",
@@ -37,16 +41,21 @@ int main() {
 
   fp_lex_in = stdin;
   eprintf0("note: for each time you finish input,"
-           " type a # character and then return\n");
-  eprintf0("empty input with # to exit\n");
-  int count = 0;
+           " type two .. characters and then return\n");
+  eprintf0("empty input with .. or EOF to exit\n");
   while (1) {
-    eprintf0("(prelude) ");
+    eprintf0("(prelude) Ques: ");
 
     glob_ast = NULL;
-    yyparse();
-    if (glob_ast == NULL) {
+    if (yyparse() == 1) {
       eprintf0("Parsing error, retry.\n");
+      char ch;
+      while ((ch = getchar()) != '\n' && ch != '\0');
+      continue;
+    }
+    else if (lexer_error) {
+      eprintf0("Lexing error, retry.\n");
+      lexer_error = false;
       continue;
     }
     else if (glob_ast->node_sema_info == ANS_FUNCTIONS) {
@@ -57,7 +66,7 @@ int main() {
     plvalue_t result = eval_expr(glob_ast, &stack);
     jjvalue_t *storage = fetch_storage(&result);
 
-    eprintf("%d ] => ", count);
+    eprintf0("  Ans: ");
     switch (result.type) {
     case JT_INT:
       eprintf("%" PRId64 " :: Int", storage->ivalue);
@@ -85,7 +94,6 @@ int main() {
       eprintf0("error");
     }
     putchar('\n');
-    ++count;
   }
 
   stack_exit_frame(&stack);

@@ -26,10 +26,12 @@ static bool my_strcmpi(const char *s1, const char *s2) {
 }
 
 FILE *fp_lex_in;
+bool repl_mode = false;
+bool lexer_error = false;
 
 static int peeked_char_ = '\0';
 
-static char curchar_ = '\n';
+static char curchar_ = '\xff';
 static uint16_t currow_ = 1;
 static uint16_t curcol_ = 0;
 
@@ -77,6 +79,14 @@ static char peeked_char(void) {
 static void lex_warn(const char *warn_text, uint16_t line,
                      uint16_t col) {
   fprintf(stderr, "at (%d, %d): warning: %s\n", line, col, warn_text);
+  if (repl_mode) {
+    fprintf(stderr, "in REPL mode, clearing input\n");
+    while (curchar() != '\n' && curchar() != '\0') {
+      get_next_char();
+    }
+  }
+  if (curchar() == '\n') curchar_ = '\xff';
+  lexer_error = true;
 }
 
 static int maybe_id_to_kwd(const char *str) {
@@ -419,14 +429,27 @@ static int lex_string(void) {
 }
 
 int yylex(void) {
+  if (curchar() == '\xff') {
+    get_next_char();
+  }
+
   while (1) {
     switch (curchar()) {
     case '\0':
       return -1;
 
-    case '#':
-      get_next_char();
-      return -1;
+    case '.':
+      peek_one_char();
+      if (peeked_char() == '.') {
+        get_next_char();
+        get_next_char();
+        return -1;
+      }
+      else {
+        ungetc(peeked_char(), fp_lex_in);
+        peeked_char_ = '\0';
+        return lex_dot_or_conv();
+      }
 
     case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
     case 'g': case 'h': case 'i': case 'j': case 'k': case 'l':
@@ -438,9 +461,6 @@ int yylex(void) {
     case 'Q': case 'R': case 'S': case 'T': case 'U': case 'V':
     case 'W': case 'X': case 'Y': case 'Z':
       return lex_id_or_kwd();
-
-    case '.':
-      return lex_dot_or_conv();
 
     case '+': case '-': case '*': case '/': case '%': case '[':
     case ']': case '=': case '<': case '>': case '&': case '|':
@@ -460,6 +480,9 @@ int yylex(void) {
 
     default:
       lex_warn("Unknown char, skipping", currow(), curcol());
+      if (repl_mode) {
+        return -1;
+      }
       get_next_char();
     }
   }
