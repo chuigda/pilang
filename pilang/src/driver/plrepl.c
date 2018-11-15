@@ -94,6 +94,8 @@ int main() {
       eprintf0("error");
     }
     putchar('\n');
+
+    destroy_ast(glob_ast);
   }
 
   stack_exit_frame(&stack);

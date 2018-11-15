@@ -130,6 +130,8 @@ void ast_list_append(ast_node_base_t *node, ast_node_base_t *data);
 void ast_attach_srcloc(ast_node_base_t *node,
                        uint16_t row, uint16_t col);
 
+void destroy_ast(ast_node_base_t *root);
+
 #ifdef __cplusplus
 }
 #endif
