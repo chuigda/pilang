@@ -74,8 +74,8 @@ stack.o: src/eval/stack.c
 plheap.o: src/eval/heap.c
 	$(CC) -c -I include src/eval/heap.c -o plheap.o $(CFLAGS)
 
-tree_dump.o: src/ast/tree_dump.c
-	$(CC) -c -I include src/ast/tree_dump.c -o tree_dump.o $(CFLAGS)
+tree_dump.o: src/ast/tree_dump.c y.tab.h
+	$(CC) -c -I include -I ./ src/ast/tree_dump.c -o tree_dump.o $(CFLAGS)
 
 ast.o : src/ast/ast.c
 	$(CC) -c -I include src/ast/ast.c -o ast.o $(CFLAGS)

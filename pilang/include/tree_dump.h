@@ -3,6 +3,7 @@
 
 #include "ast.h"
 
-void tree_dump(ast_node_base_t *root);
+void tree_dump_plast(ast_node_base_t *root);
+void tree_dump_pldot(ast_node_base_t *root);
 
 #endif
