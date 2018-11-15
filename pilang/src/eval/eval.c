@@ -292,7 +292,8 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
     }
     return ret;
   }
-  else if (EITHER_IS(JT_INT, lhs, rhs) || EITHER_IS(JT_BOOL, lhs, rhs)) {
+  else if (EITHER_IS(JT_INT, lhs, rhs) 
+           || EITHER_IS(JT_BOOL, lhs, rhs)) {
     int64_t i1 = int_failsafe(fetch_int(lhs));
     int64_t i2 = int_failsafe(fetch_int(rhs));
 
@@ -351,7 +352,8 @@ plvalue_t relative_calc(plvalue_t lhs, plvalue_t rhs,
     default: UNREAECHABLE
     }
   }
-  else if (EITHER_IS(JT_INT, lhs, rhs) || EITHER_IS(JT_BOOL, lhs, rhs)) {
+  else if (EITHER_IS(JT_INT, lhs, rhs) 
+           || EITHER_IS(JT_BOOL, lhs, rhs)) {
     int i1 = int_failsafe(fetch_int(lhs));
     int i2 = int_failsafe(fetch_int(rhs));
     switch (rlf) {
@@ -412,7 +414,9 @@ plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
   plvalue_t lhs_org = create_temp();
 
   lhs_org.type = JT_UNDEFINED;
-  if (lhs.roc == ROC_ONSTACK && lhs.type == JT_REF && rhs.type != JT_REF) {
+  if (lhs.roc == ROC_ONSTACK 
+      && lhs.type == JT_REF 
+      && rhs.type != JT_REF) {
     lhs = auto_deref(lhs);
     lhs_org.type = JT_REF;
     lhs_org.value.pvalue = fetch_storage(&lhs)->pvalue;
@@ -640,7 +644,7 @@ plvalue_t builtin_call(strhdl_t name, list_t args) {
 }
 
 plvalue_t eval_func_call(ast_dchild_t *func, stack_t *stack) {
-  /// @todo now builtin functions only. Add user-defined functions afte
+  /// @todo now builtin functions only. Add user-defined functions after
   /// releasing version Perseus
   ast_leaf_wdata_t *idref = (ast_leaf_wdata_t*)(func->children[0]);
   ast_list_t *args = (ast_list_t*)(func->children[1]);
@@ -726,7 +730,8 @@ static void callfunc(ast_tchild_wdata_t *func, list_t args,
        it = iter_next(it)) {
     plvalue_t *t = NEW(plvalue_t);
     *t = create_temp();
-    ast_leaf_wdata_t *ret_idref_node = (ast_leaf_wdata_t*)iter_deref(it);
+    ast_leaf_wdata_t *ret_idref_node = 
+      (ast_leaf_wdata_t*)iter_deref(it);
     assign(*t, eval_idref_expr(ret_idref_node, stack));
     list_push_back(&rets, t);
   }

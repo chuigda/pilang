@@ -23,8 +23,8 @@ tests: test_stack test_gc test_calc test_assign test_eval_expr
 
 test_eval_expr: test_eval_expr.o plheap.o stack.o clist.o mstring.o \
                 eval.o ast.o
-	$(CC) test_eval_expr.o plheap.o stack.o clist.o mstring.o eval.o ast.o\
-        -o test_eval_expr
+	$(CC) test_eval_expr.o plheap.o stack.o clist.o mstring.o eval.o \
+        ast.o -o test_eval_expr
 
 test_assign: test_assign.o plheap.o stack.o clist.o mstring.o eval.o
 	$(CC) test_assign.o plheap.o stack.o clist.o mstring.o eval.o \
@@ -57,7 +57,7 @@ test_stack.o: test/test_stack.c
 	$(CC) -c -I include test/test_stack.c -o test_stack.o $(CFLAGS)
 
 plast.o: src/driver/plast.c y.tab.h
-	$(CC) -c -I include -I ./ src/driver/plast.c -o plast.o $(CFLAGS) 
+	$(CC) -c -I include -I ./ src/driver/plast.c -o plast.o $(CFLAGS)
 
 pli.o: src/driver/pli.c y.tab.h
 	$(CC) -c -I include -I ./ src/driver/pli.c -o pli.o $(CFLAGS)
