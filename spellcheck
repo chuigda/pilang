@@ -1,0 +1,6 @@
+#!/bin/sh
+echo checking liness exceeding 73 lines
+find pilang -type f | xargs cat | awk '{if (length > 73) print $0}'
+echo checking lines containing tab keys, makefiles ignored automatically
+find pilang -type f | awk '{if (!match($0, "makefile")) print $0}' \
+     | xargs cat | awk '{if (match($0, "\t")) print $0}'
