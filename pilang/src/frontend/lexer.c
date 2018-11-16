@@ -174,79 +174,6 @@ static int lex_id_or_kwd(void) {
   return TK_ID;
 }
 
-static int maybe_conv(const char* str, int16_t row, int16_t col) {
-  #define STRING_CASE(EXPECT, TOKEN_KIND) \
-    if (my_strcmpi(str, EXPECT)) { \
-      yylval.token.token_kind = TOKEN_KIND; \
-      yylval.token.replaced = 1; \
-      return TOKEN_KIND; \
-    }
-
-  STRING_CASE("plus", TK_ESYM_PLUS)
-  STRING_CASE("add", TK_ESYM_PLUS)
-  STRING_CASE("minus", TK_ESYM_MINUS)
-  STRING_CASE("mult", TK_ESYM_ASTER)
-  STRING_CASE("multi", TK_ESYM_ASTER)
-  STRING_CASE("multiply", TK_ESYM_ASTER)
-  STRING_CASE("times", TK_ESYM_ASTER)
-  STRING_CASE("aster", TK_ESYM_ASTER)
-  STRING_CASE("asterisk", TK_ESYM_ASTER)
-  STRING_CASE("div", TK_ESYM_SLASH)
-  STRING_CASE("divide", TK_ESYM_SLASH)
-  STRING_CASE("slash", TK_ESYM_SLASH)
-  STRING_CASE("eqeq", TK_ESYM_EQEQ)
-  STRING_CASE("perc", TK_ESYM_PERCENT)
-  STRING_CASE("percent", TK_ESYM_PERCENT)
-  STRING_CASE("lbrace", TK_ESYM_LBRACE)
-  STRING_CASE("rbrace", TK_ESYM_RBRACE)
-
-  #undef STRING_CASE
-
-  lex_warn("Invalid conversion seq. Interpreted as normal dot",
-           row, col);
-  return TK_SYM_DOT;
-}
-
-static int lex_dot_or_conv(void) {
-  int16_t row = currow();
-  int16_t col = curcol();
-  yylval.token.row = row;
-  yylval.token.col = col;
-  peek_one_char();
-  if (peeked_char() == '[') {
-    get_next_char();
-    get_next_char();
-
-    char buffer[16];
-    int idx = 0;
-    while (idx < 15 && curchar() != ']' && curchar() != '\0') {
-      buffer[idx] = curchar();
-      ++idx;
-      get_next_char();
-    }
-    buffer[idx] = '\0';
-    if (idx == 15) {
-      lex_warn("Conv-sequence length exceeds 15 characters",
-               currow(), curcol());
-      while (curchar() != '\0' && curchar() != ']') {
-        get_next_char();
-      }
-    }
-    if (curchar() == '\0') {
-      lex_warn("Unterminated conv-sequence", currow(), curcol());
-    }
-    else {
-      get_next_char();
-    }
-    return maybe_conv(buffer, row, col);
-  }
-  else {
-    yylval.token.replaced = 0;
-    yylval.token.token_kind = TK_SYM_DOT;
-    return TK_SYM_DOT;
-  }
-}
-
 static int lex_number(void) {
   yylval.token.replaced = 0;
   yylval.token.row = currow();
@@ -283,6 +210,7 @@ static int lex_common_sym(void) {
   yylval.token.row = currow();
   yylval.token.col = curcol();
   switch(curchar()) {
+  case '.': yylval.token.token_kind = TK_SYM_DOT;      break;
   case ',': yylval.token.token_kind = TK_SYM_COMMA;    break;
   case ';': yylval.token.token_kind = TK_SYM_SEMI;     break;
   case '[': yylval.token.token_kind = TK_SYM_LBRACKET; break;
@@ -448,7 +376,7 @@ int yylex(void) {
       else {
         ungetc(peeked_char(), fp_lex_in);
         peeked_char_ = '\0';
-        return lex_dot_or_conv();
+        return lex_common_sym();
       }
 
     case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
