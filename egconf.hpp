@@ -78,12 +78,12 @@
 #endif
 
 #if __cplusplus >= 201103L
-  #define CXX11_CONSTEXPR constexpr
-  #define CXX11_NOEXCEPT noexcept
-  #define CXX11_OVERRIDE override
-  #define CXX11_FINAL final
-  #define CXX11_NULLPTR nullptr
-  #define CXX11_MOVE_SEMANTICS 1
+  #define EG_CXX11_CONSTEXPR constexpr
+  #define EG_CXX11_NOEXCEPT noexcept
+  #define EG_CXX11_OVERRIDE override
+  #define EG_CXX11_FINAL final
+  #define EG_CXX11_NULLPTR nullptr
+  #define EG_CXX11_MOVE_SEMANTICS 1
   
   #include <cinttypes>
   
@@ -92,11 +92,11 @@
   } // namespace egstd
   
 #else
-  #define CXX11_CONSTEXPR const
-  #define CXX11_NOEXCEPT throw()
-  #define CXX11_OVERRIDE
-  #define CXX11_NULLPTR 0
-  #define CXX11_FINAL
+  #define EG_CXX11_CONSTEXPR const
+  #define EG_CXX11_NOEXCEPT throw()
+  #define EG_CXX11_OVERRIDE
+  #define EG_CXX11_NULLPTR 0
+  #define EG_CXX11_FINAL
   
   #include <inttypes.h>
   namespace egstd {
@@ -148,24 +148,24 @@ public:
   ConfigValue(std::string const& svalue)
     : type(StringValue), svalue(svalue) {}
     
-  ValueType getType() const CXX11_NOEXCEPT { return type; }
+  ValueType getType() const EG_CXX11_NOEXCEPT { return type; }
   
-  egstd::int64_t getAsIntUnsafe() const CXX11_NOEXCEPT {
+  egstd::int64_t getAsIntUnsafe() const EG_CXX11_NOEXCEPT {
     assert(getType() == IntValue);
     return v.ivalue;
   }
   
-  double getAsFloatUnsafe() const CXX11_NOEXCEPT {
+  double getAsFloatUnsafe() const EG_CXX11_NOEXCEPT {
     assert(getType() == FloatValue);
     return v.fvalue;
   }
   
-  std::string const& getAsStrUnsafe() const CXX11_NOEXCEPT {
+  std::string const& getAsStrUnsafe() const EG_CXX11_NOEXCEPT {
     assert(getType() == StringValue); 
     return svalue;
   }
   
-  void dump() const CXX11_NOEXCEPT {
+  void dump() const EG_CXX11_NOEXCEPT {
     switch (getType()) {
     case IntValue: 
       std::fprintf(stderr, "{Int value %" PRId64 "}", v.ivalue); break;
@@ -191,7 +191,7 @@ struct ConfigLookupResult {
   ConfigLookupResult(ConfigValue const* value) 
     : value(value), type(Success) { }
   ConfigLookupResult(ResultType type) 
-    : value(CXX11_NULLPTR), type(type) { }
+    : value(EG_CXX11_NULLPTR), type(type) { }
   
   ConfigValue const* const value;
   ResultType const type;
@@ -204,7 +204,7 @@ struct ConfigInsertResult {
 class ConfigTreeNode {
 public:
   ConfigTreeNode(std::string const& name) : name(name) {}
-  std::string const& getName() const CXX11_NOEXCEPT { return name; }
+  std::string const& getName() const EG_CXX11_NOEXCEPT { return name; }
   virtual ~ConfigTreeNode() {}
   virtual ConfigLookupResult
   findValue(std::string const& name) const = 0;
@@ -216,14 +216,14 @@ private:
   std::string name;
 };
 
-class ConfigTreeValueNode CXX11_FINAL : public ConfigTreeNode {
+class ConfigTreeValueNode EG_CXX11_FINAL : public ConfigTreeNode {
 public:
   ConfigTreeValueNode(std::string const& name,
                       ConfigValue const& value)
     : ConfigTreeNode(name), value(value) {}
   
   ConfigLookupResult 
-  findValue(std::string const& name) const CXX11_OVERRIDE {
+  findValue(std::string const& name) const EG_CXX11_OVERRIDE {
     if (getName() == name) {
       return ConfigLookupResult(&value);  
     }
@@ -232,11 +232,11 @@ public:
 
   ConfigInsertResult::Ty
   insertValue(std::string const&,
-              ConfigValue const&) CXX11_OVERRIDE {
+              ConfigValue const&) EG_CXX11_OVERRIDE {
     return ConfigInsertResult::IllFormed;
   }
   
-  void dump(int depth) const CXX11_OVERRIDE {
+  void dump(int depth) const EG_CXX11_OVERRIDE {
     egconf_impl::printSpace(stderr, depth * EGCONF_DUMP_TABSTOP);
     std::fprintf(stderr, "%s = ", getName().c_str());
     value.dump();
@@ -247,18 +247,18 @@ private:
   ConfigValue value;
 };
 
-class ConfigTreeInternNode CXX11_FINAL : public ConfigTreeNode {
+class ConfigTreeInternNode EG_CXX11_FINAL : public ConfigTreeNode {
 public:
   ConfigTreeInternNode(std::string const& name) : ConfigTreeNode(name) {}
 
-  ~ConfigTreeInternNode() CXX11_OVERRIDE {
+  ~ConfigTreeInternNode() EG_CXX11_OVERRIDE {
     for (iter_type it = children.begin(); it != children.end(); ++it) {
       delete *it;
     }
   }
 
   ConfigLookupResult 
-  findValue(std::string const& name) const CXX11_OVERRIDE {
+  findValue(std::string const& name) const EG_CXX11_OVERRIDE {
     StrPair splittedPath = egconf_impl::splitPath(name);
     if (splittedPath.first == getName()) {
       if (splittedPath.second == "") {
@@ -277,7 +277,7 @@ public:
   
   ConfigInsertResult::Ty
   insertValue(std::string const& path,
-              ConfigValue const& value) CXX11_OVERRIDE {
+              ConfigValue const& value) EG_CXX11_OVERRIDE {
     StrPair splittedPath = egconf_impl::splitPath(path);
     if (splittedPath.second == "") {
       for (iter_type it = children.begin();
@@ -304,7 +304,7 @@ public:
     }
   }
 
-  void dump(int depth) const CXX11_OVERRIDE {
+  void dump(int depth) const EG_CXX11_OVERRIDE {
     egconf_impl::printSpace(stderr, depth * EGCONF_DUMP_TABSTOP);
     std::fprintf(stderr, "%s {\n", getName().c_str());
     for (const_iter_type it = children.begin();
@@ -353,15 +353,15 @@ public:
     return Failed;
   }
 
-  ConfigTreeNode* getAndReset() CXX11_NOEXCEPT {
+  ConfigTreeNode* getAndReset() EG_CXX11_NOEXCEPT {
     ConfigTreeNode *ret = node;
-    node = CXX11_NULLPTR;
+    node = EG_CXX11_NULLPTR;
     return ret;
   }
 
 private:
   void skipWhitespace(std::string const& str,
-                      std::size_t &idx) CXX11_NOEXCEPT {
+                      std::size_t &idx) EG_CXX11_NOEXCEPT {
     while (isblank(str[idx])) {
       ++idx;
     }
