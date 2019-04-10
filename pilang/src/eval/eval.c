@@ -246,6 +246,11 @@ static strhdl_t str_failsafe(result_t maybe) {
                        : create_string("undefined");
 }
 
+static bool bool_failsafe(result_t maybe) {
+  return maybe.success ? maybe.value.bvalue
+                       : false;
+}
+
 static plvalue_t auto_deref(plvalue_t maybe_ref) {
   if (maybe_ref.type != JT_REF) {
     return maybe_ref;
@@ -690,10 +695,70 @@ plvalue_t eval_expr(ast_node_base_t *node, stack_t *stack) {
   return failure;
 }
 
+void eval_stmt(ast_node_base_t *stmt, stack_t *stack);
+
+void eval_if_stmt(ast_node_base_t *stmt, stack_t *stack) {
+  ast_node_base_t *cond, *thenstmt, *elsestmt = NULL;
+  if (stmt->node_kind == ANK_DUAL_CHILD) {
+    ast_dchild_t *ifstmt = (ast_dchild_t*)stmt;
+    cond = ifstmt->children[0];
+    thenstmt = ifstmt->children[1];
+  }
+  else {
+    assert(stmt->node_kind == ANK_TRIPLE_CHILD);
+    ast_tchild_t *ifstmt = (ast_tchild_t*)stmt;
+    cond = ifstmt->children[0];
+    thenstmt = ifstmt->children[1];
+    elsestmt = ifstmt->children[2];
+  }
+
+  if (bool_failsafe(fetch_bool(eval_expr(cond, stack)))) {
+    eval_stmt(thenstmt, stack);
+  }
+  else if (elsestmt) {
+    eval_stmt(elsestmt, stack);
+  }
+}
+
+void eval_while_stmt(ast_node_base_t *stmt, stack_t *stack) {
+  ast_dchild_t *while_stmt = (ast_dchild_t*)stmt;
+  while (bool_failsafe(fetch_bool(eval_expr(while_stmt->children[0],
+					    stack)))) {
+    eval_stmt(while_stmt->children[1], stack);
+  }
+}
+
+void eval_stmt_list(ast_node_base_t *stmt, stack_t *stack) {
+  ast_list_t *stmt_list = (ast_list_t*)stmt;
+  for (iter_t it = list_begin(&(stmt_list->list));
+       !iter_eq(it, list_end(&(stmt_list->list)));
+       it = iter_next(it)) {
+    eval_stmt((ast_node_base_t*)iter_deref(it), stack);
+  }
+}
+
 void eval_stmt(ast_node_base_t *stmt, stack_t *stack) {
-  // TODO
-  (void)stmt;
-  (void)stack;
+  switch (stmt->node_sema_info) {
+  case ANS_BINEXPR:
+  case ANS_INTVAL:
+  case ANS_FLOATVAL:
+  case ANS_STR:
+  case ANS_IDREF:
+  case ANS_FUNC_CALL:
+    eval_expr(stmt, stack);
+    break;
+  case ANS_IF:
+    eval_if_stmt(stmt, stack);
+    break;
+  case ANS_WHILE:
+    eval_while_stmt(stmt, stack);
+    break;
+  case ANS_STATEMENTS:
+    eval_stmt_list(stmt, stack);
+    break;
+  default:
+    UNREAECHABLE;
+  }
 }
 
 void eval_func_body(ast_list_t *body, stack_t *stack) {
