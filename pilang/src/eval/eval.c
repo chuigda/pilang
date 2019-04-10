@@ -786,7 +786,9 @@ static void callfunc(ast_tchild_wdata_t *func, list_t args,
            *(plvalue_t*)iter_deref(it2));
   }
 
-  eval_func_body((ast_list_t*)(func->children[2]), stack);
+  ast_schild_t *funcbody = (ast_schild_t*)(func->children[2]);
+  
+  eval_func_body((ast_list_t*)(funcbody->child), stack);
 
   ast_list_t *rets_list_node = (ast_list_t*)func->children[1];
   list_t rets_list = rets_list_node->list;
@@ -805,5 +807,31 @@ static void callfunc(ast_tchild_wdata_t *func, list_t args,
 }
 
 void eval_ast(ast_node_base_t *program) {
-  (void)program;
+  stack_t stack;
+  init_stack(&stack);
+  init_heap();
+  
+  strhdl_t main_str = create_string("main");
+  strhdl_t start_str = create_string("start");
+  ast_list_t *functions = (ast_list_t*)program;
+
+  list_t args, rets;
+  create_list(&args, malloc, free);
+  create_list(&rets, malloc, free);
+  for (iter_t it = list_begin(&(functions->list));
+       !iter_eq(it, list_end(&(functions->list)));
+       it = iter_next(it)) {
+    ast_tchild_wdata_t *func =
+      (ast_tchild_wdata_t*)iter_deref(it);
+    if (func->value.svalue == main_str
+	|| func->value.svalue == start_str) {
+      callfunc(func, args, rets, &stack); 
+    }
+  }
+
+  destroy_list(&args);
+  destroy_list(&rets);
+  
+  close_heap();
+  close_stack(&stack);
 }

@@ -1,0 +1,7 @@
+function main takes returns begin
+  print [ 3; ' times '; 4; ' is 12\n' ];
+  a = 3;
+  b = 4;
+  c = a times b;
+  print [ a; ' times '; b; ' is '; c; '\n'];
+end function
