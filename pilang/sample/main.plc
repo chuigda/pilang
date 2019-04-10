@@ -1,7 +1,12 @@
-function main takes returns begin
-  print [ 3; ' times '; 4; ' is 12\n' ];
+function main takes returns
+begin
   a = 3;
-  b = 4;
-  c = a times b;
-  print [ a; ' times '; b; ' is '; c; '\n'];
+  while a gt 0 then
+    print ['a = '; a; ' now\n'];
+    if a equals 2 then
+      print ['two is special!\n'];
+    end if
+    a = a - 1;
+  end while
+  print ['Launch!\n'];
 end function
