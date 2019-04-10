@@ -18,8 +18,8 @@
 #define VER_PLCFRONT_REVISE 1
 
 #define VER_PLI_MAJOR 0
-#define VER_PLI_MINOR 0
-#define VER_PLI_REVISE 1
+#define VER_PLI_MINOR 1
+#define VER_PLI_REVISE 0
 
 /* PiLang Intepreter configurations */
 #define PLI_HEAP_INIT_SIZE   114514
