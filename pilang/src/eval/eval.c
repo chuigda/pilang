@@ -633,7 +633,7 @@ void eval_ast(ast_node_base_t *program) {
     ast_tchild_wdata_t *func =
       (ast_tchild_wdata_t*)iter_deref(it);
     if (func->value.svalue == main_str
-	|| func->value.svalue == start_str) {
+        || func->value.svalue == start_str) {
       callfunc(func, args, rets, &stack); 
     }
   }
