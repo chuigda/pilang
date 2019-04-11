@@ -4,33 +4,35 @@ CFLAGS = -Wall -Wextra -Wno-unused-function -g
 all: pli.exe plast.exe plrepl.exe tests
 
 pli.exe: mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
-         plheap.o pli.o
+         plheap.o pli.o value.o
 	$(CC) mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
-          plheap.o pli.o -o pli.exe
+          plheap.o value.o pli.o -o pli.exe
 
 plast.exe: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o plast.o \
-          -o plast.exe
+				-o plast.exe
 
 plrepl.exe: mstring.o lexer.o parser.o clist.o ast.o stack.o plheap.o \
-            tree_dump.o eval.o plrepl.o
+            tree_dump.o eval.o plrepl.o value.o
 	$(CC) mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plrepl.o \
-          plheap.o stack.o eval.o -o plrepl.exe
+          plheap.o stack.o eval.o value.o -o plrepl.exe
 
 tests: test_stack.exe test_gc.exe test_calc.exe test_assign.exe \
        test_eval_expr.exe
 
 test_eval_expr.exe: test_eval_expr.o plheap.o stack.o clist.o mstring.o \
-               eval.o ast.o
+										eval.o ast.o value.o
 	$(CC) test_eval_expr.o plheap.o stack.o clist.o mstring.o eval.o \
-          ast.o -o test_eval_expr.exe
+          value.o ast.o -o test_eval_expr.exe
 
-test_assign.exe: test_assign.o plheap.o stack.o clist.o mstring.o eval.o
-	$(CC) test_assign.o plheap.o stack.o clist.o mstring.o eval.o \
+test_assign.exe: test_assign.o plheap.o stack.o clist.o mstring.o \
+								 eval.o value.o
+	$(CC) test_assign.o plheap.o stack.o clist.o mstring.o eval.o value.o \
           -o test_assign.exe
 
-test_calc.exe: test_calc.o plheap.o stack.o clist.o mstring.o eval.o
-	$(CC) test_calc.o plheap.o stack.o clist.o mstring.o eval.o \
+test_calc.exe: test_calc.o plheap.o stack.o clist.o mstring.o eval.o \
+							 value.o
+	$(CC) test_calc.o plheap.o stack.o clist.o mstring.o eval.o value.o \
           -o test_calc.exe
 
 test_gc.exe: test_gc.o plheap.o clist.o mstring.o
@@ -66,6 +68,9 @@ plrepl.o: src/driver/plrepl.c y.tab.h
 
 eval.o: src/eval/eval.c y.tab.h
 	$(CC) -c -I include -I . src/eval/eval.c -o eval.o $(CFLAGS)
+
+value.o: src/eval/value.c
+	$(CC) -c -I include -I . src/eval/value.c -o value.o $(CFLAGS)
 
 stack.o: src/eval/stack.c
 	$(CC) -c -I include src/eval/stack.c -o stack.o $(CFLAGS)
