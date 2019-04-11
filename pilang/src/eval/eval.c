@@ -79,7 +79,7 @@ static result_t fetch_int(plvalue_t obj) {
     return failed_result("cannot autocast from Nothing to Int");
   }
 
-  UNREAECHABLE;
+  UNREACHABLE;
   return failed_result("failed");
 }
 
@@ -109,7 +109,7 @@ static result_t fetch_float(plvalue_t obj) {
     return failed_result("cannot autocast from Nothing to Float");
   }
 
-  UNREAECHABLE;
+  UNREACHABLE;
   return failed_result("failed");
 }
 
@@ -148,7 +148,7 @@ static result_t fetch_bool(plvalue_t obj) {
   }
   }
 
-  UNREAECHABLE;
+  UNREACHABLE;
   return failed_result("failed");
 }
 
@@ -184,7 +184,7 @@ static result_t fetch_str(plvalue_t obj) {
     return failed_result("cannot autocast fron List to Str");
   }
 
-  UNREAECHABLE;
+  UNREACHABLE;
   return failed_result("failed");
 }
 
@@ -207,7 +207,7 @@ static result_t fetch_list(plvalue_t obj) {
     return success_result(*storage);
   }
 
-  UNREAECHABLE;
+  UNREACHABLE;
   return failed_result("failed");
 }
 
@@ -225,7 +225,7 @@ static void asgn_attach_typeinfo(plvalue_t *obj, int16_t type) {
       break;
     }
     default:
-      UNREAECHABLE;
+      UNREACHABLE;
   }
 }
 
@@ -298,7 +298,7 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
     case ALF_SUB: ret.value.fvalue = f1 - f2; break;
     case ALF_MUL: ret.value.fvalue = f1 * f2; break;
     case ALF_DIV: ret.value.fvalue = f1 / f2; break;
-    default: UNREAECHABLE
+    default: UNREACHABLE
     }
     return ret;
   }
@@ -315,7 +315,7 @@ plvalue_t algebraic_calc(plvalue_t lhs, plvalue_t rhs,
     case ALF_MUL: ret.value.ivalue = i1 * i2; break;
     case ALF_DIV: ret.value.ivalue = i1 / i2; break;
     case ALF_MOD: ret.value.ivalue = i1 % i2; break;
-    default: UNREAECHABLE
+    default: UNREACHABLE
     }
     return ret;
   }
@@ -344,7 +344,7 @@ plvalue_t relative_calc(plvalue_t lhs, plvalue_t rhs,
     case RLF_GT:  ret.value.bvalue = (comp_result > 0); break;
     case RLF_NLT: ret.value.bvalue = (comp_result >= 0); break;
     case RLF_NGT: ret.value.bvalue = (comp_result <= 0); break;
-    default: UNREAECHABLE
+    default: UNREACHABLE
     }
   }
   else if (EITHER_IS(JT_FLOAT, lhs, rhs)) {
@@ -359,7 +359,7 @@ plvalue_t relative_calc(plvalue_t lhs, plvalue_t rhs,
     case RLF_GT:  ret.value.bvalue = f1 > f2;  break;
     case RLF_NLT: ret.value.bvalue = f1 >= f2; break;
     case RLF_NGT: ret.value.bvalue = f1 <= f2; break;
-    default: UNREAECHABLE
+    default: UNREACHABLE
     }
   }
   else if (EITHER_IS(JT_INT, lhs, rhs) 
@@ -373,7 +373,7 @@ plvalue_t relative_calc(plvalue_t lhs, plvalue_t rhs,
     case RLF_GT:  ret.value.bvalue = i1 > i2;  break;
     case RLF_NLT: ret.value.bvalue = i1 >= i2; break;
     case RLF_NGT: ret.value.bvalue = i1 <= i2; break;
-    default: UNREAECHABLE
+    default: UNREACHABLE
     }
   }
   else {
@@ -410,7 +410,7 @@ plvalue_t logical_calc(ast_node_base_t *lhs, ast_node_base_t *rhs,
       ret.value.bvalue = b1 || b2;
     }
     break;
-  default: UNREAECHABLE
+  default: UNREACHABLE
   }
 
   return ret;
@@ -498,7 +498,7 @@ plvalue_t eval_binexpr(ast_dchild_wdata_t *node, stack_t *stack) {
   case TK_ESYM_NEQ:     rlf = RLF_NEQ; break;
   case TK_ESYM_EQEQ:    rlf = RLF_EQ; break;
   default: {
-      UNREAECHABLE
+      UNREACHABLE
       plvalue_t failure = create_temp();
       failure.type = JT_UNDEFINED;
       return failure;
@@ -608,7 +608,7 @@ static plvalue_t builtin_copy_to_heap(list_t args) {
     ref.value.pvalue = heap_alloc_bool(storage->bvalue); break;
   case JT_UNDEFINED:
     ref.value.pvalue = heap_alloc_empty(); break;
-  default: UNREAECHABLE
+  default: UNREACHABLE
   }
   return ref;
 }
@@ -694,7 +694,7 @@ plvalue_t eval_expr(ast_node_base_t *node, stack_t *stack) {
   case ANS_INTVAL: case ANS_FLOATVAL: case ANS_BOOLVAL: case ANS_STR:
     return eval_literal_expr((ast_leaf_wdata_t*)node);
   }
-  UNREAECHABLE;
+  UNREACHABLE;
   plvalue_t failure = create_temp();
   failure.type = JT_UNDEFINED;
   return failure;
@@ -762,7 +762,7 @@ void eval_stmt(ast_node_base_t *stmt, stack_t *stack) {
     eval_stmt_list(stmt, stack);
     break;
   default:
-    UNREAECHABLE;
+    UNREACHABLE;
   }
 }
 

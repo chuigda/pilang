@@ -89,7 +89,7 @@ static heapobj_t *plalloc(void) {
     }
   }
 
-  UNREAECHABLE;
+  UNREACHABLE;
   return NULL;
 }
 
