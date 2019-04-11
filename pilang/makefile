@@ -6,14 +6,14 @@ docs: doc/makefile
 	cd doc && make && tree -P "*.html" > docs && cd ..
 
 plrepl: mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
-        plheap.o plrepl.o
+        plheap.o value.o plrepl.o
 	$(CC) mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
-        plheap.o plrepl.o -o plrepl
+        value.o plheap.o plrepl.o -o plrepl
 
 pli: mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o plheap.o \
-     pli.o
+     value.o pli.o
 	$(CC) mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
-        plheap.o pli.o -o pli
+        plheap.o pli.o value.o -o pli
 
 plast: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o plast.o \
@@ -22,17 +22,17 @@ plast: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
 tests: test_stack test_gc test_calc test_assign test_eval_expr
 
 test_eval_expr: test_eval_expr.o plheap.o stack.o clist.o mstring.o \
-                eval.o ast.o
+                eval.o ast.o value.o
 	$(CC) test_eval_expr.o plheap.o stack.o clist.o mstring.o eval.o \
-        ast.o -o test_eval_expr
+        ast.o value.o -o test_eval_expr
 
-test_assign: test_assign.o plheap.o stack.o clist.o mstring.o eval.o
+test_assign: test_assign.o plheap.o stack.o clist.o mstring.o eval.o value.o
 	$(CC) test_assign.o plheap.o stack.o clist.o mstring.o eval.o \
-        -o test_assign
+        value.o -o test_assign
 
-test_calc: test_calc.o plheap.o stack.o clist.o mstring.o eval.o
+test_calc: test_calc.o plheap.o stack.o clist.o mstring.o eval.o value.o
 	$(CC) test_calc.o plheap.o stack.o clist.o mstring.o eval.o \
-        -o test_calc
+        value.o -o test_calc
 
 test_gc: test_gc.o plheap.o clist.o mstring.o
 	$(CC) test_gc.o plheap.o clist.o mstring.o -o test_gc
@@ -64,6 +64,9 @@ pli.o: src/driver/pli.c y.tab.h
 
 plrepl.o: src/driver/plrepl.c y.tab.h
 	$(CC) -c -I include -I ./ src/driver/plrepl.c -o plrepl.o $(CFLAGS)
+
+value.o: src/eval/value.c y.tab.h
+	$(CC) -c -I include -I ./ src/eval/value.c -o value.o $(CFLAGS)
 
 eval.o: src/eval/eval.c y.tab.h
 	$(CC) -c -I include -I ./ src/eval/eval.c -o eval.o $(CFLAGS)
