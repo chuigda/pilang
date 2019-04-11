@@ -1,14 +1,9 @@
 #include "value.h"
 
 #include <assert.h>
-#include <float.h>
-#include <inttypes.h>
-#include <limits.h>
-#include <math.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <stdint.h>
+#include <inttypes.h>
 
 plvalue_t create_onstack(stkobj_t *storage) {
   plvalue_t ret;
@@ -204,4 +199,13 @@ result_t fetch_list(plvalue_t obj) {
 
   UNREACHABLE;
   return failed_result("failed");
+}
+
+plvalue_t auto_deref(plvalue_t maybe_ref) {
+  if (maybe_ref.type != JT_REF) {
+    return maybe_ref;
+  }
+  heapobj_t *referred =
+    (heapobj_t*)(fetch_storage(&maybe_ref)->pvalue);
+  return create_onheap(referred);
 }

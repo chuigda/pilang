@@ -6,33 +6,35 @@ docs: doc/makefile
 	cd doc && make && tree -P "*.html" > docs && cd ..
 
 plrepl: mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
-        plheap.o value.o plrepl.o
+        plheap.o value.o builtins.o plrepl.o
 	$(CC) mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
-        value.o plheap.o plrepl.o -o plrepl
+        value.o builtins.o plheap.o plrepl.o -o plrepl
 
 pli: mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o plheap.o \
-     value.o pli.o
+     value.o pli.o builtins.o
 	$(CC) mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
-        plheap.o pli.o value.o -o pli
+        plheap.o pli.o value.o builtins.o -o pli
 
 plast: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
-	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o plast.o \
-        -o plast
+	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o \
+        plast.o -o plast
 
 tests: test_stack test_gc test_calc test_assign test_eval_expr
 
 test_eval_expr: test_eval_expr.o plheap.o stack.o clist.o mstring.o \
-                eval.o ast.o value.o
-	$(CC) test_eval_expr.o plheap.o stack.o clist.o mstring.o eval.o \
-        ast.o value.o -o test_eval_expr
+                eval.o ast.o value.o builtins.o
+	$(CC) test_eval_expr.o plheap.o stack.o clist.o mstring.o \
+        eval.o ast.o value.o builtins.o -o test_eval_expr
 
-test_assign: test_assign.o plheap.o stack.o clist.o mstring.o eval.o value.o
+test_assign: test_assign.o plheap.o stack.o clist.o mstring.o eval.o \
+              value.o builtins.o
 	$(CC) test_assign.o plheap.o stack.o clist.o mstring.o eval.o \
-        value.o -o test_assign
+        value.o builtins.o -o test_assign
 
-test_calc: test_calc.o plheap.o stack.o clist.o mstring.o eval.o value.o
+test_calc: test_calc.o plheap.o stack.o clist.o mstring.o eval.o \
+            value.o builtins.o
 	$(CC) test_calc.o plheap.o stack.o clist.o mstring.o eval.o \
-        value.o -o test_calc
+        value.o builtins.o -o test_calc
 
 test_gc: test_gc.o plheap.o clist.o mstring.o
 	$(CC) test_gc.o plheap.o clist.o mstring.o -o test_gc
@@ -41,8 +43,8 @@ test_stack: stack.o test_stack.o clist.o mstring.o
 	$(CC) stack.o test_stack.o clist.o mstring.o -o test_stack
 
 test_eval_expr.o: test/test_eval_expr.c y.tab.h
-	$(CC) -c -I include -I . test/test_eval_expr.c -o test_eval_expr.o \
-        $(CFLAGS)
+	$(CC) -c -I include -I . test/test_eval_expr.c -o \
+        test_eval_expr.o $(CFLAGS)
 
 test_assign.o: test/test_assign.c
 	$(CC) -c -I include test/test_assign.c -o test_assign.o $(CFLAGS)
@@ -63,7 +65,12 @@ pli.o: src/driver/pli.c y.tab.h
 	$(CC) -c -I include -I ./ src/driver/pli.c -o pli.o $(CFLAGS)
 
 plrepl.o: src/driver/plrepl.c y.tab.h
-	$(CC) -c -I include -I ./ src/driver/plrepl.c -o plrepl.o $(CFLAGS)
+	$(CC) -c -I include -I ./ src/driver/plrepl.c -o plrepl.o \
+        $(CFLAGS)
+
+builtins.o: src/eval/builtins.c y.tab.h
+	$(CC) -c -I include -I ./ src/eval/builtins.c -o builtins.o \
+        $(CFLAGS)
 
 value.o: src/eval/value.c y.tab.h
 	$(CC) -c -I include -I ./ src/eval/value.c -o value.o $(CFLAGS)
