@@ -79,7 +79,8 @@ static result_t fetch_int(plvalue_t obj) {
     return failed_result("cannot autocast from Nothing to Int");
   }
 
-  UNREAECHABLE
+  UNREAECHABLE;
+  return failed_result("failed");
 }
 
 static result_t fetch_float(plvalue_t obj) {
@@ -108,7 +109,8 @@ static result_t fetch_float(plvalue_t obj) {
     return failed_result("cannot autocast from Nothing to Float");
   }
 
-  UNREAECHABLE
+  UNREAECHABLE;
+  return failed_result("failed");
 }
 
 static result_t fetch_bool(plvalue_t obj) {
@@ -146,7 +148,8 @@ static result_t fetch_bool(plvalue_t obj) {
   }
   }
 
-  UNREAECHABLE
+  UNREAECHABLE;
+  return failed_result("failed");
 }
 
 static result_t fetch_str(plvalue_t obj) {
@@ -181,7 +184,8 @@ static result_t fetch_str(plvalue_t obj) {
     return failed_result("cannot autocast fron List to Str");
   }
 
-  UNREAECHABLE
+  UNREAECHABLE;
+  return failed_result("failed");
 }
 
 static result_t fetch_list(plvalue_t obj) {
@@ -193,7 +197,7 @@ static result_t fetch_list(plvalue_t obj) {
   switch (obj.type) {
   case JT_INT:
     return failed_result("cannot autocast from Int to List");
-  case JT_FLOAT:
+    return failed_result("failed");  case JT_FLOAT:
     return failed_result("cannot autocast from Float to List");
   case JT_BOOL:
     return failed_result("cannot autocast from Bool to List");
@@ -203,7 +207,8 @@ static result_t fetch_list(plvalue_t obj) {
     return success_result(*storage);
   }
 
-  UNREAECHABLE
+  UNREAECHABLE;
+  return failed_result("failed");
 }
 
 static void asgn_attach_typeinfo(plvalue_t *obj, int16_t type) {
@@ -220,7 +225,7 @@ static void asgn_attach_typeinfo(plvalue_t *obj, int16_t type) {
       break;
     }
     default:
-    UNREAECHABLE
+      UNREAECHABLE;
   }
 }
 

@@ -86,4 +86,5 @@ const char *get_string(strhdl_t hstr) {
   }
 
   assert(0 && "Internal error");
+  return "Internal error string: there was an internal error in pilang";
 }

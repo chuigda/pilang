@@ -89,7 +89,8 @@ static heapobj_t *plalloc(void) {
     }
   }
 
-  assert(0);
+  UNREAECHABLE;
+  return NULL;
 }
 
 heapobj_t *heap_alloc_int(int64_t value) {
