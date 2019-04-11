@@ -39,7 +39,8 @@ static void plast_tnp(ast_node_base_t *node) {
         || node->node_sema_info == ANS_FUNCTION
         || node->node_sema_info == ANS_STR) {
       printf(", SDATA = %s",
-             get_string(((ast_node_wdata_base_t*)node)->value.svalue));
+             get_string(((ast_node_wdata_base_t*)node)
+                          ->value.svalue));
     }
     else {
       printf(", IDATA = %" PRId64,

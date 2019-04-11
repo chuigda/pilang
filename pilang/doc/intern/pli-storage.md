@@ -36,5 +36,5 @@ info (`soid`) held by the stack object.
 * Reference to heap value
 
 In such circumstance, `roc` should be `ROC_ONHEAP`, and `data.pvalue`
-holds the pointer to that heap object. `type` simply "forwards" type info
-(`oid`) held by the heap object.
+holds the pointer to that heap object. `type` simply "forwards" type
+info (`oid`) held by the heap object.

@@ -7,10 +7,10 @@ on stack. Stack storage starts when object gets created and stops when
 function exits.
 
 ### Heap and dynamic storage duration
-All objects with complicated data types: List, Object are stored on heap.
-Heap storage starts when object gets created and stops when it is no more
-needed. Garbage collection machanism will automatically cleanup not used
-objects.
+All objects with complicated data types: List, Object are stored on 
+heap. Heap storage starts when object gets created and stops when it is
+no more needed. Garbage collection machanism will automatically cleanup
+unused objects.
 
 ### Garbage Collection
 > This part is incomplete by this time.

@@ -307,8 +307,8 @@ plvalue_t eval_binexpr(ast_dchild_wdata_t *node, stack_t *stack) {
 }
 
 plvalue_t eval_func_call(ast_dchild_t *func, stack_t *stack) {
-  /// @todo now builtin functions only. Add user-defined functions after
-  /// releasing version Perseus
+  /// @todo now builtin functions only. Add user-defined functions 
+  /// after releasing version Perseus
   ast_leaf_wdata_t *idref = (ast_leaf_wdata_t*)(func->children[0]);
   ast_list_t *args = (ast_list_t*)(func->children[1]);
 

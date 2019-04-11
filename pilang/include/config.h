@@ -6,7 +6,7 @@
  * for any usage. As a result, a convenient naming machanism is granted.
 */
 #define BAS_LANGUAGE_NAME "PiLang"
-#define BAS_AUTHOR        "ICEY(crazycz.cc@ckx-ily.cn)"
+#define BAS_AUTHOR        "ICEY(iceyself@iceyey.tech)"
 #define BAS_DISCRIPTION   "A programming language for ordinary people"
 #define BAS_LICENSE       "WTFPL v2+"
 
