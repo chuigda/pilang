@@ -15,8 +15,8 @@
 #define VER_NAME "Halley"
 
 #define VER_PLCFRONT_MAJOR 0
-#define VER_PLCFRONT_MINOR 0
-#define VER_PLCFRONT_REVISE 1
+#define VER_PLCFRONT_MINOR 1
+#define VER_PLCFRONT_REVISE 0
 
 #define VER_PLI_MAJOR 0
 #define VER_PLI_MINOR 3

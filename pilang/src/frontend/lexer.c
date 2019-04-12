@@ -190,9 +190,12 @@ static int lex_number(void) {
     double float_value = int_part;
     double temp = 0;
     while (isdigit(curchar())) {
+      temp *= 10;
       temp += curchar() - '0';
-      temp /= 10;
       get_next_char();
+    }
+    while (temp > 1) {
+      temp /= 10;
     }
     float_value += temp;
     yylval.token.token_kind = TK_NUM_FLOAT;
