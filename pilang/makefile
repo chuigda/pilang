@@ -8,12 +8,12 @@ docs: doc/makefile
 plrepl: lexer.o parser.o ast.o eval.o builtins.o dynload.o plrepl.o \
         libpilang.a
 	$(CC) lexer.o parser.o ast.o eval.o builtins.o plrepl.o \
-              dynload.o libpilang.a -ldl -o plrepl
+              dynload.o -L. -lpilang -ldl -o plrepl
 
 pli: lexer.o parser.o ast.o eval.o pli.o builtins.o dynload.o \
      libpilang.a
 	$(CC) lexer.o parser.o ast.o eval.o pli.o builtins.o dynload.o \
-              libpilang.a -ldl -o pli
+              -L. -lpilang -ldl -o pli
 
 plast: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o \
@@ -22,26 +22,24 @@ plast: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
 tests: test_stack test_gc test_calc test_assign test_eval_expr \
        libffiex.so
 
-libffiex.so: ffiex.o clist.o value.o stack.o plheap.o mstring.o
-	$(CC) ffiex.o libpilang.a -shared -o libffiex.so
+libffiex.so: ffiex.o libpilang.a
+	$(CC) ffiex.o -L. -lpilang -shared -o libffiex.so
 
 libpilang.a: clist.o mstring.o value.o stack.o plheap.o
 	ar rcs libpilang.a clist.o mstring.o value.o stack.o plheap.o
 
-test_eval_expr: test_eval_expr.o plheap.o stack.o clist.o mstring.o \
-                eval.o ast.o value.o builtins.o dynload.o
-	$(CC) test_eval_expr.o plheap.o stack.o clist.o mstring.o \
-        eval.o ast.o value.o builtins.o dynload.o -ldl -o test_eval_expr
+test_eval_expr: test_eval_expr.o eval.o ast.o builtins.o dynload.o \
+                libpilang.a
+	$(CC) test_eval_expr.o eval.o ast.o builtins.o dynload.o \
+              -L. -lpilang -ldl -o test_eval_expr
 
-test_assign: test_assign.o plheap.o stack.o clist.o mstring.o eval.o \
-              value.o builtins.o dynload.o
-	$(CC) test_assign.o plheap.o stack.o clist.o mstring.o eval.o \
-        value.o builtins.o dynload.o -ldl -o test_assign
+test_assign: test_assign.o eval.o builtins.o dynload.o libpilang.a
+	$(CC) test_assign.o eval.o builtins.o dynload.o \
+              -L. -lpilang -ldl -o test_assign
 
-test_calc: test_calc.o plheap.o stack.o clist.o mstring.o eval.o \
-            value.o builtins.o dynload.o
-	$(CC) test_calc.o plheap.o stack.o clist.o mstring.o eval.o \
-        value.o builtins.o dynload.o -ldl -o test_calc
+test_calc: test_calc.o  eval.o builtins.o dynload.o libpilang.a
+	$(CC) test_calc.o eval.o builtins.o dynload.o -L. -lpilang \
+              -ldl -o test_calc
 
 test_gc: test_gc.o plheap.o clist.o mstring.o
 	$(CC) test_gc.o plheap.o clist.o mstring.o -o test_gc
@@ -129,3 +127,5 @@ clean:
 	rm -rf test_*
 	cd doc && make clean && cd ..
 	rm -rf doc/docs
+	rm -rf *.so
+	rm -rf *.a
