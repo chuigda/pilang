@@ -1,40 +1,40 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Wno-unused-function -g
 
-all: pli.exe plast.exe plrepl.exe tests
+all: pli.exe plast.exe plrepl.exe libpilang.a tests
 
-pli.exe: mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
-          plheap.o pli.o value.o builtins.o
-	$(CC) mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
-              plheap.o value.o pli.o builtins.o -o pli.exe
+pli.exe: lexer.o parser.o ast.o eval.o pli.o builtins.o libpilang.a \
+         dynload.o
+	$(CC) lexer.o parser.o ast.o eval.o pli.o builtins.o \
+              dynload.o -L. -lpilang -o pli.exe
 
 plast.exe: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o \
               plast.o -o plast.exe
 
-plrepl.exe: mstring.o lexer.o parser.o clist.o ast.o stack.o plheap.o \
-            tree_dump.o eval.o plrepl.o value.o builtins.o
-	$(CC) mstring.o lexer.o parser.o clist.o ast.o tree_dump.o \
-              plrepl.o plheap.o stack.o eval.o value.o builtins.o \
-              -o plrepl.exe
+plrepl.exe: lexer.o parser.o ast.o tree_dump.o eval.o builtins.o \
+            dynload.o plrepl.o libpilang.a
+	$(CC) lexer.o parser.o ast.o tree_dump.o plrepl.o builtins.o \
+              eval.o dynload.o -L. -lpilang -o plrepl.exe
 
 tests: test_stack.exe test_gc.exe test_calc.exe test_assign.exe \
-        test_eval_expr.exe
+       test_eval_expr.exe libffiex.dll
 
-test_eval_expr.exe: test_eval_expr.o plheap.o stack.o clist.o \
-                      mstring.o eval.o ast.o value.o builtins.o
-	$(CC) test_eval_expr.o plheap.o stack.o clist.o mstring.o \
-              eval.o value.o ast.o builtins.o -o test_eval_expr.exe
+libffiex.dll: ffiex.o libpilang.a
+	$(CC) ffiex.o -L. -lpilang -shared -o libffiex.dll
 
-test_assign.exe: test_assign.o plheap.o stack.o clist.o mstring.o \
-                   eval.o value.o builtins.o
-	$(CC) test_assign.o plheap.o stack.o clist.o mstring.o eval.o \
-              value.o builtins.o -o test_assign.exe
+test_eval_expr.exe: test_eval_expr.o eval.o ast.o builtins.o \
+                    dynload.o libpilang.a
+	$(CC) test_eval_expr.o eval.o ast.o builtins.o libpilang.a \
+              dynload.o -L. -lpilang -o test_eval_expr.exe
 
-test_calc.exe: test_calc.o plheap.o stack.o clist.o mstring.o eval.o \
-                 value.o builtins.o
-	$(CC) test_calc.o plheap.o stack.o clist.o mstring.o eval.o \
-              value.o builtins.o -o test_calc.exe
+test_assign.exe: test_assign.o eval.o builtins.o dynload.o libpilang.a
+	$(CC) test_assign.o eval.o builtins.o dynload.o -L. -lpilang \
+              -o test_assign.exe
+
+test_calc.exe: test_calc.o eval.o builtins.o dynload.o libpilang.a
+	$(CC) test_calc.o eval.o dynload.o builtins.o \
+              -L. -lpilang -o test_calc.exe
 
 test_gc.exe: test_gc.o plheap.o clist.o mstring.o
 	$(CC) test_gc.o plheap.o clist.o mstring.o -o test_gc.exe
@@ -68,6 +68,17 @@ pli.o: src/driver/pli.c y.tab.h
 plrepl.o: src/driver/plrepl.c y.tab.h
 	$(CC) -c -I include -I . src/driver/plrepl.c \
               -o plrepl.o $(CFLAGS)
+
+ffiex.o: sample/ffiex.c
+	$(CC) -c -I include -I ./ sample/ffiex.c -fPIC -o ffiex.o \
+              $(CFLAGS)
+
+libpilang.a: clist.o mstring.o plheap.o stack.o value.o
+	ar rcs libpilang.a clist.o mstring.o value.o stack.o plheap.o
+
+dynload.o: src/support/dynload_win32.c
+	$(CC) -c -I include -I . src/support/dynload_win32.c \
+              -o dynload.o $(CFLAGS)
 
 builtins.o: src/eval/builtins.c y.tab.h
 	$(CC) -c -I include -I . src/eval/builtins.c -o builtins.o $(CFLAGS)
@@ -118,3 +129,6 @@ clean:
 	del /F /S /Q *.o
 	del /F /S /Q plast.exe pli.exe plrepl.exe
 	del /F /S /Q test_*.exe
+	del /F /S /Q *.dll
+	del /F /S /Q *.a
+	del /F /S /Q *.lib
