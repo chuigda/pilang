@@ -27,9 +27,9 @@ int main() {
   eprintf("Created by %s, licensed under %s\n",
           BAS_AUTHOR, BAS_LICENSE);
   eprintf("Distribution \"%s\"\n", VER_NAME);
-  eprintf("  Fronted version %d.%d.%d\n",
+  eprintf("  Frontend version %d.%d.%d\n",
           VER_PLCFRONT_MAJOR, VER_PLCFRONT_MINOR, VER_PLCFRONT_REVISE);
-  eprintf("  Intepreter version %d.%d.%d\n",
+  eprintf("  Interpreter version %d.%d.%d\n",
           VER_PLI_MAJOR, VER_PLI_MINOR, VER_PLI_REVISE);
   fputc('\n', stderr);
 

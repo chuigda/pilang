@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
           BAS_LANGUAGE_NAME, BAS_DISCRIPTION);
   fprintf(stderr, "Created by %s, licensed under %s\n",
           BAS_AUTHOR, BAS_LICENSE);
-  fprintf(stderr, "  Fronted version %d.%d.%d\n",
+  fprintf(stderr, "  Frontend version %d.%d.%d\n",
           VER_PLCFRONT_MAJOR, VER_PLCFRONT_MINOR, VER_PLCFRONT_REVISE);
   fputc('\n', stderr);
 

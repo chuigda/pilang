@@ -2,8 +2,9 @@
 #define CONFIG_H
 
 /* Basis */
-/** Please note that PiLang is distributed under WTFPL v2, you may use it
- * for any usage. As a result, a convenient naming machanism is granted.
+/** Please note that PiLang is distributed under WTFPL v2, you may use 
+ * it for any usage. As a result, a convenient renaming machanism is 
+ * granted.
 */
 #define BAS_LANGUAGE_NAME "PiLang"
 #define BAS_AUTHOR        "ICEY(iceyself@iceyey.tech)"
