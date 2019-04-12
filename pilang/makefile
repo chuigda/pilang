@@ -1,19 +1,19 @@
 CFLAGS = -Wall -Wextra -Wno-unused-function -g
 
-all: docs pli plrepl plast tests
+all: docs pli plrepl plast libpilang.a tests
 
 docs: doc/makefile
 	cd doc && make && tree -P "*.html" > docs && cd ..
 
-plrepl: mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
-        plheap.o value.o builtins.o dynload.o plrepl.o
-	$(CC) mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
-        value.o builtins.o plheap.o plrepl.o dynload.o -ldl -o plrepl
+plrepl: lexer.o parser.o ast.o eval.o builtins.o dynload.o plrepl.o \
+        libpilang.a
+	$(CC) lexer.o parser.o ast.o eval.o builtins.o plrepl.o \
+              dynload.o libpilang.a -ldl -o plrepl
 
-pli: mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o plheap.o \
-     value.o pli.o builtins.o dynload.o
-	$(CC) mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
-        plheap.o pli.o value.o builtins.o dynload.o -ldl -o pli
+pli: lexer.o parser.o ast.o eval.o pli.o builtins.o dynload.o \
+     libpilang.a
+	$(CC) lexer.o parser.o ast.o eval.o pli.o builtins.o dynload.o \
+              libpilang.a -ldl -o pli
 
 plast: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o \
@@ -23,8 +23,10 @@ tests: test_stack test_gc test_calc test_assign test_eval_expr \
        libffiex.so
 
 libffiex.so: ffiex.o clist.o value.o stack.o plheap.o mstring.o
-	$(CC) ffiex.o clist.o value.o stack.o plheap.o mstring.o \
-              -shared -o libffiex.so
+	$(CC) ffiex.o libpilang.a -shared -o libffiex.so
+
+libpilang.a: clist.o mstring.o value.o stack.o plheap.o
+	ar rcs libpilang.a clist.o mstring.o value.o stack.o plheap.o
 
 test_eval_expr: test_eval_expr.o plheap.o stack.o clist.o mstring.o \
                 eval.o ast.o value.o builtins.o dynload.o
