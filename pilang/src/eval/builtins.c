@@ -1,4 +1,5 @@
 #include "builtins.h"
+#include "dynload.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -100,16 +101,96 @@ static plvalue_t builtin_copy_to_heap(list_t args) {
     ref.value.pvalue = heap_alloc_bool(storage->bvalue); break;
   case JT_UNDEFINED:
     ref.value.pvalue = heap_alloc_empty(); break;
-  default: UNREACHABLE
+  default: UNREACHABLE;
   }
   return ref;
 }
 
-plvalue_t builtin_call(strhdl_t name, list_t args) {
-  /// @todo replace this with TableGen
-  static bool initialized = false;
-  static strhdl_t builtin_func_names[11];
-  if (!initialized) {
+static plvalue_t builtin_dynload(list_t args);
+
+static bool builtin_funcs_init = false;
+static strhdl_t builtin_func_names[1024];
+static builtin_func_t builtin_funcs[1024] = {
+  builtin_print, builtin_readint, builtin_readfloat, builtin_readstr,
+  builtin_copy_to_heap, NULL, NULL, NULL, NULL, NULL, NULL,
+  builtin_dynload
+};
+
+static size_t func_slot_usage;
+static size_t func_slot_size;
+
+static plvalue_t builtin_dynload(list_t args) {
+  plvalue_t ret = create_temp();
+  ret.type = JT_UNDEFINED;
+  
+  if (list_size(&args) < 3) {
+    eprintf0("e: dynload requires three argument\n");
+    return ret;
+  }
+  
+  if (list_size(&args) > 3) {
+    eprintf0("w: dynload only requires two arguments\n");
+    return ret;
+  }
+  
+  if (func_slot_size == func_slot_usage) {
+    eprintf0("e: build more farms!\n");
+    return ret;
+  }
+  
+  iter_t it = list_begin(&args);
+  strhdl_t objpath, funcname, alias;
+  {
+    plvalue_t *objpathv = (plvalue_t*)iter_deref(it);
+    result_t strresult = fetch_str(*objpathv);
+    if (!strresult.success) {
+      eprintf0("e: args of dynload must be strings\n");
+      return ret;
+    }
+    objpath = strresult.value.svalue;
+  }
+  it = iter_next(it);
+  {
+    plvalue_t *funcnamev = (plvalue_t*)iter_deref(it);
+    result_t strresult = fetch_str(*funcnamev);
+    if (!strresult.success) {
+      eprintf0("e: args of dynload must be strings\n");
+      return ret;
+    }
+    funcname = strresult.value.svalue;
+  }
+  it = iter_next(it);
+  {
+    plvalue_t *aliasv = (plvalue_t*)iter_deref(it);
+    result_t strresult = fetch_str(*aliasv);
+    if (!strresult.success) {
+      eprintf0("e: args of dynload must be strings\n");
+      return ret;
+    }
+    alias = strresult.value.svalue;
+  }
+  
+  result_t func_result = dyn_load_func(get_string(objpath),
+                                       get_string(funcname));
+  if (!func_result.success) {
+    eprintf("e: dynload: %s\n", get_string(func_result.value.svalue));
+    return ret;
+  }
+  
+  builtin_func_t func = (builtin_func_t)(func_result.value.pvalue);
+  builtin_func_names[func_slot_usage] = alias;
+  builtin_funcs[func_slot_usage] = func;
+  func_slot_usage++;
+  ret.type = JT_STR;
+  ret.value.svalue = create_string("success");
+  return ret;
+}
+
+static void maybe_init_builtin_funcs() {
+  if (!builtin_funcs_init) {
+    builtin_funcs_init = true;
+    func_slot_usage = 12;
+    func_slot_size = 1024;
     builtin_func_names[0] = create_string("print");
     builtin_func_names[1] = create_string("readint");
     builtin_func_names[2] = create_string("readfloat");
@@ -121,26 +202,38 @@ plvalue_t builtin_call(strhdl_t name, list_t args) {
     builtin_func_names[8] = create_string("popback");
     builtin_func_names[9] = create_string("atput");
     builtin_func_names[10] = create_string("at");
-    initialized = true;
+    builtin_func_names[11] = create_string("dynload");
   }
+}
 
-  static builtin_func_t builtin_funcs[11] = {
-    builtin_print, builtin_readint, builtin_readfloat, builtin_readstr,
-    builtin_copy_to_heap, NULL, NULL, NULL, NULL, NULL, NULL
-  };
+bool is_builtin_call(strhdl_t name) {
+  maybe_init_builtin_funcs();
 
+  for (size_t i = 0; i < func_slot_usage; i++) {
+    if (name == builtin_func_names[i]) {
+      return true;
+    }
+  }
+  return false;
+}
+
+plvalue_t builtin_call(strhdl_t name, list_t args) {
+  maybe_init_builtin_funcs();
+  
   plvalue_t ret = create_temp();
   ret.type = JT_UNDEFINED;
 
-  for (size_t i = 0; i < COUNTOF(builtin_func_names); i++) {
+  for (size_t i = 0; i < func_slot_usage; i++) {
     if (name == builtin_func_names[i]) {
       if (builtin_funcs[i] == NULL) {
         eprintf("sorry, %s not implemented yet.\n", get_string(name));
         break;
       }
       ret = (builtin_funcs[i])(args);
+      return ret;
     }
   }
 
+  UNREACHABLE;
   return ret;
 }

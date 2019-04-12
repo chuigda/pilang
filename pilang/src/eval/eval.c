@@ -307,8 +307,6 @@ plvalue_t eval_binexpr(ast_dchild_wdata_t *node, stack_t *stack) {
 }
 
 plvalue_t eval_func_call(ast_dchild_t *func, stack_t *stack) {
-  /// @todo now builtin functions only. Add user-defined functions 
-  /// after releasing version Perseus
   ast_leaf_wdata_t *idref = (ast_leaf_wdata_t*)(func->children[0]);
   ast_list_t *args = (ast_list_t*)(func->children[1]);
 
@@ -324,7 +322,13 @@ plvalue_t eval_func_call(ast_dchild_t *func, stack_t *stack) {
     list_push_back(&evaluated_args, evaluated_arg);
   }
 
-  plvalue_t ret = builtin_call(idref->value.svalue, evaluated_args);
+  plvalue_t ret;
+  if (is_builtin_call(idref->value.svalue)) {
+    ret = builtin_call(idref->value.svalue, evaluated_args);
+  }
+  else {
+    /// @todo
+  }
 
   for (iter_t it = list_begin(&evaluated_args);
        !iter_eq(it, list_end(&evaluated_args));
@@ -381,7 +385,7 @@ void eval_if_stmt(ast_node_base_t *stmt, stack_t *stack) {
 void eval_while_stmt(ast_node_base_t *stmt, stack_t *stack) {
   ast_dchild_t *while_stmt = (ast_dchild_t*)stmt;
   while (bool_failsafe(fetch_bool(eval_expr(while_stmt->children[0],
-					    stack)))) {
+          stack)))) {
     eval_stmt(while_stmt->children[1], stack);
   }
 }

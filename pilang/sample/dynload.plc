@@ -1,0 +1,4 @@
+function main takes returns begin
+  print[dynload['./libffiex.so'; 'ffi_add'; 'add1']; '\n'];
+  print[add1[1; 2; 3]; '\n'];
+end function

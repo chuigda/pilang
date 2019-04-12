@@ -44,6 +44,9 @@ const_iter_t list_cend(list_t const* list);
 any_t iter_deref(iter_t iter);
 const_any_t const_iter_deref(const_iter_t iter);
 
+any_t list_at(list_t *list, size_t idx);
+const_any_t const_list_at(list_t const* list, size_t idx);
+
 iter_t iter_next(iter_t iter);
 iter_t iter_prev(iter_t iter);
 

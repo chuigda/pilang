@@ -1,4 +1,5 @@
 #include "clist.h"
+#include <assert.h>
 
 typedef struct node_ {
   any_t any;
@@ -101,6 +102,32 @@ any_t iter_deref(iter_t iter) {
 
 const_any_t const_iter_deref(const_iter_t iter) {
   return ((const node_t*)iter.opaque)->any;
+}
+
+any_t list_at(list_t *list, size_t idx) {
+  assert(idx < list_size(list));
+  size_t n = 0;
+  for (iter_t it = list_begin(list);
+       !iter_eq(it, list_end(list));
+       it = iter_next(it)) {
+    if (n == idx) {
+      return iter_deref(it);
+    }
+  }
+  return NULL;
+}
+
+const_any_t const_list_at(list_t const* list, size_t idx) {
+  assert(idx < list_size(list));
+  size_t n = 0;
+  for (const_iter_t it = list_cbegin(list);
+       !const_iter_eq(it, list_cend(list));
+       it = const_iter_next(it)) {
+    if (n == idx) {
+      return const_iter_deref(it);
+    }
+  }
+  return NULL;
 }
 
 bool iter_eq(iter_t lhs, iter_t rhs) {

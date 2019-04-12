@@ -6,35 +6,40 @@ docs: doc/makefile
 	cd doc && make && tree -P "*.html" > docs && cd ..
 
 plrepl: mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
-        plheap.o value.o builtins.o plrepl.o
+        plheap.o value.o builtins.o dynload.o plrepl.o
 	$(CC) mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
-        value.o builtins.o plheap.o plrepl.o -o plrepl
+        value.o builtins.o plheap.o plrepl.o dynload.o -ldl -o plrepl
 
 pli: mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o plheap.o \
-     value.o pli.o builtins.o
+     value.o pli.o builtins.o dynload.o
 	$(CC) mstring.o lexer.o parser.o clist.o ast.o eval.o stack.o \
-        plheap.o pli.o value.o builtins.o -o pli
+        plheap.o pli.o value.o builtins.o dynload.o -ldl -o pli
 
 plast: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
 	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o \
         plast.o -o plast
 
-tests: test_stack test_gc test_calc test_assign test_eval_expr
+tests: test_stack test_gc test_calc test_assign test_eval_expr \
+       libffiex.so
+
+libffiex.so: ffiex.o clist.o value.o stack.o plheap.o mstring.o
+	$(CC) ffiex.o clist.o value.o stack.o plheap.o mstring.o \
+              -shared -o libffiex.so
 
 test_eval_expr: test_eval_expr.o plheap.o stack.o clist.o mstring.o \
-                eval.o ast.o value.o builtins.o
+                eval.o ast.o value.o builtins.o dynload.o
 	$(CC) test_eval_expr.o plheap.o stack.o clist.o mstring.o \
-        eval.o ast.o value.o builtins.o -o test_eval_expr
+        eval.o ast.o value.o builtins.o dynload.o -ldl -o test_eval_expr
 
 test_assign: test_assign.o plheap.o stack.o clist.o mstring.o eval.o \
-              value.o builtins.o
+              value.o builtins.o dynload.o
 	$(CC) test_assign.o plheap.o stack.o clist.o mstring.o eval.o \
-        value.o builtins.o -o test_assign
+        value.o builtins.o dynload.o -ldl -o test_assign
 
 test_calc: test_calc.o plheap.o stack.o clist.o mstring.o eval.o \
-            value.o builtins.o
+            value.o builtins.o dynload.o
 	$(CC) test_calc.o plheap.o stack.o clist.o mstring.o eval.o \
-        value.o builtins.o -o test_calc
+        value.o builtins.o dynload.o -ldl -o test_calc
 
 test_gc: test_gc.o plheap.o clist.o mstring.o
 	$(CC) test_gc.o plheap.o clist.o mstring.o -o test_gc
@@ -58,8 +63,13 @@ test_gc.o: test/test_gc.c
 test_stack.o: test/test_stack.c
 	$(CC) -c -I include test/test_stack.c -o test_stack.o $(CFLAGS)
 
+ffiex.o: sample/ffiex.c
+	$(CC) -c -I include -I ./ sample/ffiex.c -fPIC -o ffiex.o \
+              $(CFLAGS)
+
 plast.o: src/driver/plast.c y.tab.h
-	$(CC) -c -I include -I ./ src/driver/plast.c -o plast.o $(CFLAGS)
+	$(CC) -c -I include -I ./ src/driver/plast.c \
+              -o plast.o $(CFLAGS)
 
 pli.o: src/driver/pli.c y.tab.h
 	$(CC) -c -I include -I ./ src/driver/pli.c -o pli.o $(CFLAGS)
@@ -67,6 +77,10 @@ pli.o: src/driver/pli.c y.tab.h
 plrepl.o: src/driver/plrepl.c y.tab.h
 	$(CC) -c -I include -I ./ src/driver/plrepl.c -o plrepl.o \
         $(CFLAGS)
+
+dynload.o: src/support/dynload_posix.c y.tab.h
+	$(CC) -c -I include -I ./ src/support/dynload_posix.c \
+        -o dynload.o $(CFLAGS)
 
 builtins.o: src/eval/builtins.c y.tab.h
 	$(CC) -c -I include -I ./ src/eval/builtins.c -o builtins.o \
