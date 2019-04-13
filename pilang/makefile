@@ -87,28 +87,30 @@ builtins.o: src/eval/builtins.c y.tab.h
         $(CFLAGS)
 
 value.o: src/eval/value.c y.tab.h
-	$(CC) -c -I include -I ./ src/eval/value.c -o value.o $(CFLAGS)
+	$(CC) -c -I include -I ./ src/eval/value.c -fPIC \
+        -o value.o $(CFLAGS)
 
 eval.o: src/eval/eval.c y.tab.h
 	$(CC) -c -I include -I ./ src/eval/eval.c -o eval.o $(CFLAGS)
 
 stack.o: src/eval/stack.c
-	$(CC) -c -I include src/eval/stack.c -o stack.o $(CFLAGS)
+	$(CC) -c -I include src/eval/stack.c -fPIC -o stack.o $(CFLAGS)
 
 plheap.o: src/eval/heap.c
-	$(CC) -c -I include src/eval/heap.c -o plheap.o $(CFLAGS)
+	$(CC) -c -I include src/eval/heap.c -fPIC -o plheap.o $(CFLAGS)
 
 tree_dump.o: src/ast/tree_dump.c y.tab.h
-	$(CC) -c -I include -I ./ src/ast/tree_dump.c -o tree_dump.o $(CFLAGS)
+	$(CC) -c -I include -I ./ src/ast/tree_dump.c \
+        -o tree_dump.o $(CFLAGS)
 
 ast.o : src/ast/ast.c
 	$(CC) -c -I include src/ast/ast.c -o ast.o $(CFLAGS)
 
 clist.o : src/support/clist.c
-	$(CC) -c -I include src/support/clist.c -o clist.o $(CFLAGS)
+	$(CC) -c -I include src/support/clist.c -fPIC -o clist.o $(CFLAGS)
 
 mstring.o : src/support/mstring.c
-	$(CC) -c -I include src/support/mstring.c -o mstring.o $(CFLAGS)
+	$(CC) -c -I include src/support/mstring.c -fPIC -o mstring.o $(CFLAGS)
 
 parser.o : y.tab.c
 	$(CC) -c -I include y.tab.c -o parser.o $(CFLAGS)
