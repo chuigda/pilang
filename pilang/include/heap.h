@@ -30,7 +30,6 @@ heapobj_id_t jt2hoid(jjtype_t jt);
 jjtype_t hoid2jt(heapobj_id_t hoid);
 
 /// @todo FIXME do we really need these assistant functions?
-heapobj_t *heap_alloc_ref(heapobj_t *source);
 heapobj_t *heap_alloc_int(int64_t value);
 heapobj_t *heap_alloc_bool(bool value);
 heapobj_t *heap_alloc_float(double value);
