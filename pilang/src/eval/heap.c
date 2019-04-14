@@ -36,6 +36,13 @@ void destroy_object(heapobj_t *obj) {
   case HOID_LIST:
     destroy_list(&(obj->value.lsvalue));
     break;
+    
+  case HOID_RESHANDLE: {
+    res_base_t *res = (res_base_t*)obj->value.pvalue;
+    void (*destructor)(void*) = res->destructor;
+    destructor(res);
+    break;
+  }
   }
 }
 
@@ -51,6 +58,9 @@ void init_heap() {
 
 void close_heap() {
   for (size_t i = 0; i < heap_cap; i++) {
+    if (heap[i]->used) {
+      destroy_object(heap[i]);
+    }
     free(heap[i]);
   }
   free(heap);
@@ -128,6 +138,13 @@ heapobj_t *heap_alloc_str(int64_t str) {
   return ret;
 }
 
+heapobj_t *heap_alloc_handle(res_base_t *res) {
+  heapobj_t *ret = plalloc();
+  ret->oid = HOID_RESHANDLE;
+  ret->value.pvalue = res;
+  return ret;
+}
+
 heapobj_t *heap_alloc_empty() {
   heapobj_t *ret = plalloc();
   ret->oid = HOID_UNDEFINED;
@@ -149,10 +166,6 @@ static void gc_mark_list(heapobj_t *obj) {
        it = iter_next(it)) {
     gc_mark_white((heapobj_t*)iter_deref(it));
   }
-}
-
-static void gc_mark_ref(heapobj_t *obj) {
-  gc_mark_white((heapobj_t*)obj->value.pvalue);
 }
 
 void gc_mark_white(heapobj_t *obj) {

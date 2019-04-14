@@ -8,6 +8,13 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define RESOURCE_COMMON_HEAD \
+  void (*destructor)(void*);
+
+typedef struct {
+  RESOURCE_COMMON_HEAD;
+} res_base_t;
+
 typedef union {
   int64_t ivalue;
   double fvalue;
@@ -24,6 +31,7 @@ typedef enum {
   JT_STR,
   JT_LIST,
   JT_REF,
+  JT_RESHANDLE,
   JT_UNDEFINED
 } jjtype_t;
 

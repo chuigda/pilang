@@ -10,6 +10,7 @@
 
 stkobj_id_t jt2soid(jjtype_t jt) {
   assert(jt != JT_LIST);
+  assert(jt != JT_RESHANDLE);
   return (stkobj_id_t)jt;
 }
 

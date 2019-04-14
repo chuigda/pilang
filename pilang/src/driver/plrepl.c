@@ -86,6 +86,9 @@ int main() {
     case JT_REF:
       eprintf0("(Not printable) :: Ref");
       break;
+    case JT_RESHANDLE:
+      eprintf0("(Not printable) :: Handle");
+      break;
     case JT_UNDEFINED:
       eprintf0("Undefined :: Undefined");
       break;

@@ -28,6 +28,8 @@ static plvalue_t builtin_print(list_t args) {
       printf("%s", get_string(storage->svalue)); break;
     case JT_LIST:
       printf("(list)"); break;
+    case JT_RESHANDLE:
+      printf("(resource-handle)"); break;
     case JT_UNDEFINED:
       printf("Undefined"); break;
     default:

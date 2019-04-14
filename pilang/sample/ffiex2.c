@@ -1,6 +1,8 @@
 #include "value.h"
 #include "builtins.h"
 
+#include <stdlib.h>
+
 static host_env_t host_env;
 
 void setup_host_env(host_env_t env) {
@@ -11,6 +13,7 @@ const char* *describe_ffi_funcs(void) {
   static const char* funcs[] = {
     "ffi_nmsl",
     "ffi_hjyz",
+    "ffi_cnmb",
     NULL
   };
   return funcs;
@@ -20,6 +23,7 @@ const char* *describe_ffi_aliases(void) {
   static const char* aliases[] = {
     "nmsl",
     "hjyz",
+    "cnmb",
     NULL
   };
   return aliases;
@@ -36,4 +40,28 @@ plvalue_t ffi_nmsl(list_t args) {
 plvalue_t ffi_hjyz(list_t args) {
   (void)args;
   return create_onheap(host_env.heap_alloc_int_fn(7777));
+}
+
+typedef struct {
+  RESOURCE_COMMON_HEAD
+  char *buffer;
+} cnm_t;
+
+static void destroy_cnm(void* res) {
+  cnm_t *cnm = (cnm_t*)res;
+  free(cnm->buffer);
+  free(cnm);
+}
+
+plvalue_t ffi_cnmb(list_t args) {
+  (void)args;
+  cnm_t *cnm = NEW(cnm_t);
+  cnm->buffer = NEWN(char, 1024);
+  cnm->destructor = &destroy_cnm;
+  
+  heapobj_t *obj = host_env.heap_alloc_handle_fn((res_base_t*)cnm);
+  plvalue_t ret = create_temp();
+  ret.type = JT_REF;
+  ret.value.pvalue = obj;
+  return ret;
 }

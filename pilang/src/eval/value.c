@@ -218,6 +218,7 @@ host_env_t get_host_env() {
   ret.heap_alloc_str_fn = &heap_alloc_str;
   ret.heap_alloc_list_fn = &heap_alloc_list;
   ret.heap_alloc_empty_fn = &heap_alloc_empty;
+  ret.heap_alloc_handle_fn = &heap_alloc_handle;
   
   ret.create_string_fn = &create_string;
   ret.get_string_fn = &get_string;
