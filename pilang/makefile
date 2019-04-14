@@ -20,7 +20,10 @@ plast: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
         plast.o -o plast
 
 tests: test_stack test_gc test_calc test_assign test_eval_expr \
-       libffiex.so
+       libffiex.so libffiex2.so
+
+libffiex2.so: ffiex2.o libpilang.a
+	$(CC) ffiex2.o -L. -lpilang -shared -o libffiex2.so
 
 libffiex.so: ffiex.o libpilang.a
 	$(CC) ffiex.o -L. -lpilang -shared -o libffiex.so
@@ -52,7 +55,8 @@ test_eval_expr.o: test/test_eval_expr.c y.tab.h
         test_eval_expr.o $(CFLAGS)
 
 test_assign.o: test/test_assign.c
-	$(CC) -c -I include test/test_assign.c -o test_assign.o $(CFLAGS)
+	$(CC) -c -I include test/test_assign.c \
+              -o test_assign.o $(CFLAGS)
 
 test_calc.o: test/test_calc.c
 	$(CC) -c -I include test/test_calc.c -o test_calc.o $(CFLAGS)
@@ -62,6 +66,10 @@ test_gc.o: test/test_gc.c
 
 test_stack.o: test/test_stack.c
 	$(CC) -c -I include test/test_stack.c -o test_stack.o $(CFLAGS)
+
+ffiex2.o: sample/ffiex2.c
+	$(CC) -c -I include -I ./ sample/ffiex2.c -fPIC -o ffiex2.o \
+              $(CFLAGS)
 
 ffiex.o: sample/ffiex.c
 	$(CC) -c -I include -I ./ sample/ffiex.c -fPIC -o ffiex.o \
@@ -107,16 +115,19 @@ ast.o : src/ast/ast.c
 	$(CC) -c -I include src/ast/ast.c -o ast.o $(CFLAGS)
 
 clist.o : src/support/clist.c
-	$(CC) -c -I include src/support/clist.c -fPIC -o clist.o $(CFLAGS)
+	$(CC) -c -I include src/support/clist.c -fPIC \
+              -o clist.o $(CFLAGS)
 
 mstring.o : src/support/mstring.c
-	$(CC) -c -I include src/support/mstring.c -fPIC -o mstring.o $(CFLAGS)
+	$(CC) -c -I include src/support/mstring.c -fPIC \
+              -o mstring.o $(CFLAGS)
 
 parser.o : y.tab.c
 	$(CC) -c -I include y.tab.c -o parser.o $(CFLAGS)
 
 lexer.o : src/frontend/lexer.c y.tab.h
-	$(CC) -c -I include src/frontend/lexer.c -I ./ -o lexer.o $(CFLAGS)
+	$(CC) -c -I include src/frontend/lexer.c -I ./ \
+              -o lexer.o $(CFLAGS)
 
 y.tab.c y.tab.h : src/frontend/parser.y
 	yacc -d -v src/frontend/parser.y
