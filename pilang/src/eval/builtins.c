@@ -1,3 +1,4 @@
+#include "config.h"
 #include "builtins.h"
 #include "dynload.h"
 
@@ -110,8 +111,8 @@ static plvalue_t builtin_dynload(list_t args);
 static plvalue_t builtin_dynmod(list_t args);
 
 static bool builtin_funcs_init = false;
-static strhdl_t builtin_func_names[1024];
-static builtin_func_t builtin_funcs[1024] = {
+static strhdl_t builtin_func_names[PLI_FFI_FUNC_SLOT_SIZE];
+static builtin_func_t builtin_funcs[PLI_FFI_FUNC_SLOT_SIZE] = {
   builtin_print, builtin_readint, builtin_readfloat, builtin_readstr,
   builtin_copy_to_heap, NULL, NULL, NULL, NULL, NULL, NULL,
   builtin_dynload, builtin_dynmod
@@ -271,7 +272,7 @@ static void maybe_init_builtin_funcs() {
   if (!builtin_funcs_init) {
     builtin_funcs_init = true;
     func_slot_usage = 13;
-    func_slot_size = 1024;
+    func_slot_size = PLI_FFI_FUNC_SLOT_SIZE;
     builtin_func_names[0] = create_string("print");
     builtin_func_names[1] = create_string("readint");
     builtin_func_names[2] = create_string("readfloat");

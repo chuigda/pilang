@@ -20,11 +20,13 @@
 
 #define VER_PLI_MAJOR 0
 #define VER_PLI_MINOR 3
-#define VER_PLI_REVISE 0
+#define VER_PLI_REVISE 2
 
 /* PiLang Intepreter configurations */
-#define PLI_HEAP_INIT_SIZE   114514
-#define PLI_STACK_SIZE       65536
-#define PLI_STACKFRAME_COUNT 512
+#define PLI_HEAP_INIT_SIZE     114514
+#define PLI_STACK_SIZE         65536
+#define PLI_STACKFRAME_COUNT   512
+
+#define PLI_FFI_FUNC_SLOT_SIZE 1024
 
 #endif
