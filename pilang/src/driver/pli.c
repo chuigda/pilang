@@ -41,8 +41,10 @@ int main(int argc, char *argv[]) {
   if (fp_lex_in != stdin) {
     fclose(fp_lex_in);
   }
-
-  eval_ast(glob_ast);
+  
+  if (glob_ast != NULL) {
+    eval_ast(glob_ast);
+  }
   return 0;
 }
 

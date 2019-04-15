@@ -15,6 +15,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+static host_env_t host_env;
+
 static void asgn_attach_typeinfo(plvalue_t *obj, int16_t type) {
   obj->type = type;
   switch (obj->roc) {
@@ -398,10 +400,17 @@ void eval_stmt_list(ast_node_base_t *stmt, stack_t *stack) {
        !iter_eq(it, list_end(&(stmt_list->list)));
        it = iter_next(it)) {
     eval_stmt((ast_node_base_t*)iter_deref(it), stack);
+    if (host_env.in_return) {
+      return;
+    }
   }
 }
 
 void eval_stmt(ast_node_base_t *stmt, stack_t *stack) {
+  if (host_env.in_return) {
+    return;
+  }
+  
   switch (stmt->node_sema_info) {
   case ANS_BINEXPR:
   case ANS_INTVAL:
@@ -420,6 +429,9 @@ void eval_stmt(ast_node_base_t *stmt, stack_t *stack) {
   case ANS_STATEMENTS:
     eval_stmt_list(stmt, stack);
     break;
+  case ANS_RETURN:
+    host_env.in_return = true;
+    break;
   default:
     UNREACHABLE;
   }
@@ -430,12 +442,12 @@ void eval_func_body(ast_list_t *body, stack_t *stack) {
   for (iter_t it = list_begin(&stmts);
        !iter_eq(it, list_end(&stmts));
        it = iter_next(it)) {
-    ast_node_base_t *stmt = (ast_node_base_t*)iter_deref(it);
-    if (stmt->node_sema_info == ANS_RETURN) {
+    eval_stmt((ast_node_base_t*)iter_deref(it), stack);
+    if (host_env.in_return) {
       break;
     }
-    eval_stmt(stmt, stack);
   }
+  host_env.in_return = false;
 }
 
 static plvalue_t callfunc(ast_tchild_wdata_t *func, list_t args, 
@@ -494,8 +506,6 @@ plvalue_t udfunction_call(strhdl_t name, list_t args, stack_t *stack) {
   return ret;
 }
 
-static host_env_t host_env;
-
 void eval_ast(ast_node_base_t *program) {
   stack_t stack;
   init_stack(&stack);
@@ -510,6 +520,7 @@ void eval_ast(ast_node_base_t *program) {
   host_env.heap = get_glob_heap();
   host_env.stack = &stack;
   host_env.program = functions;
+  host_env.in_return = false;
 
   list_t args, rets;
   create_list(&args, malloc, free);

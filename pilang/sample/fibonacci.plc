@@ -8,7 +8,7 @@ begin
       b = 1;
       return;
     else
-      b = fibonacci[b - 1] + fibonacci[b - 2];
+      b = fibonacci[a - 1] + fibonacci[a - 2];
       return;
     end if
   end if
@@ -16,6 +16,6 @@ end function
 
 function main takes returns
 begin
-  print [fibonacci[5]; '\n'];
+  print [fibonacci[10]; '\n'];
 end function
 

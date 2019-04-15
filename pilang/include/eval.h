@@ -21,6 +21,9 @@ typedef struct {
   
   // program or function list
   ast_list_t *program;
+  
+  // in early return
+  bool in_return;
 } host_env_t;
 
 host_env_t get_host_env();
