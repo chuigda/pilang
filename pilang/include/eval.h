@@ -3,8 +3,26 @@
 
 #include "ast.h"
 #include "value.h"
+#include "builtins.h"
 
 void eval_ast(ast_node_base_t *program);
+
+typedef struct {
+  // heap
+  heap_t *heap;
+  
+  // stack
+  stack_t *stack;
+  
+  // string operations
+  strhdl_t (*create_string_fn)(const char*);
+  const char* (*get_string_fn)(strhdl_t);
+  
+  // program or function list
+  ast_list_t *program;
+} host_env_t;
+
+host_env_t get_host_env();
 
 #if defined(TEST) || defined (EVAL_C)
 

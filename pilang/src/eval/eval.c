@@ -468,6 +468,8 @@ static void callfunc(ast_tchild_wdata_t *func, list_t args,
   stack_exit_frame(stack);
 }
 
+static host_env_t host_env;
+
 void eval_ast(ast_node_base_t *program) {
   stack_t stack;
   init_stack(&stack);
@@ -476,6 +478,12 @@ void eval_ast(ast_node_base_t *program) {
   strhdl_t main_str = create_string("main");
   strhdl_t start_str = create_string("start");
   ast_list_t *functions = (ast_list_t*)program;
+
+  host_env.create_string_fn = &create_string;
+  host_env.get_string_fn = &get_string;
+  host_env.heap = get_glob_heap();
+  host_env.stack = &stack;
+  host_env.program = functions;
 
   list_t args, rets;
   create_list(&args, malloc, free);
@@ -496,4 +504,8 @@ void eval_ast(ast_node_base_t *program) {
   
   close_heap();
   close_stack(&stack);
+}
+
+host_env_t get_host_env() {
+  return host_env;
 }

@@ -209,13 +209,3 @@ plvalue_t auto_deref(plvalue_t maybe_ref) {
     (heapobj_t*)(fetch_storage(&maybe_ref)->pvalue);
   return create_onheap(referred);
 }
-
-host_env_t get_host_env() {
-  host_env_t ret;
-  ret.heap = get_glob_heap();
-  // not implemented
-  ret.stack = NULL;
-  ret.create_string_fn = &create_string;
-  ret.get_string_fn = &get_string;
-  return ret;
-}

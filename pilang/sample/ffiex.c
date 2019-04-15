@@ -1,5 +1,4 @@
-#include "value.h"
-#include "builtins.h"
+#include "eval.h"
 
 static int64_t int_failsafe(result_t maybe) {
   return maybe.success ? maybe.value.ivalue : 0;

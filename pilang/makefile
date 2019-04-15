@@ -1,55 +1,54 @@
 CFLAGS = -Wall -Wextra -Wno-unused-function -g
 
-all: docs pli plrepl plast libpilang.a tests
+all: docs pli plrepl plast libpilang.a libfront.a tests
 
 docs: doc/makefile
 	cd doc && make && tree -P "*.html" > docs && cd ..
 
-plrepl: lexer.o parser.o ast.o builtins.o dynload.o plrepl.o \
-        libpilang.a
-	$(CC) lexer.o parser.o ast.o builtins.o plrepl.o \
-              dynload.o -L. -lpilang -ldl -o plrepl
+plrepl: plrepl.o libpilang.a libfront.a libsup.a
+	$(CC) builtins.o plrepl.o \
+              dynload.o -L. -lpilang -lfront -lsup -ldl -o plrepl
 
-pli: lexer.o parser.o ast.o pli.o builtins.o dynload.o \
-     libpilang.a
-	$(CC) lexer.o parser.o ast.o pli.o builtins.o dynload.o \
-              -L. -lpilang -ldl -o pli
+pli: pli.o libpilang.a libfront.a libsup.a
+	$(CC) pli.o builtins.o dynload.o \
+              -L. -lpilang -lfront -lsup -ldl -o pli
 
-plast: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
-	$(CC) mstring.o parser.o clist.o ast.o lexer.o tree_dump.o \
-        plast.o -o plast
+plast: plast.o libfront.a libsup.a
+	$(CC) plast.o -L. -lfront -lsup -o plast
 
 tests: test_stack test_gc test_calc test_assign test_eval_expr \
        libffiex.so libffiex2.so
 
-libffiex2.so: ffiex2.o libpilang.a
-	$(CC) ffiex2.o -L. -lpilang -shared -o libffiex2.so
+libffiex2.so: ffiex2.o libpilang.a libsup.a
+	$(CC) ffiex2.o -L. -lpilang -lsup -shared -o libffiex2.so
 
-libffiex.so: ffiex.o libpilang.a
-	$(CC) ffiex.o -L. -lpilang -shared -o libffiex.so
+libffiex.so: ffiex.o libpilang.a libsup.a
+	$(CC) ffiex.o -L. -lpilang -lsup -shared -o libffiex.so
 
-libpilang.a: clist.o mstring.o value.o stack.o plheap.o eval.o
-	ar rcs libpilang.a \
-               clist.o mstring.o value.o stack.o plheap.o eval.o
+libfront.a: lexer.o parser.o ast.o tree_dump.o
+	ar rcs libfront.a lexer.o parser.o ast.o tree_dump.o
 
-test_eval_expr: test_eval_expr.o ast.o builtins.o dynload.o \
-                libpilang.a
-	$(CC) test_eval_expr.o ast.o builtins.o dynload.o \
-              -L. -lpilang -ldl -o test_eval_expr
+libpilang.a: value.o stack.o plheap.o eval.o builtins.o
+	ar rcs libpilang.a value.o stack.o plheap.o eval.o builtins.o
 
-test_assign: test_assign.o builtins.o dynload.o libpilang.a
-	$(CC) test_assign.o builtins.o dynload.o \
-              -L. -lpilang -ldl -o test_assign
+libsup.a: clist.o mstring.o dynload.o
+	ar rcs libsup.a clist.o mstring.o dynload.o
 
-test_calc: test_calc.o builtins.o dynload.o libpilang.a
-	$(CC) test_calc.o builtins.o dynload.o -L. -lpilang \
-              -ldl -o test_calc
+test_eval_expr: test_eval_expr.o libpilang.a libfront.a libsup.a
+	$(CC) test_eval_expr.o \
+              -L. -lpilang -lfront -lsup -ldl -o test_eval_expr
 
-test_gc: test_gc.o plheap.o clist.o mstring.o
-	$(CC) test_gc.o plheap.o clist.o mstring.o -o test_gc
+test_assign: test_assign.o libpilang.a libsup.a
+	$(CC) test_assign.o -L. -lpilang -lsup -ldl -o test_assign
 
-test_stack: stack.o test_stack.o clist.o mstring.o
-	$(CC) stack.o test_stack.o clist.o mstring.o -o test_stack
+test_calc: test_calc.o libpilang.a libsup.a
+	$(CC) test_calc.o -L. -lpilang -lsup -ldl -o test_calc
+
+test_gc: test_gc.o plheap.o libsup.a
+	$(CC) test_gc.o plheap.o -L. -lsup -o test_gc
+
+test_stack: stack.o test_stack.o
+	$(CC) stack.o test_stack.o -L. -lsup -o test_stack
 
 test_eval_expr.o: test/test_eval_expr.c y.tab.h
 	$(CC) -c -I include -I . test/test_eval_expr.c -o \

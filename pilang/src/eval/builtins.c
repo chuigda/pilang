@@ -2,11 +2,16 @@
 #include "builtins.h"
 #include "dynload.h"
 
+#include "eval.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <inttypes.h>
+
+typedef plvalue_t (*builtin_func_t)(list_t);
+typedef void (*set_host_env_t)(host_env_t);
 
 static plvalue_t builtin_print(list_t args) {
   for (iter_t it = list_begin(&args);
