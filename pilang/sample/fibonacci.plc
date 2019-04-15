@@ -2,11 +2,14 @@ function fibonacci takes a returns b
 begin
   if a == 0 then
     b = 0;
+    return;
   else 
     if a == 1 then
       b = 1;
+      return;
     else
       b = fibonacci[b - 1] + fibonacci[b - 2];
+      return;
     end if
   end if
 end function

@@ -3,7 +3,12 @@ begin
   print [a; '\n'; b; '\n'];
 end function
 
+function funplusx takes a b returns c
+begin
+  c = a + b + 42;
+end function
+
 function main takes returns
 begin
-  printnl [3 + 2; 'string'];
+  printnl [funplusx[3; 4]; 'string'];
 end function

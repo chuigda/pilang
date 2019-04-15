@@ -430,7 +430,11 @@ void eval_func_body(ast_list_t *body, stack_t *stack) {
   for (iter_t it = list_begin(&stmts);
        !iter_eq(it, list_end(&stmts));
        it = iter_next(it)) {
-    eval_stmt((ast_node_base_t*)iter_deref(it), stack);
+    ast_node_base_t *stmt = (ast_node_base_t*)iter_deref(it);
+    if (stmt->node_sema_info == ANS_RETURN) {
+      break;
+    }
+    eval_stmt(stmt, stack);
   }
 }
 
