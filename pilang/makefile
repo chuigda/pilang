@@ -5,14 +5,14 @@ all: docs pli plrepl plast libpilang.a tests
 docs: doc/makefile
 	cd doc && make && tree -P "*.html" > docs && cd ..
 
-plrepl: lexer.o parser.o ast.o eval.o builtins.o dynload.o plrepl.o \
+plrepl: lexer.o parser.o ast.o builtins.o dynload.o plrepl.o \
         libpilang.a
-	$(CC) lexer.o parser.o ast.o eval.o builtins.o plrepl.o \
+	$(CC) lexer.o parser.o ast.o builtins.o plrepl.o \
               dynload.o -L. -lpilang -ldl -o plrepl
 
-pli: lexer.o parser.o ast.o eval.o pli.o builtins.o dynload.o \
+pli: lexer.o parser.o ast.o pli.o builtins.o dynload.o \
      libpilang.a
-	$(CC) lexer.o parser.o ast.o eval.o pli.o builtins.o dynload.o \
+	$(CC) lexer.o parser.o ast.o pli.o builtins.o dynload.o \
               -L. -lpilang -ldl -o pli
 
 plast: mstring.o lexer.o parser.o clist.o ast.o tree_dump.o plast.o
@@ -28,20 +28,21 @@ libffiex2.so: ffiex2.o libpilang.a
 libffiex.so: ffiex.o libpilang.a
 	$(CC) ffiex.o -L. -lpilang -shared -o libffiex.so
 
-libpilang.a: clist.o mstring.o value.o stack.o plheap.o
-	ar rcs libpilang.a clist.o mstring.o value.o stack.o plheap.o
+libpilang.a: clist.o mstring.o value.o stack.o plheap.o eval.o
+	ar rcs libpilang.a \
+               clist.o mstring.o value.o stack.o plheap.o eval.o
 
-test_eval_expr: test_eval_expr.o eval.o ast.o builtins.o dynload.o \
+test_eval_expr: test_eval_expr.o ast.o builtins.o dynload.o \
                 libpilang.a
-	$(CC) test_eval_expr.o eval.o ast.o builtins.o dynload.o \
+	$(CC) test_eval_expr.o ast.o builtins.o dynload.o \
               -L. -lpilang -ldl -o test_eval_expr
 
-test_assign: test_assign.o eval.o builtins.o dynload.o libpilang.a
-	$(CC) test_assign.o eval.o builtins.o dynload.o \
+test_assign: test_assign.o builtins.o dynload.o libpilang.a
+	$(CC) test_assign.o builtins.o dynload.o \
               -L. -lpilang -ldl -o test_assign
 
-test_calc: test_calc.o  eval.o builtins.o dynload.o libpilang.a
-	$(CC) test_calc.o eval.o builtins.o dynload.o -L. -lpilang \
+test_calc: test_calc.o builtins.o dynload.o libpilang.a
+	$(CC) test_calc.o builtins.o dynload.o -L. -lpilang \
               -ldl -o test_calc
 
 test_gc: test_gc.o plheap.o clist.o mstring.o
