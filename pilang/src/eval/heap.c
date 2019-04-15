@@ -62,6 +62,7 @@ void close_heap() {
     }
     free(glob_heap->heap_storage[i]);
   }
+  free(glob_heap->heap_storage);
   free(glob_heap);
 }
 

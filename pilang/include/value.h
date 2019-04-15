@@ -29,17 +29,8 @@ result_t fetch_list(plvalue_t obj);
 plvalue_t auto_deref(plvalue_t maybe_ref);
 
 typedef struct {
-  // heap functions
-  // @todo should we make heap replacable instead of singleton?
-  // okay, maybe that's unnecessary, but at least we must make heap
-  // "first class"
-  heapobj_t* (*heap_alloc_int_fn)(int64_t);
-  heapobj_t* (*heap_alloc_bool_fn)(bool);
-  heapobj_t* (*heap_alloc_float_fn)(double);
-  heapobj_t* (*heap_alloc_str_fn)(strhdl_t);
-  heapobj_t* (*heap_alloc_list_fn)(list_t);
-  heapobj_t* (*heap_alloc_handle_fn)(res_base_t*);
-  heapobj_t* (*heap_alloc_empty_fn)();
+  // heap
+  heap_t *heap;
   
   // stack
   stack_t *stack;
