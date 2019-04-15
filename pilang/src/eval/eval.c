@@ -213,6 +213,7 @@ plvalue_t logical_calc(ast_node_base_t *lhs, ast_node_base_t *rhs,
 
 plvalue_t assign(plvalue_t lhs, plvalue_t rhs) {
   if (lhs.roc != ROC_ONSTACK && lhs.roc != ROC_ONHEAP) {
+    eprintf0("e: assigning to temporary object values nothing\n");
     return lhs;
   }
 
@@ -456,19 +457,21 @@ static plvalue_t callfunc(ast_tchild_wdata_t *func, list_t args,
   ast_list_t *rets_list_node = (ast_list_t*)func->children[1];
   list_t rets_list = rets_list_node->list;
   
-  plvalue_t t = create_temp();
-  t.type = JT_UNDEFINED;
+  plvalue_t retv = create_temp();
+  retv.type = JT_UNDEFINED;
   for (iter_t it = list_begin(&rets_list);
        !iter_eq(it, list_end(&rets_list));
        it = iter_next(it)) {
     ast_leaf_wdata_t *ret_idref_node = 
       (ast_leaf_wdata_t*)iter_deref(it);
-    assign(t, eval_idref_expr(ret_idref_node, stack));
+    plvalue_t stackv = eval_idref_expr(ret_idref_node, stack);
+    retv.type = stackv.type;
+    retv.value = *fetch_storage(&stackv);
     break;
   }
 
   stack_exit_frame(stack);
-  return t;
+  return retv;
 }
 
 plvalue_t udfunction_call(strhdl_t name, list_t args, stack_t *stack) {
