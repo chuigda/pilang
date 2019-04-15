@@ -1,0 +1,9 @@
+function printnl takes a b returns 
+begin
+  print [a; '\n'; b; '\n'];
+end function
+
+function main takes returns
+begin
+  printnl [3 + 2; 'string'];
+end function

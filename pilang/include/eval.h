@@ -6,6 +6,7 @@
 #include "builtins.h"
 
 void eval_ast(ast_node_base_t *program);
+plvalue_t udfunction_call(strhdl_t name, list_t args, stack_t *stack);
 
 typedef struct {
   // heap

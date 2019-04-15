@@ -11,3 +11,8 @@ begin
   end if
 end function
 
+function main takes returns
+begin
+  print [fibonacci[5]; '\n'];
+end function
+

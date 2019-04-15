@@ -12,6 +12,7 @@
 #include <string.h>
 #include <limits.h>
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 static void asgn_attach_typeinfo(plvalue_t *obj, int16_t type) {
@@ -327,7 +328,7 @@ plvalue_t eval_func_call(ast_dchild_t *func, stack_t *stack) {
     ret = builtin_call(idref->value.svalue, evaluated_args);
   }
   else {
-    
+    ret = udfunction_call(idref->value.svalue, evaluated_args, stack);
   }
 
   for (iter_t it = list_begin(&evaluated_args);
@@ -432,8 +433,8 @@ void eval_func_body(ast_list_t *body, stack_t *stack) {
   }
 }
 
-static void callfunc(ast_tchild_wdata_t *func, list_t args,
-                     list_t rets, stack_t *stack) {
+static plvalue_t callfunc(ast_tchild_wdata_t *func, list_t args, 
+                          stack_t *stack) {
   stack_enter_frame(stack);
   ast_list_t *param_list_node = (ast_list_t*)func->children[0];
   list_t param_list = param_list_node->list;
@@ -454,18 +455,36 @@ static void callfunc(ast_tchild_wdata_t *func, list_t args,
 
   ast_list_t *rets_list_node = (ast_list_t*)func->children[1];
   list_t rets_list = rets_list_node->list;
+  
+  plvalue_t t = create_temp();
+  t.type = JT_UNDEFINED;
   for (iter_t it = list_begin(&rets_list);
        !iter_eq(it, list_end(&rets_list));
        it = iter_next(it)) {
-    plvalue_t *t = NEW(plvalue_t);
-    *t = create_temp();
     ast_leaf_wdata_t *ret_idref_node = 
       (ast_leaf_wdata_t*)iter_deref(it);
-    assign(*t, eval_idref_expr(ret_idref_node, stack));
-    list_push_back(&rets, t);
+    assign(t, eval_idref_expr(ret_idref_node, stack));
+    break;
   }
 
   stack_exit_frame(stack);
+  return t;
+}
+
+plvalue_t udfunction_call(strhdl_t name, list_t args, stack_t *stack) {
+  for (iter_t it = list_begin(&(get_host_env().program->list));
+       !iter_eq(it, list_end(&(get_host_env().program->list)));
+       it = iter_next(it)) {
+    ast_tchild_wdata_t *func = (ast_tchild_wdata_t*)iter_deref(it);
+    if (func->value.svalue == name) {
+      return callfunc(func, args, stack);
+    }
+  }
+  
+  eprintf("e: function %s not found\n", get_string(name));
+  plvalue_t ret = create_temp();
+  ret.type = JT_UNDEFINED;
+  return ret;
 }
 
 static host_env_t host_env;
@@ -495,7 +514,8 @@ void eval_ast(ast_node_base_t *program) {
       (ast_tchild_wdata_t*)iter_deref(it);
     if (func->value.svalue == main_str
         || func->value.svalue == start_str) {
-      callfunc(func, args, rets, &stack); 
+      callfunc(func, args, &stack);
+      break;
     }
   }
 
