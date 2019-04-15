@@ -327,7 +327,7 @@ plvalue_t eval_func_call(ast_dchild_t *func, stack_t *stack) {
     ret = builtin_call(idref->value.svalue, evaluated_args);
   }
   else {
-    /// @todo
+    
   }
 
   for (iter_t it = list_begin(&evaluated_args);

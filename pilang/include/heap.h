@@ -27,6 +27,12 @@ typedef struct {
   uint32_t index : 26;
 } heapobj_t;
 
+typedef struct {
+  heapobj_t **heap_storage;
+  size_t heap_cap;
+  size_t heap_usage;
+} heap_t;
+
 heapobj_id_t jt2hoid(jjtype_t jt);
 jjtype_t hoid2jt(heapobj_id_t hoid);
 
@@ -43,6 +49,9 @@ void destroy_object(heapobj_t *obj);
 
 void init_heap(void);
 void close_heap(void);
+
+heap_t *get_glob_heap(void);
+void set_glob_heap(heap_t *heap);
 
 void gc_start(void);
 void gc_mark_white(heapobj_t *obj);
