@@ -11,4 +11,11 @@
         <dir name="src"/>
         <dir name="test"/>
     </paths>
+    <libraries>
+        <library>posix</library>
+        <library>windows</library>
+    </libraries>
+    <tools>
+        <tool>clang-tidy</tool>
+    </tools>
 </project>
