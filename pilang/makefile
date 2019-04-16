@@ -1,6 +1,8 @@
 CFLAGS = -Wall -Wextra -Wno-unused-function -g
 
-all: docs pli plrepl plast libpilang.a libfront.a tests
+all: docs pli plrepl plast libpilang.a libfront.a stdlib tests
+
+stdlib: libmstr.so
 
 docs: doc/makefile
 	cd doc && make && tree -P "*.html" > docs && cd ..
@@ -18,6 +20,13 @@ plast: plast.o libfront.a libsup.a
 
 tests: test_stack test_gc test_calc test_assign test_eval_expr \
        libffiex.so libffiex2.so
+
+libmstr.so: mutstr.o libpilang.a libsup.a
+	$(CC) mutstr.o -L. -lpilang -lsup -shared -o libmstr.so
+
+mutstr.o: stdlib/mutstr.c
+	$(CC) stdlib/mutstr.c -I include -I ./ -c -fPIC -o mutstr.o\
+              $(CFLAGS)
 
 libffiex2.so: ffiex2.o libpilang.a libsup.a
 	$(CC) ffiex2.o -L. -lpilang -lsup -shared -o libffiex2.so

@@ -201,6 +201,21 @@ result_t fetch_list(plvalue_t obj) {
   return failed_result("failed");
 }
 
+result_t fetch_handle(plvalue_t obj) {
+  jjvalue_t *storage = fetch_storage(&obj);
+  if (storage == NULL) {
+    return failed_result("object does not have storage");
+  }
+  
+  switch (obj.type) {
+  case JT_RESHANDLE:
+    return success_result(*storage);
+  default:
+    return failed_result("failed");
+  }
+}
+
+
 plvalue_t auto_deref(plvalue_t maybe_ref) {
   if (maybe_ref.type != JT_REF) {
     return maybe_ref;

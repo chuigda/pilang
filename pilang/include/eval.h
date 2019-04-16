@@ -5,6 +5,7 @@
 #include "value.h"
 #include "builtins.h"
 
+void init_host_env(ast_list_t *functions, stack_t *stack);
 void eval_ast(ast_node_base_t *program);
 plvalue_t udfunction_call(strhdl_t name, list_t args, stack_t *stack);
 

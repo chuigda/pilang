@@ -26,6 +26,7 @@ result_t fetch_float(plvalue_t obj);
 result_t fetch_bool(plvalue_t obj);
 result_t fetch_str(plvalue_t obj);
 result_t fetch_list(plvalue_t obj);
+result_t fetch_handle(plvalue_t obj);
 plvalue_t auto_deref(plvalue_t maybe_ref);
 
 #endif // VALUE_H

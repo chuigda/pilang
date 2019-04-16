@@ -44,6 +44,7 @@ int main() {
            " type two .. characters and then return\n");
   eprintf0("empty input with .. or EOF to exit\n");
   while (1) {
+    init_host_env(NULL, &stack);
     eprintf0("(prelude) Ques: ");
 
     glob_ast = NULL;
