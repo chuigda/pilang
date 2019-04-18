@@ -4,13 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-static host_env_t host_env;
-
-void setup_host_env(host_env_t env) {
-  set_glob_heap(env.heap);
-  host_env = env;
-}
-
 typedef struct {
   RESOURCE_COMMON_HEAD
   char *beg, *end, *usg;
@@ -110,12 +103,12 @@ plvalue_t ffi_mstr_new(list_t args) {
   plvalue_t *v = (plvalue_t*)iter_deref(list_begin(&args));
   result_t r = fetch_str(*v);
   if (!r.success) {
-    eprintf("e: %s\n", host_env.get_string_fn(r.value.svalue));
+    eprintf("e: %s\n", get_string(r.value.svalue));
   }
   
   mutstr_t *muts = NEW(mutstr_t);
   muts->destructor = ffi_mutstr_destructor;
-  init_mutstr(muts, host_env.get_string_fn(r.value.svalue));
+  init_mutstr(muts, get_string(r.value.svalue));
   heapobj_t *h = heap_alloc_handle((res_base_t*)muts);
   plvalue_t ref = create_temp();
   ref.type = JT_REF;

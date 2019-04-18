@@ -1,13 +1,5 @@
 #include "eval.h"
-
 #include <stdlib.h>
-
-static host_env_t host_env;
-
-void setup_host_env(host_env_t env) {
-  host_env = env;
-  set_glob_heap(env.heap);
-}
 
 const char* *describe_ffi_funcs(void) {
   static const char* funcs[] = {
@@ -33,7 +25,7 @@ plvalue_t ffi_nmsl(list_t args) {
   (void)args;
   plvalue_t ret = create_temp();
   ret.type = JT_STR;
-  ret.value.svalue = host_env.create_string_fn("nmsl");
+  ret.value.svalue = create_string("nmsl");
   return ret;
 }
 

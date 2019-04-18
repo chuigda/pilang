@@ -233,21 +233,10 @@ static plvalue_t builtin_dynmod(list_t args) {
     return ret;
   }
 
-  result_t maybe_setup_host_env = 
-    dyn_load_func(get_string(modname), "setup_host_env");
-  if (!maybe_setup_host_env.success) {
-    eprintf("e: %s\n", get_string(maybe_setup_host_env.value.svalue));
-    return ret;
-  }
-
   mod_desc_t desc_ffi_funcs = 
     (mod_desc_t)maybe_desc_ffi_funcs.value.pvalue;
   mod_desc_t desc_ffi_aliases = 
     (mod_desc_t)maybe_desc_ffi_aliases.value.pvalue;
-  setup_host_env_t setup_host_env = 
-    (setup_host_env_t)maybe_setup_host_env.value.pvalue;
-
-  setup_host_env(get_host_env());
   
   const char **ffi_funcs = desc_ffi_funcs();
   const char **ffi_aliases = desc_ffi_aliases(); 
