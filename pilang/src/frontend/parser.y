@@ -45,10 +45,15 @@ functions:
   | { $$.ast = node_list(ANS_FUNCTIONS); } ;
 
 function:
-  TK_FUNCTION TK_ID TK_TAKES id_list TK_RETURNS id_list function_body
+  TK_FUNCTION TK_ID TK_TAKES id_list TK_RETURNS idref_expr function_body
   {
     $$.ast = node3_wdata(ANS_FUNCTION, $2.token.val, $4.ast, $6.ast,
                          $7.ast);
+  }
+  |
+  TK_FUNCTION TK_ID TK_TAKES id_list TK_RETURNS function_body {
+    $$.ast = node3_wdata(ANS_FUNCTION, $2.token.val, $4.ast, NULL,
+                         $6.ast);
   }
   ;
 

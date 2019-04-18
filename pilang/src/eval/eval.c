@@ -469,25 +469,22 @@ static plvalue_t callfunc(ast_tchild_wdata_t *func, list_t args,
   ast_schild_t *funcbody = (ast_schild_t*)(func->children[2]);
   
   eval_func_body((ast_list_t*)(funcbody->child), stack);
-
-  ast_list_t *rets_list_node = (ast_list_t*)func->children[1];
-  list_t rets_list = rets_list_node->list;
   
-  plvalue_t retv = create_temp();
-  retv.type = JT_UNDEFINED;
-  for (iter_t it = list_begin(&rets_list);
-       !iter_eq(it, list_end(&rets_list));
-       it = iter_next(it)) {
-    ast_leaf_wdata_t *ret_idref_node = 
-      (ast_leaf_wdata_t*)iter_deref(it);
-    plvalue_t stackv = eval_idref_expr(ret_idref_node, stack);
+  if (func->children[1]) {
+    ast_leaf_wdata_t *retloc = (ast_leaf_wdata_t*)(func->children[1]);
+    plvalue_t stackv = eval_idref_expr(retloc, stack);
+    plvalue_t retv = create_temp();
     retv.type = stackv.type;
     retv.value = *fetch_storage(&stackv);
-    break;
-  }
 
-  stack_exit_frame(stack);
-  return retv;
+    stack_exit_frame(stack);
+    return retv;
+  }
+  else {
+    plvalue_t retv = create_temp();
+    retv.type = JT_UNDEFINED;
+    return retv;
+  }
 }
 
 plvalue_t udfunction_call(strhdl_t name, list_t args, stack_t *stack) {
@@ -526,9 +523,8 @@ void eval_ast(ast_node_base_t *program) {
 
   init_host_env(functions, &stack);
 
-  list_t args, rets;
+  list_t args;
   create_list(&args, malloc, free);
-  create_list(&rets, malloc, free);
   for (iter_t it = list_begin(&(functions->list));
        !iter_eq(it, list_end(&(functions->list)));
        it = iter_next(it)) {
@@ -542,7 +538,6 @@ void eval_ast(ast_node_base_t *program) {
   }
 
   destroy_list(&args);
-  destroy_list(&rets);
   
   close_heap();
   close_stack(&stack);
