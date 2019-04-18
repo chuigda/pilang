@@ -1,51 +1,58 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Wno-unused-function -g
 
-all: pli.exe plrepl.exe plast.exe libpilang.a libfront.a tests
+all: bins libs stdlib tests
 
-plrepl.exe: plrepl.o libpilang.a libfront.a libsup.a
-	$(CC) builtins.o plrepl.o \
-              dynload.o -L. -lpilang -lfront -lsup -o plrepl
+bins: plrepl.exe pli.exe plast.exe
 
-pli.exe: pli.o libpilang.a libfront.a libsup.a
-	$(CC) pli.o builtins.o dynload.o \
-              -L. -lpilang -lfront -lsup -o pli
-
-plast.exe: plast.o libfront.a libsup.a
-	$(CC) plast.o -L. -lfront -lsup -o plast
+libs: libpilang.dll libfront.dll libsup.dll
 
 tests: test_stack.exe test_gc.exe test_calc.exe test_assign.exe \
        test_eval_expr.exe libffiex.dll libffiex2.dll
 
-libffiex2.dll: ffiex2.o libpilang.a libsup.a
+plrepl.exe: plrepl.o libpilang.dll libfront.dll libsup.dll
+	$(CC) builtins.o plrepl.o \
+              dynload.o -L. -lpilang -lfront -lsup -o plrepl
+
+pli.exe: pli.o libpilang.dll libfront.dll libsup.dll
+	$(CC) pli.o builtins.o dynload.o \
+              -L. -lpilang -lfront -lsup -o pli
+
+plast.exe: plast.o libfront.dll libsup.dll
+	$(CC) plast.o -L. -lfront -lsup -o plast
+
+libffiex2.dll: ffiex2.o libpilang.dll libsup.dll
 	$(CC) ffiex2.o -L. -lpilang -lsup -shared -o libffiex2.dll
 
-libffiex.dll: ffiex.o libpilang.a libsup.a
+libffiex.dll: ffiex.o libpilang.dll libsup.dll
 	$(CC) ffiex.o -L. -lpilang -lsup -shared -o libffiex.dll
 
-libfront.a: lexer.o parser.o ast.o tree_dump.o
-	ar rcs libfront.a lexer.o parser.o ast.o tree_dump.o
+libfront.dll: lexer.o parser.o ast.o tree_dump.o
+	$(CC) lexer.o parser.o ast.o tree_dump.o -shared \
+               -L. -lsup -o libfront.dll
 
-libpilang.a: value.o stack.o plheap.o eval.o builtins.o
-	ar rcs libpilang.a value.o stack.o plheap.o eval.o builtins.o
+libpilang.dll: value.o stack.o plheap.o eval.o builtins.o libsup.dll
+	$(CC) value.o stack.o plheap.o eval.o builtins.o \
+               -L. -lsup -shared -o libpilang.dll
 
-libsup.a: clist.o mstring.o dynload.o
-	ar rcs libsup.a clist.o mstring.o dynload.o
+libsup.dll: clist.o mstring.o dynload.o
+	$(CC) clist.o mstring.o dynload.o -shared -o libsup.dll
 
-test_eval_expr.exe: test_eval_expr.o libpilang.a libfront.a libsup.a
+test_eval_expr.exe: test_eval_expr.o \
+                    libpilang.dll libfront.dll libsup.dll
 	$(CC) test_eval_expr.o \
               -L. -lpilang -lfront -lsup -o test_eval_expr.exe
 
-test_assign.exe: test_assign.o libpilang.a libsup.a
+test_assign.exe: test_assign.o libpilang.dll libsup.dll
 	$(CC) test_assign.o -L. -lpilang -lsup -o test_assign.exe
 
-test_calc.exe: test_calc.o libpilang.a libsup.a
+test_calc.exe: test_calc.o libpilang.dll libsup.dll
 	$(CC) test_calc.o -L. -lpilang -lsup -o test_calc.exe
 
-test_gc.exe: test_gc.o plheap.o libsup.a
+test_gc.exe: test_gc.o plheap.o libsup.dll
 	$(CC) test_gc.o plheap.o -L. -lsup -o test_gc.exe
 
-test_stack.exe: stack.o test_stack.o
+test_stack.exe: stack.o test_stack.o libsup.dll
 	$(CC) stack.o test_stack.o -L. -lsup -o test_stack.exe
 
 test_eval_expr.o: test/test_eval_expr.c y.tab.h
