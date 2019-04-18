@@ -7,6 +7,8 @@ bins: plrepl.exe pli.exe plast.exe
 
 libs: libpilang.dll libfront.dll libsup.dll
 
+stdlib: libmstr.dll
+
 tests: test_stack.exe test_gc.exe test_calc.exe test_assign.exe \
        test_eval_expr.exe libffiex.dll libffiex2.dll
 
@@ -26,6 +28,9 @@ libffiex2.dll: ffiex2.o libpilang.dll libsup.dll
 
 libffiex.dll: ffiex.o libpilang.dll libsup.dll
 	$(CC) ffiex.o -L. -lpilang -lsup -shared -o libffiex.dll
+
+libmstr.dll: mutstr.o libpilang.dll libsup.dll
+	$(CC) mutstr.o -L. -lpilang -lsup -shared -o libmstr.dll
 
 libfront.dll: lexer.o parser.o ast.o tree_dump.o
 	$(CC) lexer.o parser.o ast.o tree_dump.o -shared \
@@ -71,6 +76,10 @@ test_gc.o: test/test_gc.c
 
 test_stack.o: test/test_stack.c
 	$(CC) -c -I include test/test_stack.c -o test_stack.o $(CFLAGS)
+
+mutstr.o: stdlib/mutstr.c
+	$(CC) -c -I include -I . stdlib/mutstr.c -fPIC -o mutstr.o \
+              $(CFLAGS)
 
 ffiex2.o: sample/ffiex2.c
 	$(CC) -c -I include -I . sample/ffiex2.c -fPIC -o ffiex2.o \
