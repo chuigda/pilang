@@ -19,7 +19,7 @@
 #define VER_PLCFRONT_REVISE 0
 
 #define VER_PLI_MAJOR 0
-#define VER_PLI_MINOR 4
+#define VER_PLI_MINOR 5
 #define VER_PLI_REVISE 0
 
 /* PiLang Intepreter configurations */
