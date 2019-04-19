@@ -20,15 +20,22 @@ AST nodes
 * __Children__: `function`s 
 
 ### `function` node _[entity]_
-* __Production__: 
-`TK_FUNCTION TK_ID TK_TAKES id_list TK_RETURNS id_list function_body`
-
-* __ANK__: `ANK_TRIPLE_CHILD_WDATA` 
-* __ANS__: `ANS_FUNCTION` 
-* __Data__: `TK_ID` identifier name 
-* __Child0__: params `id_list` 
-* __Child1__: return values `id_list` 
-* __Child2__: `function_body` 
+* __Production1__: 
+`TK_FUNCTION TK_ID TK_TAKES id_list TK_RETURNS idref_expr function_body`
+  - __ANK__: `ANK_TRIPLE_CHILD_WDATA` 
+  - __ANS__: `ANS_FUNCTION` 
+  - __Data__: `TK_ID` identifier name 
+  - __Child0__: params `id_list` 
+  - __Child1__: return values `idref_expr` 
+  - __Child2__: `function_body` 
+* __Production2__:
+`TK_FUNCTION TK_ID TK_TAKES id_list TK_RETURNS function_body`
+  - __ANK__: `ANK_TRIPLE_CHILD_WDATA` 
+  - __ANS__: `ANS_FUNCTION` 
+  - __Data__: `TK_ID` identifier name 
+  - __Child0__: params `id_list` 
+  - __Child1__: `NULL`
+  - __Child2__: `function_body` 
 
 ### `function_body` node _[wrapper]_
 * __Production__: `TK_BEGIN statements TK_END` 
