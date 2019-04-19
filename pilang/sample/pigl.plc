@@ -1,0 +1,22 @@
+function draw takes returns begin
+  glclear[glconst['colorbufferbit']];
+  glbegin[glconst['polygon']];
+  glcolor[1.0; 0.0; 0.0];
+  glvertex[0.0 - 0.5; 0.0 - 0.5];
+  glcolor[0.0; 1.0; 0.0];
+  glvertex[0.5; 0.0 - 0.5];
+  glcolor[0.0; 0.0; 1.0];
+  glvertex[0.0; 0.5];
+  glend[];
+  glflush[];
+end function
+
+function main takes returns begin
+  dynmod ['./libpigl.so'];
+  glutinit[];
+  glutinitwindsize[400; 400];
+  glutcrtwind['OpenGL-PiLang example'];
+  glclearcolor[0.0; 0.0; 0.0; 0.0];
+  glutdispfn['draw'];
+  glutmainloop[];
+end function
