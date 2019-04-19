@@ -15,12 +15,12 @@
 #define VER_NAME "Halley"
 
 #define VER_PLCFRONT_MAJOR 0
-#define VER_PLCFRONT_MINOR 3
+#define VER_PLCFRONT_MINOR 4
 #define VER_PLCFRONT_REVISE 0
 
 #define VER_PLI_MAJOR 0
-#define VER_PLI_MINOR 5
-#define VER_PLI_REVISE 2
+#define VER_PLI_MINOR 6
+#define VER_PLI_REVISE 0
 
 /* PiLang Intepreter configurations */
 #define PLI_HEAP_INIT_SIZE     114514
