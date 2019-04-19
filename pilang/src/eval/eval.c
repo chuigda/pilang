@@ -344,12 +344,47 @@ plvalue_t eval_func_call(ast_dchild_t *func, stack_t *stack) {
   return ret;
 }
 
+plvalue_t eval_unaexpr(ast_schild_wdata_t *expr, stack_t *stack) {
+  int op = expr->value.ivalue;
+  ast_node_base_t *base_expr = expr->child;
+  plvalue_t v0 = eval_expr(base_expr, stack);
+  
+  switch (op) {
+  case TK_ESYM_PLUS: break;
+  case TK_ESYM_MINUS: {
+    plvalue_t ret = create_temp();
+    ret.type = v0.type;
+    switch (v0.type) {
+    case JT_INT:
+      ret.value.ivalue = - int_failsafe(fetch_int(auto_deref(v0)));
+      break;
+    case JT_FLOAT:
+      ret.value.fvalue = - float_failsafe(fetch_float(auto_deref(v0)));
+      break;
+    case JT_BOOL:
+      ret.value.bvalue = ! bool_failsafe(fetch_bool(auto_deref(v0)));
+      break;
+    default:
+      eprintf0("e: negative operator not appliable to this type\n");
+      ret.type = JT_UNDEFINED;
+    }
+    return ret;
+  }
+  default:
+    UNREACHABLE;
+  }
+  
+  return v0;
+}
+
 plvalue_t eval_expr(ast_node_base_t *node, stack_t *stack) {
   switch (node->node_sema_info) {
   case ANS_FUNC_CALL:
     return eval_func_call((ast_dchild_t*)node, stack);
   case ANS_BINEXPR:
     return eval_binexpr((ast_dchild_wdata_t*)node, stack);
+  case ANS_UNARYEXPR:
+    return eval_unaexpr((ast_schild_wdata_t*)node, stack);
   case ANS_IDREF:
     return eval_idref_expr((ast_leaf_wdata_t*)node, stack);
   case ANS_INTVAL: case ANS_FLOATVAL: case ANS_BOOLVAL: case ANS_STR:

@@ -27,7 +27,7 @@ ast_node_base_t *glob_ast = NULL;
 %token TK_ESYM_AMP TK_ESYM_PIPE TK_ESYM_AMPAMP TK_ESYM_PIPEPIPE
 %token TK_ESYM_CARET TK_ESYM_SLASH TK_ESYM_PERCENT TK_ESYM_LPAREN
 %token TK_ESYM_RPAREN TK_ESYM_LBRACE TK_ESYM_RBRACE TK_ESYM_LT
-%token TK_ESYM_GT TK_ESYM_NOT TK_ESYM_NEQ TK_ESYM_LEQ TK_ESYM_GEQ
+%token TK_ESYM_GT TK_ESYM_NEQ TK_ESYM_LEQ TK_ESYM_GEQ
 
 %%
 
@@ -168,21 +168,16 @@ mul_expr:
   ;
 
 unary_expr:
-  atom_expr
-  // { $$.ast = node2(ANS_UNARYEXPR, $1.ast, $2.ast); }
-  { $$.ast = $1.ast; }
-  ;
-/*
-unary_op_chain:
-  unary_op_chain unary_op
+  unary_op unary_expr 
   {
     jjvalue_t t;
-    t.ivalue = $2.token.token_kind;
-    ast_node_base_t *tnode = node1_wdata(ANS_UNARYOP, t, $1.ast);
-    ast_list_append($$.ast, tnode);
+    t.ivalue = $1.token.token_kind;
+    $$.ast = node1_wdata(ANS_UNARYEXPR, t, $2.ast); 
   }
-  | { $$.ast = node_list(ANS_UNARYOPS); };
-*/
+  |
+  atom_expr 
+  { $$.ast = $1.ast; }
+  ;
 
 bin_logicop: TK_ESYM_AMPAMP { $$ = $1; }
              | TK_ESYM_PIPEPIPE { $$ = $1; }
@@ -204,13 +199,11 @@ bin_mulop: TK_ESYM_ASTER { $$ = $1; }
 bin_addop: TK_ESYM_PLUS { $$ = $1; }
            | TK_ESYM_MINUS { $$ = $1; }
            ;
-/*
+
 unary_op: TK_ESYM_PLUS { $$ = $1; }
           | TK_ESYM_MINUS { $$ = $1; }
-          | TK_ESYM_NOT { $$ = $1; }
           | TK_ESYM_CARET { $$ = $1; }
           ;
-*/
 
 atom_expr: int_expr { $$ = $1; }
            | float_expr { $$ = $1; }

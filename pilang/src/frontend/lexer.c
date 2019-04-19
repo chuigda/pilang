@@ -272,7 +272,9 @@ static int lex_common_sym(void) {
       yylval.token.token_kind = TK_ESYM_NEQ;
     }
     else {
-      yylval.token.token_kind = TK_ESYM_NOT;
+      lex_warn("! does not values anything, replace that with -\n",
+               currow(), curcol());
+      yylval.token.token_kind = TK_ESYM_MINUS;
     }
     break;
   }
