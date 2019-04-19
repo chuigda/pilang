@@ -2,9 +2,9 @@ function draw takes returns begin
   glclear[glconst['colorbufferbit']];
   glbegin[glconst['polygon']];
   glcolor[1.0; 0.0; 0.0];
-  glvertex[0.0 - 0.5; 0.0 - 0.5];
+  glvertex[-0.5; -0.5];
   glcolor[0.0; 1.0; 0.0];
-  glvertex[0.5; 0.0 - 0.5];
+  glvertex[0.5; -0.5];
   glcolor[0.0; 0.0; 1.0];
   glvertex[0.0; 0.5];
   glend[];
