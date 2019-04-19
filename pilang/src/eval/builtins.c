@@ -116,13 +116,14 @@ static plvalue_t builtin_copy_to_heap(list_t args) {
 
 static plvalue_t builtin_dynload(list_t args);
 static plvalue_t builtin_dynmod(list_t args);
+static plvalue_t builtin_limits(list_t args);
 
 static bool builtin_funcs_init = false;
 static strhdl_t builtin_func_names[PLI_FFI_FUNC_SLOT_SIZE];
 static builtin_func_t builtin_funcs[PLI_FFI_FUNC_SLOT_SIZE] = {
   builtin_print, builtin_readint, builtin_readfloat, builtin_readstr,
   builtin_copy_to_heap, NULL, NULL, NULL, NULL, NULL, NULL,
-  builtin_dynload, builtin_dynmod
+  builtin_dynload, builtin_dynmod, builtin_limits
 };
 
 static size_t func_slot_usage;
@@ -264,10 +265,26 @@ static plvalue_t builtin_dynmod(list_t args) {
   return ret;
 }
 
+static plvalue_t builtin_limits(list_t args) {
+  (void)args;
+  
+  eprintf0("limits of pilang environment: \n");
+  eprintf("  interpreter version: %d.%d.%d\n",
+          VER_PLI_MAJOR, VER_PLI_MINOR, VER_PLI_REVISE);
+  eprintf("  stack size: %d\n", PLI_STACK_SIZE);
+  eprintf("  max recursion depth: %d\n", PLI_STACKFRAME_COUNT);
+  eprintf("  max ffi functions: %d\n", PLI_FFI_FUNC_SLOT_SIZE - 128);
+  eprintf("  build time: %s %s\n", __DATE__, __TIME__);
+  
+  plvalue_t ret = create_temp();
+  ret.type = JT_UNDEFINED;
+  return ret;
+}
+
 static void maybe_init_builtin_funcs() {
   if (!builtin_funcs_init) {
     builtin_funcs_init = true;
-    func_slot_usage = 13;
+    func_slot_usage = 14;
     func_slot_size = PLI_FFI_FUNC_SLOT_SIZE;
     builtin_func_names[0] = create_string("print");
     builtin_func_names[1] = create_string("readint");
@@ -282,6 +299,7 @@ static void maybe_init_builtin_funcs() {
     builtin_func_names[10] = create_string("at");
     builtin_func_names[11] = create_string("dynload");
     builtin_func_names[12] = create_string("dynmod");
+    builtin_func_names[13] = create_string("limits");
   }
 }
 
