@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -Wno-unused-function -g
+CFLAGS = -fPIC -Wall -Wextra -Wno-unused-function -g
 
 all: docs bins scripts libs stdlib tests
 
@@ -43,7 +43,7 @@ libmstr.so: mutstr.o libpilang.so libsup.so
 	$(CC) mutstr.o -L. -lpilang -lsup -shared -o libmstr.so
 
 mutstr.o: stdlib/mutstr.c
-	$(CC) stdlib/mutstr.c -I include -I ./ -c -fPIC -o mutstr.o \
+	$(CC) stdlib/mutstr.c -I include -I ./ -c -o mutstr.o \
               $(CFLAGS)
 
 libffiex2.so: ffiex2.o libpilang.so libsup.so
@@ -96,11 +96,11 @@ test_stack.o: test/test_stack.c
 	$(CC) -c -I include test/test_stack.c -o test_stack.o $(CFLAGS)
 
 ffiex2.o: sample/ffiex2.c
-	$(CC) -c -I include -I ./ sample/ffiex2.c -fPIC -o ffiex2.o \
+	$(CC) -c -I include -I ./ sample/ffiex2.c -o ffiex2.o \
               $(CFLAGS)
 
 ffiex.o: sample/ffiex.c
-	$(CC) -c -I include -I ./ sample/ffiex.c -fPIC -o ffiex.o \
+	$(CC) -c -I include -I ./ sample/ffiex.c -o ffiex.o \
               $(CFLAGS)
 
 plast.o: src/driver/plast.c y.tab.h
@@ -119,21 +119,22 @@ dynload.o: src/support/dynload_posix.c y.tab.h
         -o dynload.o $(CFLAGS)
 
 builtins.o: src/eval/builtins.c y.tab.h
-	$(CC) -c -I include -I ./ src/eval/builtins.c -o builtins.o \
-        $(CFLAGS)
+	$(CC) -c -I include -I ./ src/eval/builtins.c \
+        -o builtins.o $(CFLAGS)
 
 value.o: src/eval/value.c y.tab.h
-	$(CC) -c -I include -I ./ src/eval/value.c -fPIC \
+	$(CC) -c -I include -I ./ src/eval/value.c \
         -o value.o $(CFLAGS)
 
 eval.o: src/eval/eval.c y.tab.h
-	$(CC) -c -I include -I ./ src/eval/eval.c -o eval.o $(CFLAGS)
+	$(CC) -c -I include -I ./ src/eval/eval.c \
+        -o eval.o $(CFLAGS)
 
 stack.o: src/eval/stack.c
-	$(CC) -c -I include src/eval/stack.c -fPIC -o stack.o $(CFLAGS)
+	$(CC) -c -I include src/eval/stack.c -o stack.o $(CFLAGS)
 
 plheap.o: src/eval/heap.c
-	$(CC) -c -I include src/eval/heap.c -fPIC -o plheap.o $(CFLAGS)
+	$(CC) -c -I include src/eval/heap.c -o plheap.o $(CFLAGS)
 
 tree_dump.o: src/ast/tree_dump.c y.tab.h
 	$(CC) -c -I include -I ./ src/ast/tree_dump.c \
@@ -143,11 +144,11 @@ ast.o : src/ast/ast.c
 	$(CC) -c -I include src/ast/ast.c -o ast.o $(CFLAGS)
 
 clist.o : src/support/clist.c
-	$(CC) -c -I include src/support/clist.c -fPIC \
+	$(CC) -c -I include src/support/clist.c \
               -o clist.o $(CFLAGS)
 
 mstring.o : src/support/mstring.c
-	$(CC) -c -I include src/support/mstring.c -fPIC \
+	$(CC) -c -I include src/support/mstring.c \
               -o mstring.o $(CFLAGS)
 
 parser.o : y.tab.c
