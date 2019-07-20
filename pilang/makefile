@@ -1,4 +1,4 @@
-CFLAGS = -fPIC -Wall -Wextra -Wno-unused-function -g
+CFLAGS = -fPIC -Wall -Wextra -Wno-unused-function -std=c99 -g
 
 all: docs bins scripts libs stdlib tests
 
@@ -20,7 +20,7 @@ plrepl: plrepl.script.in
 pli: pli.script.in
 	cp pli.script.in pli
 	chmod 755 pli
-	
+
 plast: plast.script.in
 	cp plast.script.in plast
 	chmod 755 plast
@@ -160,6 +160,8 @@ lexer.o : src/frontend/lexer.c y.tab.h
 
 y.tab.c y.tab.h : src/frontend/parser.y
 	yacc -d -v src/frontend/parser.y
+	if [ -f parser.tab.h ]; then mv parser.tab.h y.tab.h; fi
+	if [ -f parser.tab.c ]; then mv parser.tab.c y.tab.c; fi
 
 clean:
 	rm -rf y.tab.*

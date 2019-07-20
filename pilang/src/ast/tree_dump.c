@@ -125,8 +125,10 @@ static void
 tree_dump_impl(ast_node_base_t *node, uint16_t parent_id,
                int nth_child, strhdl_t extra_info,
                tree_node_printer tnp, tree_link_printer tlp) {
+#ifdef _Static_assert
   _Static_assert(ANS_COMMENCE_ == 0, "Incorrect ANS order!");
   _Static_assert(ANK_COMMENCE_ == 0, "Incorrect ANK order!");
+#endif
 
   tlp(parent_id, nth_child, node, extra_info);
   tnp(node);
