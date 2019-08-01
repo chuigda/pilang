@@ -5,25 +5,13 @@
 #include "value.h"
 #include "builtins.h"
 
-void init_host_env(ast_list_t *functions, stack_t *stack);
+void init_host_env(ast_list_t *functions);
 void eval_ast(ast_node_base_t *program);
 plvalue_t udfunction_call(strhdl_t name, list_t args, stack_t *stack);
 
 typedef struct {
-  // heap
   heap_t *heap;
-  
-  // stack
-  stack_t *stack;
-  
-  // string operations
-  strhdl_t (*create_string_fn)(const char*);
-  const char* (*get_string_fn)(strhdl_t);
-  
-  // program or function list
   ast_list_t *program;
-  
-  // in early return
   bool in_return;
 } host_env_t;
 

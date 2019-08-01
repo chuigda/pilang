@@ -492,6 +492,9 @@ void eval_func_body(ast_list_t *body, stack_t *stack) {
 }
 
 static ast_tchild_wdata_t* lookup_function(strhdl_t name) {
+  if (get_host_env().program == NULL) {
+    return NULL;
+  }
   list_t funcs = get_host_env().program->list;
   for (iter_t it = list_begin(&funcs);
        !iter_eq(it, list_end(&funcs));
@@ -552,11 +555,8 @@ plvalue_t udfunction_call(strhdl_t name, list_t args, stack_t *stack) {
   return ret;
 }
 
-void init_host_env(ast_list_t *program, stack_t *stack) {
-  host_env.create_string_fn = &create_string;
-  host_env.get_string_fn = &get_string;
+void init_host_env(ast_list_t *program) {
   host_env.heap = get_glob_heap();
-  host_env.stack = stack;
   host_env.program = program;
   host_env.in_return = false;
 }
@@ -569,7 +569,7 @@ void eval_ast(ast_node_base_t *program) {
   strhdl_t main_str = create_string("main");
   ast_list_t *functions = (ast_list_t*)program;
 
-  init_host_env(functions, &stack);
+  init_host_env(functions);
 
   list_t args;
   create_list(&args, malloc, free);
