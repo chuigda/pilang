@@ -555,31 +555,37 @@ plvalue_t udfunction_call(strhdl_t name, list_t args, stack_t *stack) {
   return ret;
 }
 
-void init_host_env(ast_list_t *program) {
-  host_env.heap = get_glob_heap();
-  host_env.program = program;
-  host_env.in_return = false;
-}
-
 void eval_ast(ast_node_base_t *program) {
-  stack_t stack;
-  init_stack(&stack);
   init_heap();
+  ast_list_t *functions = (ast_list_t*)program;
+  init_host_env(functions);
+  
+  stack_t *stack = NEW(stack_t);
+  init_stack(stack);
+  host_reg_stack(stack);
   
   strhdl_t main_str = create_string("main");
-  ast_list_t *functions = (ast_list_t*)program;
-
-  init_host_env(functions);
 
   list_t args;
   create_list(&args, malloc, free);
-  
-  udfunction_call(main_str, args, &stack);
-
+  udfunction_call(main_str, args, stack);
   destroy_list(&args);
   
+  // TODO extract method
   close_heap();
-  close_stack(&stack);
+  // TODO close all stacks in host_env instead
+  close_stack(stack);
+}
+
+void init_host_env(ast_list_t *program) {
+  host_env.heap = get_glob_heap();
+  host_env.program = program;
+  create_list(&(host_env.stacks), malloc, free);
+  host_env.in_return = false;
+}
+
+void host_reg_stack(stack_t *stack) {
+  list_push_back(&(host_env.stacks), (void*)stack);
 }
 
 host_env_t get_host_env() {

@@ -38,7 +38,9 @@ void close_stack(stack_t *stack) {
 static stkobj_t *stack_allocate(stack_t *stack, strhdl_t name) {
   if (stack->stack_usage == stack->stack_size) {
     eprintf("pilang pivm: stack overflow, "
-            "with DFL_STACK_SIZE = %d\n", PLI_STACK_SIZE);
+            "with PLI_STACK_SIZE = %d\n", PLI_STACK_SIZE);
+    eprintf0("note: recompile with a larger PLI_STACK_SIZE "
+             "may solve this problem");
     abort();
   }
 

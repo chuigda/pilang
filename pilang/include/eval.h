@@ -11,11 +11,13 @@ plvalue_t udfunction_call(strhdl_t name, list_t args, stack_t *stack);
 
 typedef struct {
   heap_t *heap;
+  list_t stacks;
   ast_list_t *program;
   bool in_return;
 } host_env_t;
 
 host_env_t get_host_env();
+void host_reg_stack(stack_t *stack);
 
 #if defined(TEST) || defined (EVAL_C)
 

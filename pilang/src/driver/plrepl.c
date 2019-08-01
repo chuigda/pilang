@@ -33,18 +33,17 @@ int main() {
           VER_PLI_MAJOR, VER_PLI_MINOR, VER_PLI_REVISE);
   fputc('\n', stderr);
 
-  init_heap();
-
-  stack_t stack;
-  init_stack(&stack);
-  stack_enter_frame(&stack);
-
   fp_lex_in = stdin;
   eprintf0("note: for each time you finish input,"
            " type two .. characters and then return\n");
   eprintf0("empty input with .. or EOF to exit\n");
   while (1) {
+    init_heap();
     init_host_env(NULL);
+    stack_t *stack = NEW(stack_t);
+    init_stack(stack);
+    host_reg_stack(stack);  
+    stack_enter_frame(stack);
     eprintf0("(prelude) Ques: ");
 
     glob_ast = NULL;
@@ -64,7 +63,7 @@ int main() {
       break;
     }
 
-    plvalue_t result = eval_expr(glob_ast, &stack);
+    plvalue_t result = eval_expr(glob_ast, stack);
     jjvalue_t *storage = fetch_storage(&result);
 
     eprintf0("  Ans: ");
@@ -100,9 +99,10 @@ int main() {
     putchar('\n');
 
     destroy_ast(glob_ast);
+    
+    stack_exit_frame(stack);
+    close_stack(stack);
+    close_heap();
+    free(stack);
   }
-
-  stack_exit_frame(&stack);
-  close_stack(&stack);
-  close_heap();
 }

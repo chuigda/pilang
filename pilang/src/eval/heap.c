@@ -90,14 +90,11 @@ static void expand_heap(void) {
 }
 
 static heapobj_t *plalloc(void) {
-  // TODO this is incorrect, rewrite
   if (glob_heap->heap_cap == glob_heap->heap_usage) {
-    // TODO gc should be implemented by stack side code
     // heap_request_gc();
-  }
-
-  if (0.8 * glob_heap->heap_cap < glob_heap->heap_usage) {
-    expand_heap();
+    if (0.8 * glob_heap->heap_cap < glob_heap->heap_usage) {
+      expand_heap();
+    }
   }
 
   for (size_t i = 0; i < glob_heap->heap_cap; i++) {
