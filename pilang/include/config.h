@@ -22,6 +22,10 @@
 #define VER_PLI_MINOR 6
 #define VER_PLI_REVISE 1
 
+#define VER_REPL_MAJOR 0
+#define VER_REPL_MINOR 2
+#define VER_REPL_REVISE 0
+
 /* PiLang Intepreter configurations */
 #define PLI_HEAP_INIT_SIZE     114514
 #define PLI_STACK_SIZE         65536

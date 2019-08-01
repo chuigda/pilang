@@ -31,19 +31,23 @@ int main() {
           VER_PLCFRONT_MAJOR, VER_PLCFRONT_MINOR, VER_PLCFRONT_REVISE);
   eprintf("  Interpreter version %d.%d.%d\n",
           VER_PLI_MAJOR, VER_PLI_MINOR, VER_PLI_REVISE);
+  eprintf("  REPL version %d.%d.%d\n",
+          VER_REPL_MAJOR, VER_REPL_MINOR, VER_REPL_REVISE);
   fputc('\n', stderr);
 
   fp_lex_in = stdin;
   eprintf0("note: for each time you finish input,"
            " type two .. characters and then return\n");
   eprintf0("empty input with .. or EOF to exit\n");
+  
+  init_heap();
+  init_host_env(NULL);
+  stack_t *stack = NEW(stack_t);
+  init_stack(stack);
+  host_reg_stack(stack);  
+  stack_enter_frame(stack);
+  
   while (1) {
-    init_heap();
-    init_host_env(NULL);
-    stack_t *stack = NEW(stack_t);
-    init_stack(stack);
-    host_reg_stack(stack);  
-    stack_enter_frame(stack);
     eprintf0("(prelude) Ques: ");
 
     glob_ast = NULL;
@@ -99,10 +103,10 @@ int main() {
     putchar('\n');
 
     destroy_ast(glob_ast);
-    
-    stack_exit_frame(stack);
-    close_stack(stack);
-    close_heap();
-    free(stack);
   }
+  
+  stack_exit_frame(stack);
+  close_stack(stack);
+  close_heap();
+  free(stack);
 }
