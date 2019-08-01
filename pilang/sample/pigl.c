@@ -138,7 +138,9 @@ static strhdl_t glut_display_func_name;
 static void display_intern(void) {
   list_t args;
   create_list(&args, malloc, free);
-  udfunction_call(glut_display_func_name, args, get_host_env().stack);
+  list_t stacks = get_host_env().stacks;
+  udfunction_call(glut_display_func_name, args,
+		  (stack_t*)iter_deref(list_begin(&stacks)));
   destroy_list(&args);
 }
 
