@@ -310,21 +310,27 @@ plvalue_t eval_binexpr(ast_dchild_wdata_t *node, stack_t *stack) {
   }
 }
 
+static list_t evaluate_args(list_t args, stack_t *stack) {
+  list_t ret;
+  create_list(&ret, malloc, free);
+  
+  for (iter_t it = list_begin(&args);
+       !iter_eq(it, list_end(&args));
+       it = iter_next(it)) {
+    plvalue_t *evaluated_arg = NEW(plvalue_t);
+    *evaluated_arg =
+      eval_expr((ast_node_base_t*)iter_deref(it), stack);
+    list_push_back(&ret, evaluated_arg);
+  }
+  
+  return ret;
+}
+
 plvalue_t eval_func_call(ast_dchild_t *func, stack_t *stack) {
   ast_leaf_wdata_t *idref = (ast_leaf_wdata_t*)(func->children[0]);
   ast_list_t *args = (ast_list_t*)(func->children[1]);
 
-  list_t evaluated_args;
-  create_list(&evaluated_args, malloc, free);
-
-  for (iter_t it = list_begin(&(args->list));
-       !iter_eq(it, list_end(&(args->list)));
-       it = iter_next(it)) {
-    plvalue_t *evaluated_arg = NEW(plvalue_t);
-    *evaluated_arg =
-      eval_expr((ast_node_base_t*)(iter_deref(it)), stack);
-    list_push_back(&evaluated_args, evaluated_arg);
-  }
+  list_t evaluated_args = evaluate_args(args->list, stack);
 
   plvalue_t ret;
   if (is_builtin_call(idref->value.svalue)) {
@@ -485,56 +491,64 @@ void eval_func_body(ast_list_t *body, stack_t *stack) {
   host_env.in_return = false;
 }
 
-static plvalue_t callfunc(ast_tchild_wdata_t *func, list_t args, 
-                          stack_t *stack) {
-  stack_enter_frame(stack);
-  ast_list_t *param_list_node = (ast_list_t*)func->children[0];
-  list_t param_list = param_list_node->list;
-  for (iter_t it1 = list_begin(&param_list),
-              it2 = list_begin(&args);
-       !iter_eq(it1, list_end(&param_list))
-       && !iter_eq(it2, list_end(&args));
-       it1 = iter_next(it1), it2 = iter_next(it2)) {
-    ast_leaf_wdata_t *param_idref_node =
-      (ast_leaf_wdata_t*)iter_deref(it1);
-    assign(eval_idref_expr(param_idref_node, stack),
-           *(plvalue_t*)iter_deref(it2));
-  }
-
-  ast_schild_t *funcbody = (ast_schild_t*)(func->children[2]);
-  
-  eval_func_body((ast_list_t*)(funcbody->child), stack);
-  
-  if (func->children[1]) {
-    ast_leaf_wdata_t *retloc = (ast_leaf_wdata_t*)(func->children[1]);
-    plvalue_t stackv = eval_idref_expr(retloc, stack);
-    plvalue_t retv = create_temp();
-    retv.type = stackv.type;
-    retv.value = *fetch_storage(&stackv);
-
-    stack_exit_frame(stack);
-    return retv;
-  }
-  else {
-    plvalue_t retv = create_temp();
-    retv.type = JT_UNDEFINED;
-    return retv;
-  }
-}
-
-plvalue_t udfunction_call(strhdl_t name, list_t args, stack_t *stack) {
-  for (iter_t it = list_begin(&(get_host_env().program->list));
-       !iter_eq(it, list_end(&(get_host_env().program->list)));
+static ast_tchild_wdata_t* lookup_function(strhdl_t name) {
+  list_t funcs = get_host_env().program->list;
+  for (iter_t it = list_begin(&funcs);
+       !iter_eq(it, list_end(&funcs));
        it = iter_next(it)) {
     ast_tchild_wdata_t *func = (ast_tchild_wdata_t*)iter_deref(it);
     if (func->value.svalue == name) {
-      return callfunc(func, args, stack);
+      return func;
     }
   }
-  
-  eprintf("e: function %s not found\n", get_string(name));
+  return NULL;
+}
+
+static void bind_params(ast_tchild_wdata_t *func, list_t args,
+                        stack_t *stack) {
+  list_t params = ((ast_list_t*)func->children[0])->list;
+  for (iter_t it1 = list_begin(&params), it2 = list_begin(&args);
+       !iter_eq(it1, list_end(&params))
+       && !iter_eq(it2, list_end(&args));
+       it1 = iter_next(it1), it2 = iter_next(it2)) {
+    ast_leaf_wdata_t *param_id_node = (ast_leaf_wdata_t*)iter_deref(it1);
+    assign(eval_idref_expr(param_id_node, stack),
+           *(plvalue_t*)iter_deref(it2));
+  }
+}
+
+static plvalue_t get_return_value(ast_tchild_wdata_t *func,
+                                  stack_t *stack) {
   plvalue_t ret = create_temp();
-  ret.type = JT_UNDEFINED;
+  if (func->children[1]) {
+    ast_leaf_wdata_t *retloc = (ast_leaf_wdata_t*)(func->children[1]);
+    plvalue_t stackv = eval_idref_expr(retloc, stack);
+    ret.type = stackv.type;
+    ret.value = *fetch_storage(&stackv);
+  }
+  else {
+    ret.type = JT_UNDEFINED;
+  }
+  return ret;
+}
+
+plvalue_t udfunction_call(strhdl_t name, list_t args, stack_t *stack) {
+  ast_tchild_wdata_t *func = lookup_function(name);
+  if (func == NULL) {
+    eprintf("e: function %s not found\n", get_string(name));
+    plvalue_t ret = create_temp();
+    ret.type = JT_UNDEFINED;
+    return ret;
+  }
+  
+  stack_enter_frame(stack);
+  bind_params(func, args, stack);
+  
+  ast_schild_t *funcbody = (ast_schild_t*)(func->children[2]);
+  eval_func_body((ast_list_t*)(funcbody->child), stack);
+  
+  plvalue_t ret = get_return_value(func, stack);
+  stack_exit_frame(stack);
   return ret;
 }
 
@@ -553,24 +567,14 @@ void eval_ast(ast_node_base_t *program) {
   init_heap();
   
   strhdl_t main_str = create_string("main");
-  strhdl_t start_str = create_string("start");
   ast_list_t *functions = (ast_list_t*)program;
 
   init_host_env(functions, &stack);
 
   list_t args;
   create_list(&args, malloc, free);
-  for (iter_t it = list_begin(&(functions->list));
-       !iter_eq(it, list_end(&(functions->list)));
-       it = iter_next(it)) {
-    ast_tchild_wdata_t *func =
-      (ast_tchild_wdata_t*)iter_deref(it);
-    if (func->value.svalue == main_str
-        || func->value.svalue == start_str) {
-      callfunc(func, args, &stack);
-      break;
-    }
-  }
+  
+  udfunction_call(main_str, args, &stack);
 
   destroy_list(&args);
   

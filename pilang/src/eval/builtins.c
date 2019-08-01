@@ -209,7 +209,7 @@ static plvalue_t builtin_dynmod(list_t args) {
   }
   
   if (list_size(&args) > 1) {
-    eprintf0("w: dynload requires only one argument\n");
+    eprintf0("w: dynmod requires only one argument\n");
   }
   
   plvalue_t modnamev = *(plvalue_t*)(iter_deref(list_begin(&args)));

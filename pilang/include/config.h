@@ -7,7 +7,7 @@
  * granted.
 */
 #define BAS_LANGUAGE_NAME "PiLang"
-#define BAS_AUTHOR        "ICEY(iceyself@iceyey.tech)"
+#define BAS_AUTHOR        "ICEY(icey@icey.tech)"
 #define BAS_DISCRIPTION   "A programming language for ordinary people"
 #define BAS_LICENSE       "WTFPL v2+"
 
@@ -20,7 +20,7 @@
 
 #define VER_PLI_MAJOR 0
 #define VER_PLI_MINOR 6
-#define VER_PLI_REVISE 0
+#define VER_PLI_REVISE 1
 
 /* PiLang Intepreter configurations */
 #define PLI_HEAP_INIT_SIZE     114514
