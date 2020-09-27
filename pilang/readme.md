@@ -39,8 +39,10 @@ memorize these replacements.
 ### Dynamically typed
 PiLang is dynamically typed. Variable does not have to be declared
 before its first use, and PiLang does not require types to be written
-out explicitly. This may be friendly to freshmen. However, type
-annonations are also possible, and linting tools will come out soon.
+out explicitly. This may be friendly to freshmen. <del>However, type
+annonations are also possible, and linting tools will come out 
+ soon.</del>
+There will never be any type annonations and linting tools.
 
 ## Building from source
 ### Building on linux
