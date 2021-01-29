@@ -1,3 +1,10 @@
+> # ⚠️⚠️⚠️WARNING⚠️⚠️⚠️: OUT OF MAINTAINCE
+> The Pi-Lang project, originally designed for "military race", 
+> have been out of maintaince for a while. In general, Pi-Lang
+> has embedded worst parts of Pascal, Python and JavaScript, and
+> it is extremely not recommended to use it in any product. I'm
+> still glad to provide information about its implementations.
+
 # Pi-Lang introduction
 <br/>
 
